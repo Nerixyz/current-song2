@@ -1,8 +1,11 @@
 mod actors;
+mod config;
 mod image_store;
 mod model;
 mod repositories;
 mod workers;
+
+use config::CONFIG;
 
 use crate::{
     actors::{broadcaster, broadcaster::Broadcaster, manager::Manager},
@@ -15,6 +18,7 @@ use tokio::sync::{watch, RwLock};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    lazy_static::initialize(&CONFIG);
     env_logger::init();
 
     let (event_tx, event_rx) =
@@ -26,9 +30,11 @@ async fn main() -> std::io::Result<()> {
     let image_store = web::Data::new(RwLock::new(ImageStore::new()));
 
     if cfg!(windows) {
-        workers::gsmtc::start_spawning(manager, image_store.clone().into_inner())
-            .await
-            .unwrap();
+        if CONFIG.modules.gsmtc.enabled {
+            workers::gsmtc::start_spawning(manager, image_store.clone().into_inner())
+                .await
+                .unwrap();
+        }
     }
 
     let event_rx = web::Data::new(event_rx);
@@ -39,7 +45,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::scope("api").configure(init_repositories))
             .service(actix_files::Files::new("/", "client/dist").index_file("index.html"))
     })
-    .bind("127.0.0.1:48457")?
+    .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
     .run()
     .await
 }

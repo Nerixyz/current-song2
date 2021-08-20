@@ -1,5 +1,6 @@
 use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
+    config::CONFIG,
     image_store::ImageStore,
     model::{ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
@@ -29,7 +30,12 @@ pub async fn start_spawning(
     let mut rx = SessionManager::new().await?;
     tokio::spawn(async move {
         while let Some(evt) = rx.recv().await {
-            if let ManagerEvent::SessionCreated { rx, .. } = evt {
+            if let ManagerEvent::SessionCreated { rx, source, .. } = evt {
+                if !CONFIG.modules.gsmtc.filter.pass_filter(&source) {
+                    log::debug!("Ignoring {} as it's filtered", source);
+                    continue;
+                }
+
                 if let (Ok(module_id), mut store) = future::join(
                     manager.send(CreateModule { priority: 0 }),
                     image_store.write(),

@@ -55,7 +55,7 @@ impl SessionHandle {
         id: usize,
         sess: GlobalSystemMediaTransportControlsSession,
         sess_tx: mpsc::UnboundedSender<SessionUpdateEvent>,
-    ) -> Result<Self> {
+    ) -> Result<(Self, String)> {
         let (loop_tx, loop_rx) = mpsc::unbounded_channel();
         let loop_tx = Arc::new(loop_tx);
         let playback_token = {
@@ -93,7 +93,7 @@ impl SessionHandle {
                 playback: None,
                 timeline: None,
                 media: None,
-                source,
+                source: source.clone(),
             },
 
             loop_tx: Arc::downgrade(&loop_tx),
@@ -106,10 +106,13 @@ impl SessionHandle {
         }
         .spawn();
 
-        Ok(Self {
-            sender: loop_tx,
-            id,
-        })
+        Ok((
+            Self {
+                sender: loop_tx,
+                id,
+            },
+            source,
+        ))
     }
 }
 

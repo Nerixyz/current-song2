@@ -1,0 +1,15 @@
+[modules.gsmtc]
+# settings for GSMTC
+# default is true
+enabled = true
+
+# optional, by default all sources will be included (mode = "Disabled")
+[modules.gsmtc.filter]
+# one of "Include", "Exclude" and "Disabled"
+mode = "Included"
+# this is case-sensitive
+items = ["Spotify.exe"]
+
+[server]
+# this is the default
+port = 48457

@@ -29,6 +29,7 @@ pub enum ManagerEvent {
     SessionCreated {
         session_id: usize,
         rx: mpsc::UnboundedReceiver<SessionUpdateEvent>,
+        source: String,
     },
     SessionRemoved {
         session_id: usize,
@@ -183,11 +184,15 @@ impl SessionManager {
 
         let (tx, rx) = mpsc::unbounded_channel();
 
-        self.sessions
-            .insert(model_id, SessionHandle::create(id, session, tx)?);
+        let (session, source) = SessionHandle::create(id, session, tx)?;
+        self.sessions.insert(model_id, session);
 
         self.event_tx
-            .send(ManagerEvent::SessionCreated { session_id: id, rx })
+            .send(ManagerEvent::SessionCreated {
+                session_id: id,
+                rx,
+                source,
+            })
             .ok();
 
         log::debug!("Created session id {}", id);
