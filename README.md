@@ -11,7 +11,7 @@ There are a few unique features separating this project:
 * **Near zero latency** ⏱ All modules are created with this in mind.
 * **Displaying Progress** 💯 Progress is displayed where available.
 * **Display Album Art** 🖼
-* **Highly Customizable** 🔧 The overlay is customizable through CSS.
+* **Customizable** 🔧 The overlay is customizable through CSS. Modules and the server can be configured in a `config.toml` file.
 
 # Setup
 
