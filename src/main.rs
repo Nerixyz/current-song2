@@ -31,17 +31,19 @@ async fn main() -> std::io::Result<()> {
 
     if cfg!(windows) {
         if CONFIG.modules.gsmtc.enabled {
-            workers::gsmtc::start_spawning(manager, image_store.clone().into_inner())
+            workers::gsmtc::start_spawning(manager.clone(), image_store.clone().into_inner())
                 .await
                 .unwrap();
         }
     }
 
+    let manager = web::Data::new(manager);
     let event_rx = web::Data::new(event_rx);
     HttpServer::new(move || {
         App::new()
             .app_data(event_rx.clone())
             .app_data(image_store.clone())
+            .app_data(manager.clone())
             .service(web::scope("api").configure(init_repositories))
             .service(actix_files::Files::new("/", "client/dist").index_file("index.html"))
     })
