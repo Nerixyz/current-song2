@@ -6,7 +6,7 @@ enabled = true
 # optional, by default all sources will be included (mode = "Disabled")
 [modules.gsmtc.filter]
 # one of "Include", "Exclude" and "Disabled"
-mode = "Included"
+mode = "Include"
 # this is case-sensitive
 items = ["Spotify.exe"]
 
