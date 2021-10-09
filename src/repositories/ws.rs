@@ -1,4 +1,5 @@
-use crate::actors::{broadcaster, ws::WsSession};
+use crate::actors::{broadcaster, browser::BrowserSession, manager::Manager, ws::WsSession};
+use actix::Addr;
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 use actix_web_actors::ws;
 use tokio::sync::watch;
@@ -12,6 +13,15 @@ async fn client(
     ws::start(WsSession::new(events.get_ref().clone()), &req, stream)
 }
 
+#[get("/extension")]
+async fn extension(
+    req: HttpRequest,
+    stream: web::Payload,
+    manager: web::Data<Addr<Manager>>,
+) -> Result<HttpResponse> {
+    ws::start(BrowserSession::new(manager.into_inner()), &req, stream)
+}
+
 pub fn init_ws(config: &mut web::ServiceConfig) {
-    config.service(client);
+    config.service(client).service(extension);
 }
