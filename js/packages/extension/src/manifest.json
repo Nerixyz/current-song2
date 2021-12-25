@@ -1,0 +1,35 @@
+{
+  "manifest_version": 2,
+  "name": "CurrentSong",
+  "version": "0.6.0",
+
+  "description": "Implements a client to send the current active tab to a local server",
+
+  "background": {
+    "scripts": ["background/index.ts"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content-scripts/youtube.ts"],
+      "all_frames": true
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-scripts/mediaSessionProxy.ts"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "options_ui": {
+    "page": "options-page/index.html"
+  },
+  "web_accessible_resources": ["content-scripts/mediaSessionProxy.inject.ts"],
+  "permissions": ["tabs", "storage", "*://localhost/*"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{02914143-ede8-492c-8ad4-8a3af03f75bb}",
+      "strict_min_version": "78.0"
+    }
+  }
+}

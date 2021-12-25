@@ -1,6 +1,5 @@
-import { PlayInfo } from './types';
-import { formatLocalUrl } from './url';
-import { State } from './state';
+import { formatLocalUrl } from '../../shared/url';
+import { PlayInfo } from '../../shared/types';
 
 export function getImageUrl(info: PlayInfo): string | undefined {
   if (!info.image) return undefined;

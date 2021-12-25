@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`splitTitle should work 1`] = `
+Array [
+  Object {
+    "artist": "Forsen ",
+    "title": " My Cool Video",
+  },
+  Object {
+    "title": "Without Dash",
+  },
+  Object {
+    "artist": "Obama",
+    "title": "AlienDancing",
+  },
+  Object {
+    "artist": "LULE ",
+    "title": " AlienGathering (forsen remix)",
+  },
+  Object {
+    "artist": "Oops ",
+    "title": " My chair broke [xd] (feat. alien)",
+  },
+  Object {
+    "artist": "Here ",
+    "title": " Are   Multiple   Dashes",
+  },
+]
+`;

@@ -20,9 +20,3 @@ export interface TimelineInfo {
   progressMs: number;
   rate: number;
 }
-
-export interface EventMap {
-  Playing: PlayInfo;
-  Paused: undefined | null;
-  Ping: undefined;
-}
