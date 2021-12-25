@@ -1,7 +1,7 @@
 [package]
 name = "current-song-2"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [workspace]
 members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings"]
@@ -9,14 +9,15 @@ members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.10", features = ["sync"] }
-tokio-stream = { version = "0.1.7", features = ["sync"] }
+tokio = { version = "1.15", features = ["sync"] }
+tokio-stream = { version = "0.1.8", features = ["sync"] }
 futures = "0.3"
 
 actix = "0.12.0"
-actix-web = { version = "4.0.0-beta.8", features = ["compress-brotli"] }
-actix-files = "0.6.0-beta.6"
-actix-web-actors = "4.0.0-beta.6"
+actix-web = { version = "4.0.0-beta.15", features = ["compress-brotli"] }
+actix-files = "0.6.0-beta.10"
+actix-web-actors = "4.0.0-beta.8"
+actix-cors = "0.6.0-beta.7"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
