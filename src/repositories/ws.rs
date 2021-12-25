@@ -10,6 +10,7 @@ async fn client(
     stream: web::Payload,
     events: web::Data<watch::Receiver<broadcaster::Event>>,
 ) -> Result<HttpResponse> {
+    log::debug!("Client connected");
     ws::start(WsSession::new(events.get_ref().clone()), &req, stream)
 }
 
@@ -19,6 +20,7 @@ async fn extension(
     stream: web::Payload,
     manager: web::Data<Addr<Manager>>,
 ) -> Result<HttpResponse> {
+    log::debug!("Extension connected");
     ws::start(BrowserSession::new(manager.into_inner()), &req, stream)
 }
 
