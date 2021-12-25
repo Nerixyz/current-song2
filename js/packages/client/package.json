@@ -1,0 +1,16 @@
+{
+  "name": "client",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "build": "rimraf dist && parcel build src/index.html",
+    "test": "echo 0"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0",
+    "typescript": "^4.3.5",
+    "tslib": "^2.3.1",
+    "rimraf": "^3.0.2"
+  }
+}

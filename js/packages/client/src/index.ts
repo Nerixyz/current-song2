@@ -1,9 +1,11 @@
 import { getElements } from './dom/utils';
-import { ReconnectingWebsocket } from './reconnecting-websocket';
 import { createProgress } from './progress';
 import { smolTree } from './dom/smol-tree';
 import { hasImage, hasSubtitle, hasTimeline, isSpotify, makeState, not, State } from './state';
 import { animateOnChange, TextChangeAnimation } from './dom/animation';
+import { ReconnectingWebsocket } from '../../shared/reconnecting-websocket';
+import { EventMap } from './types';
+import { formatLocalUrl } from '../../shared/url';
 
 (async function main() {
   const [container, imageContainer, imageEl, titleEl, subtitleEl, progressEl] = getElements<
@@ -26,7 +28,9 @@ import { animateOnChange, TextChangeAnimation } from './dom/animation';
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
 
-  const ws = new ReconnectingWebsocket();
+  const ws = new ReconnectingWebsocket<EventMap, { Pong: undefined }>(
+    formatLocalUrl('/api/ws/client', 'ws'),
+  );
   ws.addEventListener('Playing', ({ data }) => {
     container.classList.remove('vanish');
     const state = makeState(data);

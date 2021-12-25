@@ -1,16 +1,18 @@
-import { EventMap } from './types';
-import { formatLocalUrl } from './url';
+export type MinEventMap = { [x: string]: unknown } & { Ping: undefined };
+export type MinSendMap = { [x: string]: unknown } & { Pong: undefined };
 
-export class WsMessageEvent<K extends keyof EventMap> extends Event {
-  constructor(public messageType: K, public data: EventMap[K]) {
-    super(messageType);
+export class WsMessageEvent<M extends { [x: string]: unknown }, K extends keyof M> extends Event {
+  public messageType: K;
+  constructor(messageType: K, public data: M[K]) {
+    super(messageType as any);
+    this.messageType = messageType;
   }
 }
 
-export interface ReconnectingWebsocket extends EventTarget {
+export interface ReconnectingWebsocket<EventMap extends MinEventMap, SendMap extends MinSendMap> extends EventTarget {
   addEventListener<K extends keyof EventMap>(
     type: K,
-    listener: (this: WebSocket, ev: WsMessageEvent<K>) => any,
+    listener: (this: WebSocket, ev: WsMessageEvent<EventMap, K>) => any,
     options?: boolean | AddEventListenerOptions,
   ): void;
   addEventListener(
@@ -20,7 +22,7 @@ export interface ReconnectingWebsocket extends EventTarget {
   ): void;
   removeEventListener<K extends keyof EventMap>(
     type: K,
-    listener: (this: WebSocket, ev: WsMessageEvent<K>) => any,
+    listener: (this: WebSocket, ev: WsMessageEvent<EventMap, K>) => any,
     options?: boolean | EventListenerOptions,
   ): void;
   removeEventListener(
@@ -30,14 +32,21 @@ export interface ReconnectingWebsocket extends EventTarget {
   ): void;
 }
 
-export class ReconnectingWebsocket extends EventTarget {
+export class ReconnectingWebsocket<EventMap extends MinEventMap, SendMap extends MinSendMap> extends EventTarget {
   private ws?: WebSocket;
   private nextDelay = 1;
+  private shouldClose = false;
+
+  constructor(private url: string | URL) {
+    super();
+  }
 
   public connect(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
-      const ws = new WebSocket(createWebsocketUrl());
+      const ws = new WebSocket(this.url);
       this.ws = ws;
+      this.shouldClose = false;
+      console.info(`Connecting to ${this.ws.url}`);
 
       // functions to make the first connection a promise
       const clearListeners = () => {
@@ -48,9 +57,14 @@ export class ReconnectingWebsocket extends EventTarget {
       const openListener = () => {
         resolve();
         clearListeners();
+        console.info(`Connected to ${this.ws?.url ?? '<?>'}`);
       };
-      const errorListener = (e: Event) => {
-        reject(e);
+      const errorListener = (e: Event | ErrorEvent) => {
+        reject(
+          (e as ErrorEvent).message
+            ? (e as ErrorEvent).message
+            : `Connection closed readyState: ${(e.target as WebSocket).readyState}`,
+        );
         clearListeners();
       };
 
@@ -60,7 +74,7 @@ export class ReconnectingWebsocket extends EventTarget {
 
       const closeListener = () => {
         ws.removeEventListener('message', messageListener);
-        this.reconnectLater();
+        if (!this.shouldClose) this.reconnectLater();
       };
       const messageListener = (e: MessageEvent) => {
         if (typeof e.data === 'string') {
@@ -86,11 +100,22 @@ export class ReconnectingWebsocket extends EventTarget {
     });
   }
 
+  public trySend<K extends keyof SendMap>(type: K, data: SendMap[K]) {
+    this.ws?.send(JSON.stringify({ type, data }));
+  }
+
+  public close() {
+    this.shouldClose = true;
+    this.ws?.close();
+    this.ws = undefined;
+  }
+
   private reconnectLater() {
     console.info(`Reconnecting in ${this.nextDelay}s`);
     setTimeout(() => {
-      this.nextDelay = Math.min(this.nextDelay * 2 + 5, 120);
-      this.connect().then(() => (this.nextDelay = 1));
+      this.nextDelay = Math.min(this.nextDelay * 2 + 3, 120);
+
+      if (!this.shouldClose) this.connect().then(() => (this.nextDelay = 1));
     }, this.nextDelay * 1000);
   }
 
@@ -98,11 +123,7 @@ export class ReconnectingWebsocket extends EventTarget {
     this.dispatchEvent(new WsMessageEvent(type, content));
 
     if (type === 'Ping') {
-      this.ws?.send(JSON.stringify({ type: 'Pong' }));
+      this.trySend('Pong', undefined);
     }
   }
-}
-
-function createWebsocketUrl() {
-  return formatLocalUrl('/api/ws/client', 'ws');
 }

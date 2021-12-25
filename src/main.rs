@@ -14,6 +14,7 @@ use crate::{
 };
 use actix::Actor;
 use actix_web::{web, App, HttpServer};
+use actix_web::middleware::Logger;
 use tokio::sync::{watch, RwLock};
 
 #[actix_web::main]
@@ -44,8 +45,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(event_rx.clone())
             .app_data(image_store.clone())
             .app_data(manager.clone())
+            .wrap(Logger::default())
             .service(web::scope("api").configure(init_repositories))
-            .service(actix_files::Files::new("/", "client/dist").index_file("index.html"))
+            .service(actix_files::Files::new("/", "js/packages/client/dist").index_file("index.html"))
     })
     .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
     .run()

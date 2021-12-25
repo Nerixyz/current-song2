@@ -1,0 +1,35 @@
+{
+  "name": "extension",
+  "version": "0.6.0",
+  "private": true,
+  "targets": {
+    "dev": {
+      "sourceMap": {
+        "inline": true,
+        "inlineSources": true
+      }
+    },
+    "prod": {
+      "sourceMap": false
+    }
+  },
+  "scripts": {
+    "start": "parcel src/manifest.json --host localhost --target dev",
+    "build": "parcel build src/manifest.json --target prod",
+    "sign": "npm run build && web-ext sign",
+    "test": "jest"
+  },
+  "dependencies": {
+    "beaverjs": "^0.2.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.0.0",
+    "@parcel/config-webextension": "^2.0.0",
+    "web-ext": "^6.4.0",
+    "dotenv": "^10.0.0",
+    "@types/firefox-webext-browser": "^82.0.1",
+    "jest": "^27.3.1",
+    "ts-jest": "^27.0.7",
+    "@types/jest": "^27.0.2"
+  }
+}

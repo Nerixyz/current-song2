@@ -1,6 +1,6 @@
-import { PlayInfo } from './types';
 import { cleanupTitleAndSub, extractTitleAndSub } from './text';
 import { getImageUrl } from './image';
+import { PlayInfo } from '../../shared/types';
 
 export interface State {
   info: PlayInfo;
