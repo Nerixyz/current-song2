@@ -4,13 +4,16 @@ use actix::{Actor, ActorFutureExt, Context, ContextFutureSpawner, Handler, Recip
 use futures::future;
 pub use messages::*;
 use std::collections::HashMap;
-use tracing::{event, Level};
+use tracing::{event, span, Level};
+use tracing_actix::ActorInstrument;
 
+#[derive(Debug)]
 struct Module {
     priority: u8,
     state: ModuleState,
 }
 
+#[derive(Debug)]
 pub struct Manager {
     receiver: Recipient<Update>,
 
@@ -35,11 +38,16 @@ impl Manager {
             self.receiver
                 .send(Update(state))
                 .into_actor(self)
+                .actor_instrument(span!(Level::TRACE, "send update", id = updated))
                 .then(|_, _, _| future::ready(()))
                 .spawn(ctx);
         }
     }
 
+    /// Updates the state of a module.
+    /// Returns
+    /// * `Ok(Some(..))` if a new state has to be sent
+    /// * `Ok(None)`     is nothing changed
     fn update_state(&mut self, updated: usize) -> anyhow::Result<Option<String>> {
         let mut active: Vec<(usize, &Module)> = self
             .modules
@@ -58,7 +66,7 @@ impl Manager {
                 None
             } else {
                 self.current_module = None;
-                event!(Level::DEBUG, message = ?(ModuleState::Paused), "Send");
+                event!(Level::DEBUG, id = updated, message = ?(ModuleState::Paused), "Send");
                 Some(serde_json::to_string(&ModuleState::Paused)?)
             }
         } else {
@@ -79,7 +87,7 @@ impl Manager {
 
             self.current_module = Some(*id);
 
-            event!(Level::DEBUG, message = ?(module.state), "Send");
+            event!(Level::DEBUG, id = updated, message = ?(module.state), "Send");
             Some(serde_json::to_string(&module.state)?)
         })
     }

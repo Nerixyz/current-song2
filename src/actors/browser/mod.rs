@@ -94,13 +94,13 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for BrowserSession {
                         });
                     }
                     Err(e) => {
-                        event!(Level::WARN, error = %e, "Invalid WS message");
+                        event!(Level::WARN, id = %self.id, error = %e, "Invalid WS message");
                     }
                 }
             }
             Ok(_) => (),
             Err(e) => {
-                event!(Level::WARN, error = %e, "WebSocket error");
+                event!(Level::WARN, id = %self.id, error = %e, "WebSocket error");
                 ctx.stop();
             }
         }

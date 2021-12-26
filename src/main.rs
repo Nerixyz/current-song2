@@ -16,7 +16,6 @@ use actix::Actor;
 use actix_web::{web, App, HttpServer};
 use tokio::sync::{watch, RwLock};
 use tracing_actix_web::TracingLogger;
-use tracing_log::LogTracer;
 use tracing_subscriber::{util::SubscriberInitExt, EnvFilter, FmtSubscriber};
 
 #[actix_web::main]
@@ -26,7 +25,6 @@ async fn main() -> std::io::Result<()> {
         .with_env_filter(EnvFilter::from_default_env())
         .finish()
         .init();
-    //LogTracer::init().unwrap();
 
     let (event_tx, event_rx) =
         watch::channel::<broadcaster::Event>(serde_json::json!({"type": "Paused"}).to_string());

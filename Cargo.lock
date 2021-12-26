@@ -502,6 +502,7 @@ dependencies = [
  "tokio-stream",
  "toml",
  "tracing",
+ "tracing-actix",
  "tracing-actix-web",
  "tracing-log",
  "tracing-subscriber",
@@ -1538,6 +1539,18 @@ dependencies = [
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
+]
+
+[[package]]
+name = "tracing-actix"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8a5321c876b5a40dd7e9d8b91b72ea20a48169883dc02def4257e6d43a710c8a"
+dependencies = [
+ "actix",
+ "futures",
+ "pin-project-lite",
+ "tracing",
 ]
 
 [[package]]

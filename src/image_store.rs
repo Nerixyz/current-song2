@@ -1,10 +1,22 @@
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fmt::{Debug, Formatter},
+};
 
 pub struct Image {
     pub content_type: String,
     pub data: Vec<u8>,
 }
 
+impl Debug for Image {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Image")
+            .field("content_type", &self.content_type)
+            .finish()
+    }
+}
+
+#[derive(Debug)]
 pub struct ImageStore {
     images: HashMap<usize, (usize, Option<Image>)>,
     next_id: usize,

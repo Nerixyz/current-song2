@@ -11,8 +11,8 @@ use futures::future;
 use gsmtc::{Image, PlaybackStatus, SessionModel};
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
-use tracing::{event, Level};
-
+use tracing::{event, span, Instrument, Level};
+#[derive(Debug)]
 struct GsmtcWorker {
     manager: Addr<Manager>,
     image_store: Arc<RwLock<ImageStore>>,
@@ -29,40 +29,48 @@ pub async fn start_spawning(
     image_store: Arc<RwLock<ImageStore>>,
 ) -> AnyResult<()> {
     let mut rx = SessionManager::new().await?;
-    tokio::spawn(async move {
-        while let Some(evt) = rx.recv().await {
-            if let ManagerEvent::SessionCreated { rx, source, .. } = evt {
-                if !CONFIG.modules.gsmtc.filter.pass_filter(&source) {
-                    event!(Level::DEBUG, "Ignoring {} as it's filtered", source);
-                    continue;
-                }
+    tokio::spawn(
+        async move {
+            while let Some(evt) = rx.recv().await {
+                if let ManagerEvent::SessionCreated { rx, source, .. } = evt {
+                    if !CONFIG.modules.gsmtc.filter.pass_filter(&source) {
+                        event!(Level::DEBUG, "Ignoring {} as it's filtered", source);
+                        continue;
+                    }
 
-                if let (Ok(module_id), mut store) = future::join(
-                    manager.send(CreateModule { priority: 0 }),
-                    image_store.write(),
-                )
-                .await
-                {
-                    event!(
-                        Level::DEBUG,
-                        "Creating GSMTC worker: module-id: {}",
-                        module_id
-                    );
-                    tokio::spawn(
-                        GsmtcWorker {
-                            image_id: store.create_id(),
-                            module_id,
-                            image_store: image_store.clone(),
-                            manager: manager.clone(),
-                            image: None,
-                            paused: true,
-                        }
-                        .feed_manager(rx),
-                    );
+                    if let (Ok(module_id), mut store) = future::join(
+                        manager.send(CreateModule { priority: 0 }),
+                        image_store.write(),
+                    )
+                    .await
+                    {
+                        event!(
+                            Level::DEBUG,
+                            "Creating GSMTC worker: module-id: {}",
+                            module_id
+                        );
+                        tokio::spawn(
+                            GsmtcWorker {
+                                image_id: store.create_id(),
+                                module_id,
+                                image_store: image_store.clone(),
+                                manager: manager.clone(),
+                                image: None,
+                                paused: true,
+                            }
+                            .feed_manager(rx)
+                            .instrument(span!(
+                                Level::DEBUG,
+                                "GsmtcWorker",
+                                id = module_id
+                            )),
+                        );
+                    }
                 }
             }
         }
-    });
+        .instrument(span!(Level::INFO, "GsmtcManager")),
+    );
     Ok(())
 }
 
@@ -88,6 +96,7 @@ impl GsmtcWorker {
         self.image_store.write().await.remove(self.image_id);
     }
 
+    #[tracing::instrument(level = "trace")]
     async fn store_image(&mut self, image: Option<Image>) -> Option<ImageInfo> {
         let mut store = self.image_store.write().await;
         let img = match image {
@@ -112,11 +121,13 @@ impl GsmtcWorker {
             return;
         }
         self.paused = matches!(state, ModuleState::Paused);
+        let span = span!(Level::TRACE, "Update Module", id = self.module_id, state = ?state, paused = self.paused);
         self.manager
             .send(UpdateModule {
                 id: self.module_id,
                 state,
             })
+            .instrument(span)
             .await
             .ok();
     }
