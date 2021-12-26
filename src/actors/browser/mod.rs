@@ -15,6 +15,7 @@ use std::{
     sync::Arc,
     time::{Duration, Instant},
 };
+use tracing::{event, Level};
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(40);
@@ -46,7 +47,7 @@ impl Actor for BrowserSession {
                 match res {
                     Ok(id) => this.id = id,
                     Err(e) => {
-                        log::warn!("Failed creating module: {}", e);
+                        event!(Level::WARN, error = %e, "Failed creating module");
                         ctx.stop();
                     }
                 };
@@ -93,13 +94,13 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for BrowserSession {
                         });
                     }
                     Err(e) => {
-                        log::warn!("Invalid WS message: {}", e);
+                        event!(Level::WARN, id = %self.id, error = %e, "Invalid WS message");
                     }
                 }
             }
             Ok(_) => (),
             Err(e) => {
-                log::warn!("Websocket error: {}", e);
+                event!(Level::WARN, id = %self.id, error = %e, "WebSocket error");
                 ctx.stop();
             }
         }

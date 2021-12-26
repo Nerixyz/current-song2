@@ -1,6 +1,7 @@
 use crate::actors::{manager, manager::Update};
 use actix::{Actor, Context, Handler};
 use tokio::sync::watch;
+use tracing::{event, Level};
 
 pub type Event = String;
 
@@ -23,7 +24,7 @@ impl Handler<manager::Update> for Broadcaster {
 
     fn handle(&mut self, msg: Update, _ctx: &mut Self::Context) -> Self::Result {
         if let Err(e) = self.event_tx.send(msg.0) {
-            log::warn!("Could not send update message: {}", e);
+            event!(Level::WARN, error = %e, "Could not send update message");
         }
     }
 }

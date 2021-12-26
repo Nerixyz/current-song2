@@ -14,6 +14,7 @@ use std::{
     sync::{Arc, Weak},
 };
 use tokio::sync::mpsc;
+use tracing::{event, Level};
 use windows::Result;
 
 pub struct SessionHandle {
@@ -42,6 +43,7 @@ pub enum SessionUpdateEvent {
     Media(SessionModel, Option<Image>),
 }
 
+#[derive(Debug)]
 pub enum SessionCommand {
     PlaybackInfoChanged,
     MediaPropertiesChanged,
@@ -130,7 +132,9 @@ impl SessionWorker {
 
         while let Some(cmd) = self.loop_rx.recv().await {
             match self.handle_command(cmd) {
-                Err(e) => log::warn!("Could not handle command: {}", e),
+                Err(e) => {
+                    event!(Level::WARN, error = %e, source = %self.model.source, "Could not handle command")
+                }
                 Ok(false) => break,
                 _ => (),
             }
@@ -139,6 +143,7 @@ impl SessionWorker {
 
     /// Returns Result<running>
     fn handle_command(&mut self, cmd: SessionCommand) -> Result<bool> {
+        event!(Level::TRACE, source = %self.model.source, command = ?cmd);
         match cmd {
             SessionCommand::PlaybackInfoChanged => {
                 let model = self.session.GetPlaybackInfo()?.try_into()?;
@@ -153,7 +158,7 @@ impl SessionWorker {
                 let session = self.session.clone();
                 tokio::spawn(async move {
                     if let Err(e) = Self::request_media_properties(loop_tx, session).await {
-                        log::warn!("Could not get media: {}", e);
+                        event!(Level::WARN, error = %e, "Could not get media properties")
                     }
                 });
             }

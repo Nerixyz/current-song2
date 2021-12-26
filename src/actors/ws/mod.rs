@@ -8,6 +8,7 @@ use serde::Deserialize;
 use std::time::{Duration, Instant};
 use tokio::sync::watch;
 use tokio_stream::wrappers::WatchStream;
+use tracing::{event, Level};
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(40);
@@ -66,7 +67,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
             }
             Ok(_) => (),
             Err(e) => {
-                log::warn!("Websocket error: {}", e);
+                event!(Level::WARN, error = %e, "WebSocket error");
                 ctx.stop();
             }
         }
