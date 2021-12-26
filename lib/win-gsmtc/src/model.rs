@@ -1,3 +1,5 @@
+use std::fmt::{Debug, Formatter};
+
 #[derive(Debug, Clone)]
 pub struct SessionModel {
     pub playback: Option<PlaybackModel>,
@@ -6,10 +8,17 @@ pub struct SessionModel {
     pub source: String,
 }
 
-#[derive(Debug)]
 pub struct Image {
     pub content_type: String,
     pub data: Vec<u8>,
+}
+
+impl Debug for Image {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Image")
+            .field("content_type", &self.content_type)
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -14,13 +14,19 @@ use crate::{
 };
 use actix::Actor;
 use actix_web::{web, App, HttpServer};
-use actix_web::middleware::Logger;
 use tokio::sync::{watch, RwLock};
+use tracing_actix_web::TracingLogger;
+use tracing_log::LogTracer;
+use tracing_subscriber::{util::SubscriberInitExt, EnvFilter, FmtSubscriber};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     lazy_static::initialize(&CONFIG);
-    env_logger::init();
+    FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env())
+        .finish()
+        .init();
+    //LogTracer::init().unwrap();
 
     let (event_tx, event_rx) =
         watch::channel::<broadcaster::Event>(serde_json::json!({"type": "Paused"}).to_string());
@@ -45,9 +51,11 @@ async fn main() -> std::io::Result<()> {
             .app_data(event_rx.clone())
             .app_data(image_store.clone())
             .app_data(manager.clone())
-            .wrap(Logger::default())
+            .wrap(TracingLogger::default())
             .service(web::scope("api").configure(init_repositories))
-            .service(actix_files::Files::new("/", "js/packages/client/dist").index_file("index.html"))
+            .service(
+                actix_files::Files::new("/", "js/packages/client/dist").index_file("index.html"),
+            )
     })
     .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
     .run()

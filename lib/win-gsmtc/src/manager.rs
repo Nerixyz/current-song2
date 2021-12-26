@@ -7,6 +7,7 @@ use bindings::Windows::{
 };
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::mpsc;
+use tracing::{event, Level};
 use windows::Result;
 
 pub struct SessionManager {
@@ -39,6 +40,7 @@ pub enum ManagerEvent {
     },
 }
 
+#[derive(Debug, Clone, Copy)]
 pub enum ManagerCommand {
     UpdateSessions,
     CurrentSessionChanged,
@@ -55,7 +57,7 @@ impl SessionManager {
         let update_token = {
             let loop_tx = Arc::downgrade(&loop_tx);
             this.SessionsChanged(TypedEventHandler::new(move |_, _| {
-                log::debug!("SessionsChanged");
+                event!(Level::DEBUG, "SessionsChanged");
                 if let Some(loop_tx) = loop_tx.upgrade() {
                     loop_tx.send(ManagerCommand::UpdateSessions).ok();
                 }
@@ -65,7 +67,7 @@ impl SessionManager {
         let current_changed_token = {
             let loop_tx = Arc::downgrade(&loop_tx);
             this.CurrentSessionChanged(TypedEventHandler::new(move |_, _| {
-                log::debug!("Current SessionChanged");
+                event!(Level::DEBUG, "Current SessionChanged");
                 if let Some(loop_tx) = loop_tx.upgrade() {
                     loop_tx.send(ManagerCommand::CurrentSessionChanged).ok();
                 }
@@ -100,11 +102,11 @@ impl SessionManager {
             .ok();
         while let Some(cmd) = self.loop_rx.recv().await {
             if let Err(e) = self.handle_command(cmd) {
-                log::error!("Manager encountered error - exiting: {}", e);
+                event!(Level::ERROR, error = %e, command = ?cmd, "Manager encountered error - exiting");
                 break;
             }
         }
-        log::info!("Manager Loop Ended")
+        event!(Level::INFO, "Manager Loop Ended")
     }
 
     fn handle_command(&mut self, cmd: ManagerCommand) -> Result<()> {
@@ -130,7 +132,7 @@ impl SessionManager {
                     })
                     .collect();
 
-                log::debug!("Update: remove {} sessions", to_remove.len());
+                event!(Level::DEBUG, "Update: remove {} sessions", to_remove.len());
 
                 for (session, id) in to_remove {
                     self.event_tx
@@ -149,7 +151,7 @@ impl SessionManager {
                 let current = match self.manager.GetCurrentSession() {
                     Ok(sess) => sess,
                     Err(e) => {
-                        log::warn!("Could not get current sessions: {}", e);
+                        event!(Level::WARN, error = %e, "Could not get current sessions");
                         return Ok(());
                     }
                 };
@@ -187,6 +189,8 @@ impl SessionManager {
         let (session, source) = SessionHandle::create(id, session, tx)?;
         self.sessions.insert(model_id, session);
 
+        event!(Level::DEBUG, id, %source, "New Session");
+
         self.event_tx
             .send(ManagerEvent::SessionCreated {
                 session_id: id,
@@ -194,8 +198,6 @@ impl SessionManager {
                 source,
             })
             .ok();
-
-        log::debug!("Created session id {}", id);
 
         Ok(id)
     }

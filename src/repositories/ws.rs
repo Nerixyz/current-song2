@@ -3,6 +3,7 @@ use actix::Addr;
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 use actix_web_actors::ws;
 use tokio::sync::watch;
+use tracing::{event, Level};
 
 #[get("/client")]
 async fn client(
@@ -10,7 +11,7 @@ async fn client(
     stream: web::Payload,
     events: web::Data<watch::Receiver<broadcaster::Event>>,
 ) -> Result<HttpResponse> {
-    log::debug!("Client connected");
+    event!(Level::DEBUG, "Client connected");
     ws::start(WsSession::new(events.get_ref().clone()), &req, stream)
 }
 
@@ -20,7 +21,7 @@ async fn extension(
     stream: web::Payload,
     manager: web::Data<Addr<Manager>>,
 ) -> Result<HttpResponse> {
-    log::debug!("Extension connected");
+    event!(Level::DEBUG, "Extension connected");
     ws::start(BrowserSession::new(manager.into_inner()), &req, stream)
 }
 

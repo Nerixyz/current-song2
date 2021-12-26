@@ -4,6 +4,7 @@ use actix::{Actor, ActorFutureExt, Context, ContextFutureSpawner, Handler, Recip
 use futures::future;
 pub use messages::*;
 use std::collections::HashMap;
+use tracing::{event, Level};
 
 struct Module {
     priority: u8,
@@ -57,7 +58,7 @@ impl Manager {
                 None
             } else {
                 self.current_module = None;
-                log::debug!("Send: Paused");
+                event!(Level::DEBUG, message = ?(ModuleState::Paused), "Send");
                 Some(serde_json::to_string(&ModuleState::Paused)?)
             }
         } else {
@@ -78,7 +79,7 @@ impl Manager {
 
             self.current_module = Some(*id);
 
-            log::debug!("Send: {:?}", module.state);
+            event!(Level::DEBUG, message = ?(module.state), "Send");
             Some(serde_json::to_string(&module.state)?)
         })
     }
@@ -115,13 +116,11 @@ impl Handler<UpdateModule> for Manager {
             .and_then(|id| self.modules.get(id).map(|current| current.priority));
 
         if let Some(module) = self.modules.get_mut(&msg.id) {
-            log::debug!(
-                "Update {} - {:?} current-prio: {:?} mod-prio: {}",
-                msg.id,
-                msg.state,
-                current_priority,
-                module.priority
-            );
+            event!(Level::DEBUG,
+                id = msg.id,
+                state = ?msg.state,
+                current_priority = ?current_priority,
+                module.priority = module.priority,  "Update");
             module.state = msg.state;
 
             if current_priority

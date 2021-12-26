@@ -11,6 +11,7 @@ use futures::future;
 use gsmtc::{Image, PlaybackStatus, SessionModel};
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
+use tracing::{event, Level};
 
 struct GsmtcWorker {
     manager: Addr<Manager>,
@@ -32,7 +33,7 @@ pub async fn start_spawning(
         while let Some(evt) = rx.recv().await {
             if let ManagerEvent::SessionCreated { rx, source, .. } = evt {
                 if !CONFIG.modules.gsmtc.filter.pass_filter(&source) {
-                    log::debug!("Ignoring {} as it's filtered", source);
+                    event!(Level::DEBUG, "Ignoring {} as it's filtered", source);
                     continue;
                 }
 
@@ -42,7 +43,11 @@ pub async fn start_spawning(
                 )
                 .await
                 {
-                    log::debug!("Creating GSMTC worker: module-id: {}", module_id);
+                    event!(
+                        Level::DEBUG,
+                        "Creating GSMTC worker: module-id: {}",
+                        module_id
+                    );
                     tokio::spawn(
                         GsmtcWorker {
                             image_id: store.create_id(),
