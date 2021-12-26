@@ -21,3 +21,6 @@ TODO
 
 * **Browser Extension** - To get progress from browsers.
 * **Windows Service** 💻 To simplify usage
+* **Easy setup**
+* **Single executable**
+* **Output to File**
