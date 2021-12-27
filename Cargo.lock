@@ -264,6 +264,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-static-files"
+version = "3.0.5"
+source = "git+https://github.com/Nerixyz/actix-web-static-files?branch=actix-4#d1b9808622db836e5d017627a74b4ff3f063589e"
+dependencies = [
+ "actix-service",
+ "actix-web",
+ "derive_more",
+ "futures",
+ "static-files",
+]
+
+[[package]]
 name = "actix_derive"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -418,6 +430,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "change-detection"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "159fa412eae48a1d94d0b9ecdb85c97ce56eb2a347c62394d3fdbf221adabc1a"
+dependencies = [
+ "path-matchers",
+ "path-slash",
+]
+
+[[package]]
 name = "const-sha1"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -493,11 +515,13 @@ dependencies = [
  "actix-files",
  "actix-web",
  "actix-web-actors",
+ "actix-web-static-files",
  "anyhow",
  "futures",
  "lazy_static",
  "serde",
  "serde_json",
+ "static-files",
  "tokio",
  "tokio-stream",
  "toml",
@@ -694,6 +718,12 @@ dependencies = [
  "libc",
  "wasi",
 ]
+
+[[package]]
+name = "glob"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 
 [[package]]
 name = "h2"
@@ -1000,6 +1030,21 @@ name = "paste"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
+
+[[package]]
+name = "path-matchers"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36cd9b72a47679ec193a5f0229d9ab686b7bd45e1fbc59ccf953c9f3d83f7b2b"
+dependencies = [
+ "glob",
+]
+
+[[package]]
+name = "path-slash"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3cacbb3c4ff353b534a67fb8d7524d00229da4cb1dc8c79f4db96e375ab5b619"
 
 [[package]]
 name = "percent-encoding"
@@ -1331,6 +1376,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e113fb6f3de07a243d434a56ec6f186dfd51cb08448239fe7bcae73f87ff28ff"
 dependencies = [
  "version_check",
+]
+
+[[package]]
+name = "static-files"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64712ea1e3e140010e1d9605872ba205afa2ab5bd38191cc6ebd248ae1f6a06b"
+dependencies = [
+ "change-detection",
+ "mime_guess",
+ "path-slash",
 ]
 
 [[package]]

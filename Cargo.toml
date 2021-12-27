@@ -6,7 +6,9 @@ edition = "2021"
 [workspace]
 members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+single-executable = []
+default = ["single-executable"]
 
 [dependencies]
 tokio = { version = "1.15", features = ["sync"] }
@@ -18,6 +20,8 @@ actix-web = { version = "4.0.0-beta.15", features = ["compress-brotli"] }
 actix-files = "0.6.0-beta.10"
 actix-web-actors = "4.0.0-beta.8"
 actix-cors = "0.6.0-beta.7"
+actix-web-static-files = { git = "https://github.com/Nerixyz/actix-web-static-files", branch = "actix-4" }
+static-files = "0.2"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -34,3 +38,6 @@ tracing-actix = "0.3"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
+
+[build-dependencies]
+actix-web-static-files = { git = "https://github.com/Nerixyz/actix-web-static-files", branch = "actix-4" }
