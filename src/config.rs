@@ -1,21 +1,21 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 #[serde(default)]
 pub struct Config {
     pub modules: ModuleConfig,
     pub server: ServerConfig,
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default)]
 #[serde(default)]
 pub struct ModuleConfig {
     #[cfg(windows)]
     pub gsmtc: GsmtcConfig,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(default)]
 #[cfg(windows)]
 pub struct GsmtcConfig {
@@ -34,7 +34,7 @@ impl Default for GsmtcConfig {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(tag = "mode", content = "items")]
 #[cfg(windows)]
 pub enum GsmtcFilter {
@@ -61,7 +61,7 @@ impl GsmtcFilter {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct ServerConfig {
     #[serde(default = "default_port")]
     pub port: u16,
@@ -86,5 +86,18 @@ fn bool_true() -> bool {
 }
 
 lazy_static::lazy_static! {
-    pub static ref CONFIG: Config = toml::from_slice(&std::fs::read("config.toml").unwrap()).unwrap();
+    pub static ref CONFIG: Config = {
+        let config_path = std::path::PathBuf::from("config.toml");
+        match std::fs::read(&config_path).ok().and_then(|file| toml::from_slice(&file).ok()) {
+            Some(config) => config,
+            None => {
+                let conf = Config::default();
+                if config_path.exists() {
+                    std::fs::rename(&config_path, "config.toml.old").ok();
+                }
+                std::fs::write(&config_path, toml::to_string(&conf).unwrap()).ok();
+                conf
+            }
+        }
+    };
 }
