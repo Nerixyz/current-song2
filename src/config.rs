@@ -46,7 +46,11 @@ pub enum GsmtcFilter {
 #[cfg(windows)]
 impl Default for GsmtcFilter {
     fn default() -> Self {
-        Self::Disabled
+        let mut set = HashSet::new();
+        set.insert("firefox.exe".into());
+        set.insert("chrome.exe".into());
+        set.insert("msedge.exe".into());
+        Self::Exclude(set)
     }
 }
 
