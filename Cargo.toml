@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings"]
+members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings", "lib/win-service", "bin/win-svc"]
 
 [features]
 single-executable = []
@@ -32,12 +32,14 @@ lazy_static = "1.4"
 
 tracing = "0.1"
 tracing-log = "0.1"
-tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+tracing-subscriber = { version = "0.3", features = ["fmt", "std", "env-filter"] }
 tracing-actix-web = "0.5.0-beta.6"
 tracing-actix = "0.3"
+tracing-appender = "0.2"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
+win-service = { path = "lib/win-service" }
 
 [build-dependencies]
 actix-web-static-files = { git = "https://github.com/Nerixyz/actix-web-static-files", branch = "actix-4" }

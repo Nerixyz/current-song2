@@ -1,0 +1,10 @@
+[package]
+name = "win-service"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+windows = { version = "0.29", features = ["alloc", "Win32_Foundation", "Win32_System_Memory", "Win32_UI_Shell", "Win32_System_Threading", "Win32_System_Services", "Win32_Security", "Win32_System_Registry"] }
+tracing = "0.1"

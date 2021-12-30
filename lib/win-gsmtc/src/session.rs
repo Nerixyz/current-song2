@@ -131,6 +131,7 @@ impl SessionWorker {
         }
 
         while let Some(cmd) = self.loop_rx.recv().await {
+            event!(Level::TRACE, "session command");
             match self.handle_command(cmd) {
                 Err(e) => {
                     event!(Level::WARN, error = %e, source = %self.model.source, "Could not handle command")

@@ -101,6 +101,7 @@ impl SessionManager {
             .send(ManagerCommand::CurrentSessionChanged)
             .ok();
         while let Some(cmd) = self.loop_rx.recv().await {
+            event!(Level::TRACE, "manager event");
             if let Err(e) = self.handle_command(cmd) {
                 event!(Level::ERROR, error = %e, command = ?cmd, "Manager encountered error - exiting");
                 break;
