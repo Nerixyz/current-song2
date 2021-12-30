@@ -3,6 +3,7 @@ mod config;
 mod image_store;
 mod model;
 mod repositories;
+mod static_files;
 mod workers;
 
 use config::CONFIG;
@@ -17,22 +18,6 @@ use actix_web::{web, App, HttpServer};
 use tokio::sync::{watch, RwLock};
 use tracing_actix_web::TracingLogger;
 use tracing_subscriber::{util::SubscriberInitExt, EnvFilter, FmtSubscriber};
-
-#[cfg(feature = "single-executable")]
-mod static_web_files {
-    include!(concat!(env!("OUT_DIR"), "/generated.rs"));
-}
-
-#[cfg(feature = "single-executable")]
-fn static_file_service() -> actix_web_static_files::ResourceFiles {
-    let generated = static_web_files::generate();
-    actix_web_static_files::ResourceFiles::new("", generated).resolve_not_found_to_root()
-}
-
-#[cfg(not(feature = "single-executable"))]
-fn static_file_service() -> actix_files::Files {
-    actix_files::Files::new("/", "js/packages/client/dist").index_file("index.html")
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -67,7 +52,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(manager.clone())
             .wrap(TracingLogger::default())
             .service(web::scope("api").configure(init_repositories))
-            .service(static_file_service())
+            .service(static_files::service())
     })
     .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
     .run()
