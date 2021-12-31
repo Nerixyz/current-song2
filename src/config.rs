@@ -1,21 +1,22 @@
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::{collections::HashSet, path::PathBuf};
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct Config {
+    pub no_autostart: bool,
     pub modules: ModuleConfig,
     pub server: ServerConfig,
 }
 
-#[derive(Deserialize, Serialize, Debug, Default)]
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct ModuleConfig {
     #[cfg(windows)]
     pub gsmtc: GsmtcConfig,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(default)]
 #[cfg(windows)]
 pub struct GsmtcConfig {
@@ -34,7 +35,7 @@ impl Default for GsmtcConfig {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "mode", content = "items")]
 #[cfg(windows)]
 pub enum GsmtcFilter {
@@ -65,7 +66,7 @@ impl GsmtcFilter {
     }
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ServerConfig {
     #[serde(default = "default_port")]
     pub port: u16,
@@ -90,18 +91,24 @@ fn bool_true() -> bool {
 }
 
 lazy_static::lazy_static! {
+    static ref CONFIG_PATH: PathBuf = PathBuf::from("config.toml");
+}
+lazy_static::lazy_static! {
     pub static ref CONFIG: Config = {
-        let config_path = std::path::PathBuf::from("config.toml");
-        match std::fs::read(&config_path).ok().and_then(|file| toml::from_slice(&file).ok()) {
+        match std::fs::read(&*CONFIG_PATH).ok().and_then(|file| toml::from_slice(&file).ok()) {
             Some(config) => config,
             None => {
                 let conf = Config::default();
-                if config_path.exists() {
-                    std::fs::rename(&config_path, "config.toml.old").ok();
+                if CONFIG_PATH.exists() {
+                    std::fs::rename(&*CONFIG_PATH, "config.toml.old").ok();
                 }
-                std::fs::write(&config_path, toml::to_string(&conf).unwrap()).ok();
+                save_config(&conf).ok();
                 conf
             }
         }
     };
+}
+
+pub fn save_config(config: &Config) -> anyhow::Result<()> {
+    Ok(std::fs::write(&*CONFIG_PATH, toml::to_string(config)?)?)
 }

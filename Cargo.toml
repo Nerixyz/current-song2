@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings"]
+members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings", "lib/win-wrapper"]
 
 [features]
 single-executable = []
@@ -38,6 +38,7 @@ tracing-actix = "0.3"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
+win-wrapper = { path = "lib/win-wrapper" }
 
 [build-dependencies]
 actix-web-static-files = { git = "https://github.com/Nerixyz/actix-web-static-files", branch = "actix-4" }

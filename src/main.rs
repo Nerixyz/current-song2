@@ -4,6 +4,7 @@ mod image_store;
 mod model;
 mod repositories;
 mod static_files;
+mod win_setup;
 mod workers;
 
 use config::CONFIG;
@@ -20,7 +21,7 @@ use tracing_actix_web::TracingLogger;
 use tracing_subscriber::{util::SubscriberInitExt, EnvFilter, FmtSubscriber};
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn async_main() -> std::io::Result<()> {
     lazy_static::initialize(&CONFIG);
     FmtSubscriber::builder()
         .with_env_filter(EnvFilter::from_default_env())
@@ -57,4 +58,11 @@ async fn main() -> std::io::Result<()> {
     .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
     .run()
     .await
+}
+
+fn main() -> std::io::Result<()> {
+    #[cfg(windows)]
+    win_setup::win_main();
+
+    async_main()
 }
