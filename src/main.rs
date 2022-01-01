@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 mod actors;
 mod config;
 mod image_store;
