@@ -1,8 +1,8 @@
 pub mod autostart;
 pub mod elevate;
 pub mod message_box;
-mod pwstr;
 pub mod path;
+mod pwstr;
 
 #[cfg(test)]
 mod tests {
