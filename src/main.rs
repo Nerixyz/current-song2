@@ -22,12 +22,6 @@ use tracing_subscriber::{util::SubscriberInitExt, EnvFilter, FmtSubscriber};
 
 #[actix_web::main]
 async fn async_main() -> std::io::Result<()> {
-    lazy_static::initialize(&CONFIG);
-    FmtSubscriber::builder()
-        .with_env_filter(EnvFilter::from_default_env())
-        .finish()
-        .init();
-
     let (event_tx, event_rx) =
         watch::channel::<broadcaster::Event>(serde_json::json!({"type": "Paused"}).to_string());
 
@@ -61,6 +55,15 @@ async fn async_main() -> std::io::Result<()> {
 }
 
 fn main() -> std::io::Result<()> {
+    #[cfg(windows)]
+    win_wrapper::path::cd_to_exe();
+
+    lazy_static::initialize(&CONFIG);
+    FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env())
+        .finish()
+        .init();
+
     #[cfg(windows)]
     win_setup::win_main();
 
