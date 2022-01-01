@@ -18,12 +18,18 @@ fn has_arg(arg: &str) -> bool {
 }
 
 pub fn win_main() {
+    // consider using `clap`
+    // not _really_ needed since it's very basic
     if has_arg("--elevated") {
         elevated_main();
     }
     if has_arg("--remove-autostart") {
         remove_autostart(APPLICATION_NAME);
-        return;
+        MessageBox::<Okay>::information("Removed from autostart, exiting.")
+            .with_title(APPLICATION_NAME)
+            .show()
+            .ok();
+        std::process::exit(0);
     }
 
     if CONFIG.no_autostart || check_autostart(APPLICATION_NAME) {
@@ -65,7 +71,12 @@ pub fn win_main() {
             .show()
             .ok();
         }
-        _ => (),
+        Ok(_) => {
+            MessageBox::<Okay>::information("Added to autostart.\nStarting in normal mode.")
+                .with_title(APPLICATION_NAME)
+                .show()
+                .ok();
+        }
     };
 }
 
@@ -78,6 +89,11 @@ fn elevated_main() -> ! {
         .with_title(APPLICATION_NAME)
         .show()
         .ok();
+    } else {
+        MessageBox::<Okay>::information("Added to autostart.\nRunning application in user-mode.")
+            .with_title(APPLICATION_NAME)
+            .show()
+            .ok();
     }
     std::process::exit(0)
 }
