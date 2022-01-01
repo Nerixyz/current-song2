@@ -17,6 +17,12 @@ There are a few unique features separating this project:
 
 TODO
 
+## Windows Autostart
+
+To remove the application from autostart, run `current-song2.exe --remove-autostart` from a terminal.
+
+Alternatively you can **disable** the autostart entry in the Task Manager (startup tab).
+
 # Planned Features
 
 See more in the [projects tab](https://github.com/Nerixyz/current-song2/projects/1).
