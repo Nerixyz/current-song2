@@ -3,6 +3,7 @@
 mod actors;
 mod config;
 mod image_store;
+mod logging;
 mod model;
 mod repositories;
 mod static_files;
@@ -14,13 +15,13 @@ use config::CONFIG;
 use crate::{
     actors::{broadcaster, broadcaster::Broadcaster, manager::Manager},
     image_store::ImageStore,
+    logging::init_logging,
     repositories::init_repositories,
 };
 use actix::Actor;
 use actix_web::{web, App, HttpServer};
 use tokio::sync::{watch, RwLock};
 use tracing_actix_web::TracingLogger;
-use tracing_subscriber::{util::SubscriberInitExt, EnvFilter, FmtSubscriber};
 
 #[actix_web::main]
 async fn async_main() -> std::io::Result<()> {
@@ -60,11 +61,7 @@ fn main() -> std::io::Result<()> {
     #[cfg(windows)]
     win_wrapper::path::cd_to_exe();
 
-    lazy_static::initialize(&CONFIG);
-    FmtSubscriber::builder()
-        .with_env_filter(EnvFilter::from_default_env())
-        .finish()
-        .init();
+    let _guard = init_logging();
 
     #[cfg(windows)]
     win_setup::win_main();

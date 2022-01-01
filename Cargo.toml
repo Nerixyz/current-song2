@@ -35,6 +35,7 @@ tracing-log = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-actix-web = "0.5.0-beta.6"
 tracing-actix = "0.3"
+tracing-appender = "0.2"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }

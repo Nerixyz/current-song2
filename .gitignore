@@ -3,3 +3,4 @@
 .vscode
 .env
 config.toml
+*.log
