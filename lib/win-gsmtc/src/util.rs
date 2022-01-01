@@ -1,7 +1,7 @@
-use bindings::Windows::Storage::Streams::{
+use windows::Storage::Streams::{
     Buffer, DataReader, IRandomAccessStreamWithContentType, InputStreamOptions,
 };
-use windows::Result;
+use windows::core::Result;
 
 pub async fn read_stream_entirely(stream: IRandomAccessStreamWithContentType) -> Result<Vec<u8>> {
     let stream_len = stream.Size()? as usize;

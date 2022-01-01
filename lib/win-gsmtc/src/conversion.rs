@@ -2,7 +2,7 @@ use crate::model::{
     AlbumModel, AutoRepeatMode, MediaModel, PlaybackModel, PlaybackStatus, PlaybackType,
     TimelineModel,
 };
-use bindings::Windows::Media::{
+use windows::Media::{
     Control::{
         GlobalSystemMediaTransportControlsSessionMediaProperties,
         GlobalSystemMediaTransportControlsSessionPlaybackInfo,
@@ -12,10 +12,10 @@ use bindings::Windows::Media::{
     MediaPlaybackAutoRepeatMode, MediaPlaybackType,
 };
 use std::convert::{TryFrom, TryInto};
-use windows::HRESULT;
+use windows::core::HRESULT;
 
 impl TryFrom<GlobalSystemMediaTransportControlsSessionPlaybackInfo> for PlaybackModel {
-    type Error = windows::Error;
+    type Error = windows::core::Error;
 
     fn try_from(
         value: GlobalSystemMediaTransportControlsSessionPlaybackInfo,
@@ -42,7 +42,7 @@ impl TryFrom<GlobalSystemMediaTransportControlsSessionPlaybackInfo> for Playback
 }
 
 impl TryFrom<GlobalSystemMediaTransportControlsSessionTimelineProperties> for TimelineModel {
-    type Error = windows::Error;
+    type Error = windows::core::Error;
 
     fn try_from(
         value: GlobalSystemMediaTransportControlsSessionTimelineProperties,
@@ -57,7 +57,7 @@ impl TryFrom<GlobalSystemMediaTransportControlsSessionTimelineProperties> for Ti
 }
 
 impl TryFrom<GlobalSystemMediaTransportControlsSessionMediaProperties> for MediaModel {
-    type Error = windows::Error;
+    type Error = windows::core::Error;
 
     fn try_from(
         value: GlobalSystemMediaTransportControlsSessionMediaProperties,
@@ -82,7 +82,7 @@ impl TryFrom<GlobalSystemMediaTransportControlsSessionMediaProperties> for Media
 }
 
 impl TryFrom<GlobalSystemMediaTransportControlsSessionPlaybackStatus> for PlaybackStatus {
-    type Error = windows::Error;
+    type Error = windows::core::Error;
 
     fn try_from(
         value: GlobalSystemMediaTransportControlsSessionPlaybackStatus,

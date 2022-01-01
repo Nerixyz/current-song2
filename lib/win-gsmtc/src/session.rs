@@ -2,7 +2,7 @@ use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
     util::read_stream_entirely,
 };
-use bindings::Windows::{
+use windows::{
     Foundation::{EventRegistrationToken, TypedEventHandler},
     Media::Control::{
         GlobalSystemMediaTransportControlsSession,
@@ -15,7 +15,7 @@ use std::{
 };
 use tokio::sync::mpsc;
 use tracing::{event, Level};
-use windows::Result;
+use windows::core::Result;
 
 pub struct SessionHandle {
     pub id: usize,
