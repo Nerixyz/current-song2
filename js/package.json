@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "build-client": "npm run build --workspace=client",
+    "release": "npm run release --workspaces",
     "format": "prettier -w packages/**/*.{js,jsx,ts,tsx,html} --loglevel warn",
     "lint": "eslint packages/**/*.{js,jsx,ts,tsx} --fix",
     "test": "npm run test --workspaces"
