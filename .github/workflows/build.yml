@@ -21,7 +21,6 @@ jobs:
           working-directory: js
       - run: npm i
         working-directory: js
-
       - name: JS Build
         run: npm build
         if: !(contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
@@ -29,9 +28,7 @@ jobs:
         run: npm release
         if: (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
         working-directory: js
-
       - run: 7z a artifacts\client.zip .\js\packages\client\dist
-
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -51,7 +48,6 @@ jobs:
         with:
           name: client
           path: artifacts/client.zip
-
   create-release:
     needs: [build]
     runs-on: ubuntu-latest
@@ -67,7 +63,6 @@ jobs:
           artifacts: "artifacts/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
-
   create-prerelease:
     needs: [build]
     runs-on: ubuntu-latest
