@@ -10,6 +10,10 @@ members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings", "lib/win-wrapper"]
 single-executable = []
 default = ["single-executable"]
 
+[[bin]]
+name = "current-song2"
+path = "src/main.rs"
+
 [dependencies]
 tokio = { version = "1.15", features = ["sync"] }
 tokio-stream = { version = "0.1.8", features = ["sync"] }
