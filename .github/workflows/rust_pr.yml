@@ -1,0 +1,26 @@
+name: Rust PR
+
+on:
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    if: contains(github.event.pull_request.labels.*.name, 'rust')
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: Swatinem/rust-cache@v1
+      - name: Update Rust
+        run: rustup update
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+      - name: Build
+        # todo: cargo test
+        run: cargo build --verbose --release

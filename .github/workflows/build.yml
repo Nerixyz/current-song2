@@ -1,0 +1,86 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+  WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+  WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          working-directory: js
+      - run: npm i
+        working-directory: js
+
+      - name: JS Build
+        run: npm build
+        if: !(contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
+      - name: JS Release Build
+        run: npm release
+        if: (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
+        working-directory: js
+
+      - run: 7z a artifacts\client.zip .\js\packages\client\dist
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+      - name: Build
+        run: cargo build --verbose --release
+      - uses: actions/upload-artifact@v2
+        with:
+          name: executable
+          path: target/release/current-song-2.exe
+      - uses: actions/upload-artifact@v2
+        with:
+          name: extension
+          path: js/packages/extension/artifacts/*
+      - uses: actions/uplaod-artifact@v2
+        with:
+          name: client
+          path: artifacts/client.zip
+
+  create-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "artifacts/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
+
+  create-prerelease:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: (contains(github.ref, 'refs/tags/') && (contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "artifacts/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: true
+          prerelease: true
