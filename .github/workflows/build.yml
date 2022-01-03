@@ -76,7 +76,7 @@ jobs:
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "artifacts/*"
+          artifacts: "artifacts/**/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
           prerelease: ${{ (contains(github.ref, 'refs/tags/') && (contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
