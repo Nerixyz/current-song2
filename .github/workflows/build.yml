@@ -23,10 +23,10 @@ jobs:
         working-directory: js
       - name: JS Build
         run: npm build
-        if: !(contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
+        if: ${{ !(contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
       - name: JS Release Build
         run: npm release
-        if: (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
+        if: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
         working-directory: js
       - run: 7z a artifacts\client.zip .\js\packages\client\dist
       - uses: actions-rs/toolchain@v1
@@ -63,19 +63,4 @@ jobs:
           artifacts: "artifacts/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
-  create-prerelease:
-    needs: [build]
-    runs-on: ubuntu-latest
-    if: (contains(github.ref, 'refs/tags/') && (contains(github.ref, 'beta') || contains(github.ref, 'alpha')))
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          path: artifacts
-
-      - uses: ncipollo/release-action@v1
-        with:
-          artifacts: "artifacts/*"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
-          prerelease: true
+          preselease: ${{ (contains(github.ref, 'refs/tags/') && (contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }} 
