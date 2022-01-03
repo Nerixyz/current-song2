@@ -7,6 +7,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  ext_release: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
+  ext_type: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
 
 jobs:
   build:
@@ -24,12 +26,12 @@ jobs:
       - name: JS Build
         run: npm run build
         working-directory: js
-        if: ${{ !(contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
+        if: ${{ env.ext_release == '0' }}
       - name: JS Release Build
         run: npm run release
         working-directory: js
         # only on if it's a release build
-        if: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
+        if: ${{ env.ext_release == '1' }}
         env:
           WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
           WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
@@ -52,15 +54,15 @@ jobs:
         run: cargo build --release
       - uses: actions/upload-artifact@v2
         with:
-          name: executable
+          name: current-song2.exe
           path: target/release/current-song-2.exe
       - uses: actions/upload-artifact@v2
         with:
-          name: extension
-          path: js/packages/extension/artifacts/*
+          name: extension.${{ env.ext_type }}
+          path: js/packages/extension/artifacts/extension.${{ env.ext_type }}
       - uses: actions/upload-artifact@v2
         with:
-          name: client
+          name: client.zip
           path: artifacts/client.zip
   create-release:
     needs: [build]
@@ -77,4 +79,4 @@ jobs:
           artifacts: "artifacts/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
-          preselease: ${{ (contains(github.ref, 'refs/tags/') && (contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }} 
+          prerelease: ${{ (contains(github.ref, 'refs/tags/') && (contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
