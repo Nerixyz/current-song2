@@ -17,8 +17,16 @@ jobs:
         with:
           profile: minimal
           override: true
-          toolchain: nightly
-      - uses: Swatinem/rust-cache@v1
+          toolchain: stable
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ steps.rust_chain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}-build
       - run: cargo check --release
   check-format:
     if: contains(github.event.pull_request.labels.*.name, 'rust')

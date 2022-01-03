@@ -37,10 +37,19 @@ jobs:
           WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
       - run: 7z a artifacts\client.zip .\js\packages\client\dist
       - uses: actions-rs/toolchain@v1
+        id: rust_chain
         with:
           profile: minimal
           toolchain: stable
-      - uses: Swatinem/rust-cache@v1
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ steps.rust_chain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}-build
       - name: Build
         run: cargo build --verbose --release
       - uses: actions/upload-artifact@v2
