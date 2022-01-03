@@ -45,7 +45,7 @@ jobs:
         with:
           name: extension
           path: js/packages/extension/artifacts/*
-      - uses: actions/uplaod-artifact@v2
+      - uses: actions/upload-artifact@v2
         with:
           name: client
           path: artifacts/client.zip
