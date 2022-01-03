@@ -15,8 +15,10 @@
   },
   "scripts": {
     "start": "parcel src/manifest.json --host localhost --target dev",
-    "build": "parcel build src/manifest.json --target prod",
-    "sign": "npm run build && web-ext sign",
+    "parcel-build": "rimraf dist && parcel build src/manifest.json --target prod",
+    "build": "npm run parcel-build && web-ext build",
+    "sign": "npm run parcel-build && web-ext sign",
+    "release": "npm run sign",
     "test": "jest"
   },
   "dependencies": {
@@ -30,6 +32,7 @@
     "@types/firefox-webext-browser": "^82.0.1",
     "jest": "^27.3.1",
     "ts-jest": "^27.0.7",
-    "@types/jest": "^27.0.2"
+    "@types/jest": "^27.0.2",
+    "rimraf": "^3.0.2"
   }
 }

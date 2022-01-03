@@ -2,9 +2,8 @@ use actix_web_static_files::deps::static_files::{resource_dir, NpmBuild};
 use std::{env, io, path::PathBuf};
 
 fn include_static_files() -> io::Result<()> {
-    if env::var("PROFILE").unwrap() != "release"
-        && PathBuf::from("js/packages/client/dist").exists()
-    {
+    // assume it's already built
+    if PathBuf::from("js/packages/client/dist").exists() {
         resource_dir("js/packages/client/dist").build()
     } else {
         NpmBuild::new("js")
