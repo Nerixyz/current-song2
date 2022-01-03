@@ -26,6 +26,7 @@ jobs:
         if: ${{ !(contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
       - name: JS Release Build
         run: npm release
+        # only on if it's a release build
         if: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) }}
         working-directory: js
       - run: 7z a artifacts\client.zip .\js\packages\client\dist
