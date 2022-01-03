@@ -16,8 +16,8 @@
   "scripts": {
     "start": "parcel src/manifest.json --host localhost --target dev",
     "parcel-build": "rimraf dist && parcel build src/manifest.json --target prod",
-    "build": "npm run parcel-build && web-ext build",
-    "sign": "npm run parcel-build && web-ext sign",
+    "build": "npm run parcel-build && web-ext build -n extension.zip",
+    "sign": "npm run parcel-build && web-ext sign -n extension.xpi",
     "release": "npm run sign",
     "test": "jest"
   },
