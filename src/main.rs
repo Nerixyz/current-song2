@@ -13,6 +13,7 @@ mod workers;
 mod macros;
 
 use config::CONFIG;
+use std::sync::Arc;
 
 use crate::{
     actors::{broadcaster, broadcaster::Broadcaster, manager::Manager},
@@ -20,29 +21,40 @@ use crate::{
     logging::init_logging,
     repositories::init_repositories,
 };
-use actix::Actor;
+use actix::{Actor, Addr};
 use actix_web::{web, App, HttpServer};
 use tokio::sync::{watch, RwLock};
 use tracing_actix_web::TracingLogger;
 
-#[actix_web::main]
-async fn async_main() -> std::io::Result<()> {
+fn init_channels() -> (watch::Receiver<broadcaster::Event>, Addr<Manager>) {
     let (event_tx, event_rx) =
         watch::channel::<broadcaster::Event>(serde_json::json!({"type": "Paused"}).to_string());
 
     let broadcaster = Broadcaster::new(event_tx).start();
     let manager = Manager::new(broadcaster.recipient()).start();
 
-    let image_store = web::Data::new(RwLock::new(ImageStore::new()));
+    (event_rx, manager)
+}
 
-    if cfg!(windows) {
-        if CONFIG.modules.gsmtc.enabled {
-            workers::gsmtc::start_spawning(manager.clone(), image_store.clone().into_inner())
-                .await
-                .unwrap();
-        }
+#[cfg(windows)]
+async fn init_windows_actors(manager: Addr<Manager>, image_store: Arc<RwLock<ImageStore>>) {
+    if CONFIG.modules.gsmtc.enabled {
+        workers::gsmtc::start_spawning(manager, image_store)
+            .await
+            .unwrap();
     }
+}
 
+#[actix_web::main]
+async fn async_main() -> std::io::Result<()> {
+    let (event_rx, manager) = init_channels();
+
+    let image_store = Arc::new(RwLock::new(ImageStore::new()));
+
+    #[cfg(windows)]
+    init_windows_actors(manager.clone(), image_store.clone()).await;
+
+    let image_store: web::Data<_> = image_store.into();
     let manager = web::Data::new(manager);
     let event_rx = web::Data::new(event_rx);
     HttpServer::new(move || {
