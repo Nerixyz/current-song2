@@ -95,9 +95,10 @@ lazy_static::lazy_static! {
 }
 lazy_static::lazy_static! {
     pub static ref CONFIG: Config = {
-        match std::fs::read(&*CONFIG_PATH).ok().and_then(|file| toml::from_slice(&file).ok()) {
-            Some(config) => config,
-            None => {
+        match read_config() {
+            Ok(config) => config,
+            Err(e) => {
+                event!(Level::WARN, error = e, "Couldn't read config, creating a new one.");
                 let conf = Config::default();
                 if CONFIG_PATH.exists() {
                     std::fs::rename(&*CONFIG_PATH, "config.toml.old").ok();
@@ -107,6 +108,11 @@ lazy_static::lazy_static! {
             }
         }
     };
+}
+
+fn read_config() -> anyhow::Result<Config> {
+    let file = fs::read(&*CONFIG_PATH)?;
+    Ok(toml::from_slice(&file)?)
 }
 
 pub fn save_config(config: &Config) -> anyhow::Result<()> {
