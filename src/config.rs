@@ -98,7 +98,7 @@ lazy_static::lazy_static! {
         match read_config() {
             Ok(config) => config,
             Err(e) => {
-                event!(Level::WARN, error = e, "Couldn't read config, creating a new one.");
+                event!(Level::WARN, error = %e, "Couldn't read config, creating a new one.");
                 let conf = Config::default();
                 if CONFIG_PATH.exists() {
                     std::fs::rename(&*CONFIG_PATH, "config.toml.old").ok();
