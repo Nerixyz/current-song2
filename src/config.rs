@@ -1,5 +1,7 @@
+use crate::cfg_windows;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, path::PathBuf};
+use std::{collections::HashSet, fs, path::PathBuf};
+use tracing::{event, Level};
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
@@ -7,63 +9,6 @@ pub struct Config {
     pub no_autostart: bool,
     pub modules: ModuleConfig,
     pub server: ServerConfig,
-}
-
-#[derive(Deserialize, Serialize, Debug, Default, Clone)]
-#[serde(default)]
-pub struct ModuleConfig {
-    #[cfg(windows)]
-    pub gsmtc: GsmtcConfig,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-#[serde(default)]
-#[cfg(windows)]
-pub struct GsmtcConfig {
-    #[serde(default = "bool_true")]
-    pub enabled: bool,
-    pub filter: GsmtcFilter,
-}
-
-#[cfg(windows)]
-impl Default for GsmtcConfig {
-    fn default() -> Self {
-        Self {
-            enabled: true,
-            filter: Default::default(),
-        }
-    }
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-#[serde(tag = "mode", content = "items")]
-#[cfg(windows)]
-pub enum GsmtcFilter {
-    Disabled,
-    Include(HashSet<String>),
-    Exclude(HashSet<String>),
-}
-
-#[cfg(windows)]
-impl Default for GsmtcFilter {
-    fn default() -> Self {
-        let mut set = HashSet::new();
-        set.insert("firefox.exe".into());
-        set.insert("chrome.exe".into());
-        set.insert("msedge.exe".into());
-        Self::Exclude(set)
-    }
-}
-
-#[cfg(windows)]
-impl GsmtcFilter {
-    pub fn pass_filter(&self, source_model_id: &str) -> bool {
-        match self {
-            GsmtcFilter::Disabled => true,
-            GsmtcFilter::Include(include) => include.contains(source_model_id),
-            GsmtcFilter::Exclude(exclude) => !exclude.contains(source_model_id),
-        }
-    }
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -88,6 +33,60 @@ fn default_port() -> u16 {
 #[inline]
 fn bool_true() -> bool {
     true
+}
+
+#[derive(Deserialize, Serialize, Debug, Default, Clone)]
+#[serde(default)]
+pub struct ModuleConfig {
+    #[cfg(windows)]
+    pub gsmtc: GsmtcConfig,
+}
+
+cfg_windows! {
+    #[derive(Deserialize, Serialize, Debug, Clone)]
+    #[serde(default)]
+    pub struct GsmtcConfig {
+        #[serde(default = "bool_true")]
+        pub enabled: bool,
+        pub filter: GsmtcFilter,
+    }
+
+    impl Default for GsmtcConfig {
+        fn default() -> Self {
+            Self {
+                enabled: true,
+                filter: Default::default(),
+            }
+        }
+    }
+
+    #[derive(Deserialize, Serialize, Debug, Clone)]
+    #[serde(tag = "mode", content = "items")]
+    pub enum GsmtcFilter {
+        Disabled,
+        Include(HashSet<String>),
+        Exclude(HashSet<String>),
+    }
+
+    impl Default for GsmtcFilter {
+        fn default() -> Self {
+            let mut set = HashSet::new();
+            set.insert("firefox.exe".into());
+            set.insert("chrome.exe".into());
+            set.insert("msedge.exe".into());
+            Self::Exclude(set)
+        }
+    }
+
+    impl GsmtcFilter {
+        pub fn pass_filter(&self, source_model_id: &str) -> bool {
+            match self {
+                GsmtcFilter::Disabled => true,
+                GsmtcFilter::Include(include) => include.contains(source_model_id),
+                GsmtcFilter::Exclude(exclude) => !exclude.contains(source_model_id),
+            }
+        }
+    }
 }
 
 lazy_static::lazy_static! {

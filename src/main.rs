@@ -9,6 +9,8 @@ mod repositories;
 mod static_files;
 mod win_setup;
 mod workers;
+#[macro_use]
+mod macros;
 
 use config::CONFIG;
 
