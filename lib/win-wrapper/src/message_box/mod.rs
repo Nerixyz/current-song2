@@ -139,7 +139,7 @@ impl<'text, 'title, T: MessageBoxOption> MessageBox<'text, 'title, T> {
             }
         };
         match return_code {
-            0 => Err(unsafe { GetLastError() }),
+            MESSAGEBOX_RESULT(0) => Err(unsafe { GetLastError() }),
             x => Ok(T::from(x)),
         }
     }

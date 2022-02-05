@@ -8,7 +8,7 @@ use windows::Win32::{
 };
 
 pub use windows::Win32::Foundation::ERROR_ACCESS_DENIED;
-use windows::Win32::System::Registry::{RegDeleteValueW, RegOpenKeyExW};
+use windows::Win32::System::Registry::{RegDeleteValueW, RegOpenKeyExW, REG_OPTION_RESERVED};
 
 struct ManagedHkey(HKEY);
 impl ManagedHkey {
@@ -38,14 +38,14 @@ impl Drop for ManagedHkey {
 
 pub fn add_self_to_autostart(application_name: &str) -> Result<(), WIN32_ERROR> {
     unsafe {
-        let mut hkey = 0;
+        let mut hkey = HKEY(0);
         let hkey = ManagedHkey::try_new(
             RegCreateKeyExW(
                 HKEY_CURRENT_USER,
                 "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                 0,
                 None,
-                0,
+                REG_OPTION_RESERVED,
                 KEY_CREATE_SUB_KEY | KEY_SET_VALUE,
                 std::ptr::null(),
                 &mut hkey,
@@ -94,7 +94,7 @@ pub fn check_autostart(application_name: &str) -> bool {
 
 pub fn remove_autostart(application_name: &str) {
     unsafe {
-        let mut hkey = 0;
+        let mut hkey = HKEY(0);
         if RegOpenKeyExW(
             HKEY_CURRENT_USER,
             "Software\\Microsoft\\Windows\\CurrentVersion\\Run",

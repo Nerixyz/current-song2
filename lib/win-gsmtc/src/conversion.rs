@@ -2,17 +2,19 @@ use crate::model::{
     AlbumModel, AutoRepeatMode, MediaModel, PlaybackModel, PlaybackStatus, PlaybackType,
     TimelineModel,
 };
-use windows::Media::{
-    Control::{
-        GlobalSystemMediaTransportControlsSessionMediaProperties,
-        GlobalSystemMediaTransportControlsSessionPlaybackInfo,
-        GlobalSystemMediaTransportControlsSessionPlaybackStatus,
-        GlobalSystemMediaTransportControlsSessionTimelineProperties,
-    },
-    MediaPlaybackAutoRepeatMode, MediaPlaybackType,
-};
 use std::convert::{TryFrom, TryInto};
-use windows::core::HRESULT;
+use windows::{
+    core::HRESULT,
+    Media::{
+        Control::{
+            GlobalSystemMediaTransportControlsSessionMediaProperties,
+            GlobalSystemMediaTransportControlsSessionPlaybackInfo,
+            GlobalSystemMediaTransportControlsSessionPlaybackStatus,
+            GlobalSystemMediaTransportControlsSessionTimelineProperties,
+        },
+        MediaPlaybackAutoRepeatMode, MediaPlaybackType,
+    },
+};
 
 impl TryFrom<GlobalSystemMediaTransportControlsSessionPlaybackInfo> for PlaybackModel {
     type Error = windows::core::Error;
