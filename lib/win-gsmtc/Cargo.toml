@@ -7,8 +7,6 @@ edition = "2021"
 name = "gsmtc"
 path = "src/lib.rs"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 tokio = { version = "1.15", features = ["sync", "macros", "rt"] }
 windows = { version = "0.32", features = ["Media_Control", "Foundation", "Foundation_Collections", "Storage_Streams"] }
