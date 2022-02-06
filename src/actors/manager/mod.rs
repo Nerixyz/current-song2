@@ -1,21 +1,22 @@
 mod messages;
 use crate::model::ModuleState;
-use actix::{Actor, ActorFutureExt, Context, ContextFutureSpawner, Handler, Recipient, WrapFuture};
-use futures::future;
+use actix::{Actor, Context, Handler};
 pub use messages::*;
-use std::collections::HashMap;
-use tracing::{event, span, Level};
-use tracing_actix::ActorInstrument;
+use std::{collections::HashMap, sync::Arc};
+use tokio::sync::watch;
+use tracing::{error, event, Level};
+
+pub type Event = Arc<ModuleState>;
 
 #[derive(Debug)]
 struct Module {
     priority: u8,
-    state: ModuleState,
+    state: Arc<ModuleState>,
 }
 
 #[derive(Debug)]
 pub struct Manager {
-    receiver: Recipient<Update>,
+    event_tx: watch::Sender<Event>,
 
     modules: HashMap<usize, Module>,
     current_module: Option<usize>,
@@ -24,23 +25,20 @@ pub struct Manager {
 }
 
 impl Manager {
-    pub fn new(receiver: Recipient<Update>) -> Self {
+    pub fn new(event_tx: watch::Sender<Event>) -> Self {
         Self {
-            receiver,
+            event_tx,
             modules: Default::default(),
             current_module: None,
             next_id: 0,
         }
     }
 
-    fn send_update_state(&mut self, ctx: &mut <Self as Actor>::Context, updated: usize) {
+    fn send_update_state(&mut self, updated: usize) {
         if let Ok(Some(state)) = self.update_state(updated) {
-            self.receiver
-                .send(Update(state))
-                .into_actor(self)
-                .actor_instrument(span!(Level::TRACE, "send update", id = updated))
-                .then(|_, _, _| future::ready(()))
-                .spawn(ctx);
+            if let Err(e) = self.event_tx.send(state) {
+                error!(error = %e,"Couldn't send state on event_tx");
+            }
         }
     }
 
@@ -48,15 +46,12 @@ impl Manager {
     /// Returns
     /// * `Ok(Some(..))` if a new state has to be sent
     /// * `Ok(None)`     is nothing changed
-    fn update_state(&mut self, updated: usize) -> anyhow::Result<Option<String>> {
+    fn update_state(&mut self, updated: usize) -> anyhow::Result<Option<Event>> {
         let mut active: Vec<(usize, &Module)> = self
             .modules
             .iter()
-            .filter_map(|(id, m)| match m {
-                Module {
-                    state: ModuleState::Playing(_),
-                    ..
-                } => Some((*id, m)),
+            .filter_map(|(id, m)| match *m.state {
+                ModuleState::Playing(_) => Some((*id, m)),
                 _ => None,
             })
             .collect();
@@ -67,7 +62,7 @@ impl Manager {
             } else {
                 self.current_module = None;
                 event!(Level::DEBUG, id = updated, message = ?(ModuleState::Paused), "Send");
-                Some(serde_json::to_string(&ModuleState::Paused)?)
+                Some(Arc::new(ModuleState::Paused))
             }
         } else {
             // sort descending
@@ -88,7 +83,7 @@ impl Manager {
             self.current_module = Some(*id);
 
             event!(Level::DEBUG, id = updated, message = ?(module.state), "Send");
-            Some(serde_json::to_string(&module.state)?)
+            Some(module.state.clone())
         })
     }
 }
@@ -107,7 +102,7 @@ impl Handler<CreateModule> for Manager {
             id,
             Module {
                 priority: msg.priority,
-                state: ModuleState::Paused,
+                state: Arc::new(ModuleState::Paused),
             },
         );
         id
@@ -117,7 +112,7 @@ impl Handler<CreateModule> for Manager {
 impl Handler<UpdateModule> for Manager {
     type Result = ();
 
-    fn handle(&mut self, msg: UpdateModule, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: UpdateModule, _: &mut Self::Context) -> Self::Result {
         let current_priority = self
             .current_module
             .as_ref()
@@ -129,13 +124,13 @@ impl Handler<UpdateModule> for Manager {
                 state = ?msg.state,
                 current_priority = ?current_priority,
                 module.priority = module.priority,  "Update");
-            module.state = msg.state;
+            module.state = Arc::new(msg.state);
 
             if current_priority
                 .map(|current_priority| module.priority >= current_priority)
                 .unwrap_or(true)
             {
-                self.send_update_state(ctx, msg.id);
+                self.send_update_state(msg.id);
             }
         }
     }
@@ -144,9 +139,9 @@ impl Handler<UpdateModule> for Manager {
 impl Handler<RemoveModule> for Manager {
     type Result = ();
 
-    fn handle(&mut self, msg: RemoveModule, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: RemoveModule, _: &mut Self::Context) -> Self::Result {
         if self.modules.remove(&msg.id).is_some() && self.current_module == Some(msg.id) {
-            self.send_update_state(ctx, msg.id);
+            self.send_update_state(msg.id);
         }
     }
 }

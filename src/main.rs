@@ -1,4 +1,6 @@
 #![windows_subsystem = "windows"]
+#![warn(clippy::pedantic)]
+#![warn(clippy::cargo)]
 
 mod actors;
 mod config;
@@ -16,9 +18,10 @@ use config::CONFIG;
 use std::sync::Arc;
 
 use crate::{
-    actors::{broadcaster, broadcaster::Broadcaster, manager::Manager},
+    actors::manager::{self, Manager},
     image_store::ImageStore,
     logging::init_logging,
+    model::ModuleState,
     repositories::init_repositories,
 };
 use actix::{Actor, Addr};
@@ -26,12 +29,10 @@ use actix_web::{web, App, HttpServer};
 use tokio::sync::{watch, RwLock};
 use tracing_actix_web::TracingLogger;
 
-fn init_channels() -> (watch::Receiver<broadcaster::Event>, Addr<Manager>) {
-    let (event_tx, event_rx) =
-        watch::channel::<broadcaster::Event>(serde_json::json!({"type": "Paused"}).to_string());
+fn init_channels() -> (watch::Receiver<manager::Event>, Addr<Manager>) {
+    let (event_tx, event_rx) = watch::channel(Arc::new(ModuleState::Paused));
 
-    let broadcaster = Broadcaster::new(event_tx).start();
-    let manager = Manager::new(broadcaster.recipient()).start();
+    let manager = Manager::new(event_tx).start();
 
     (event_rx, manager)
 }
