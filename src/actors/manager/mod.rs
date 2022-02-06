@@ -1,4 +1,7 @@
 mod messages;
+#[cfg(test)]
+mod tests;
+
 use crate::model::ModuleState;
 use actix::{Actor, Context, Handler};
 pub use messages::*;
