@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [".", "lib/win-gsmtc", "lib/win-gsmtc/bindings", "lib/win-wrapper"]
+members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
 
 [features]
 single-executable = []

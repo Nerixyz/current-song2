@@ -1,14 +1,14 @@
 use crate::session::{SessionCommand, SessionHandle, SessionUpdateEvent};
-use bindings::Windows::{
+use std::{collections::HashMap, sync::Arc};
+use tokio::sync::mpsc;
+use tracing::{event, Level};
+use windows::{
+    core::Result,
     Foundation::{EventRegistrationToken, TypedEventHandler},
     Media::Control::{
         GlobalSystemMediaTransportControlsSession, GlobalSystemMediaTransportControlsSessionManager,
     },
 };
-use std::{collections::HashMap, sync::Arc};
-use tokio::sync::mpsc;
-use tracing::{event, Level};
-use windows::Result;
 
 pub struct SessionManager {
     sessions: HashMap<String, SessionHandle>,

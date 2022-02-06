@@ -1,13 +1,6 @@
 use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
-    util::read_stream_entirely,
-};
-use bindings::Windows::{
-    Foundation::{EventRegistrationToken, TypedEventHandler},
-    Media::Control::{
-        GlobalSystemMediaTransportControlsSession,
-        GlobalSystemMediaTransportControlsSessionMediaProperties,
-    },
+    util::request_media_properties,
 };
 use std::{
     convert::TryInto,
@@ -15,7 +8,11 @@ use std::{
 };
 use tokio::sync::mpsc;
 use tracing::{event, Level};
-use windows::Result;
+use windows::{
+    core::{AgileReference, Result},
+    Foundation::{EventRegistrationToken, TypedEventHandler},
+    Media::Control::GlobalSystemMediaTransportControlsSession,
+};
 
 pub struct SessionHandle {
     pub id: usize,
@@ -155,9 +152,9 @@ impl SessionWorker {
             }
             SessionCommand::MediaPropertiesChanged => {
                 let loop_tx = self.loop_tx.clone();
-                let session = self.session.clone();
+                let session = AgileReference::new(&self.session)?;
                 tokio::spawn(async move {
-                    if let Err(e) = Self::request_media_properties(loop_tx, session).await {
+                    if let Err(e) = request_media_properties(loop_tx, session).await {
                         event!(Level::WARN, error = %e, "Could not get media properties")
                     }
                 });
@@ -185,35 +182,6 @@ impl SessionWorker {
         };
 
         Ok(true)
-    }
-
-    async fn request_media_properties(
-        loop_tx: Weak<mpsc::UnboundedSender<SessionCommand>>,
-        session: GlobalSystemMediaTransportControlsSession,
-    ) -> Result<()> {
-        let media_properties = session.TryGetMediaPropertiesAsync()?.await?;
-        let image = Self::try_get_thumbnail(&media_properties).await.ok();
-
-        if let Some(loop_tx) = loop_tx.upgrade() {
-            loop_tx
-                .send(SessionCommand::MediaPropertiesResult(
-                    media_properties.try_into()?,
-                    image,
-                ))
-                .ok();
-        }
-        Ok(())
-    }
-
-    async fn try_get_thumbnail(
-        media_properties: &GlobalSystemMediaTransportControlsSessionMediaProperties,
-    ) -> Result<Image> {
-        let read = media_properties.Thumbnail()?.OpenReadAsync()?;
-        let stream = read.await?;
-        let content_type = stream.ContentType()?.to_string();
-
-        let data = read_stream_entirely(stream).await?;
-        Ok(Image { content_type, data })
     }
 }
 

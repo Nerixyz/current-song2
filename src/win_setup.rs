@@ -56,7 +56,7 @@ pub fn win_main() {
     match add_self_to_autostart(APPLICATION_NAME) {
         Err(ERROR_ACCESS_DENIED) => {
             if let Err(e) = elevate_self() {
-                MessageBox::<Okay>::error(&format!("Cannot elevate process: {}", e))
+                MessageBox::<Okay>::error(&format!("Cannot elevate process: {}", e.0))
                     .with_title(APPLICATION_NAME)
                     .show()
                     .ok();
@@ -65,7 +65,7 @@ pub fn win_main() {
         Err(e) => {
             MessageBox::<Okay>::error(&format!(
                 "Cannot add {} to autostart: WindowsErrorCode({})",
-                APPLICATION_NAME, e
+                APPLICATION_NAME, e.0
             ))
             .with_title(APPLICATION_NAME)
             .show()
@@ -84,7 +84,7 @@ fn elevated_main() -> ! {
     if let Err(e) = add_self_to_autostart(APPLICATION_NAME) {
         MessageBox::<Okay>::error(&format!(
             "Cannot add {} to autostart (even in elevated mode): WindowsErrorCode({})",
-            APPLICATION_NAME, e
+            APPLICATION_NAME, e.0
         ))
         .with_title(APPLICATION_NAME)
         .show()

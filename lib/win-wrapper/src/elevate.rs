@@ -20,7 +20,7 @@ pub fn elevate_self() -> Result<(), WIN32_ERROR> {
             lpFile: file.get_pwstr(),
             lpParameters: parameters.get_pwstr(),
             lpDirectory: PWSTR(std::ptr::null_mut()),
-            nShow: SW_NORMAL as _,
+            nShow: SW_NORMAL.0 as _,
             fMask: SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC,
             ..Default::default()
         };
