@@ -1,4 +1,4 @@
-use crate::actors::broadcaster;
+use crate::manager;
 use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
 use actix_web_actors::{
     ws,
@@ -8,18 +8,18 @@ use serde::Deserialize;
 use std::time::{Duration, Instant};
 use tokio::sync::watch;
 use tokio_stream::wrappers::WatchStream;
-use tracing::{event, Level};
+use tracing::{error, event, Level};
 
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(40);
 
 pub struct WsSession {
     hb: Instant,
-    rx: Option<watch::Receiver<broadcaster::Event>>,
+    rx: Option<watch::Receiver<manager::Event>>,
 }
 
 impl WsSession {
-    pub fn new(rx: watch::Receiver<broadcaster::Event>) -> Self {
+    pub fn new(rx: watch::Receiver<manager::Event>) -> Self {
         Self {
             hb: Instant::now(),
             rx: Some(rx),
@@ -43,9 +43,12 @@ impl Actor for WsSession {
     }
 }
 
-impl StreamHandler<String> for WsSession {
-    fn handle(&mut self, item: String, ctx: &mut Self::Context) {
-        ctx.text(item);
+impl StreamHandler<manager::Event> for WsSession {
+    fn handle(&mut self, item: manager::Event, ctx: &mut Self::Context) {
+        match serde_json::to_string(&*item) {
+            Ok(json) => ctx.text(json),
+            Err(e) => error!(error=%e, "Cannot serialize json"),
+        }
     }
 
     fn finished(&mut self, ctx: &mut Self::Context) {

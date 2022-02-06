@@ -1,4 +1,7 @@
-use crate::actors::{broadcaster, browser::BrowserSession, manager::Manager, ws::WsSession};
+use crate::{
+    actors::{browser::BrowserSession, manager::Manager, ws::WsSession},
+    manager,
+};
 use actix::Addr;
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
 use actix_web_actors::ws;
@@ -9,7 +12,7 @@ use tracing::{event, Level};
 async fn client(
     req: HttpRequest,
     stream: web::Payload,
-    events: web::Data<watch::Receiver<broadcaster::Event>>,
+    events: web::Data<watch::Receiver<manager::Event>>,
 ) -> Result<HttpResponse> {
     event!(Level::DEBUG, "Client connected");
     ws::start(WsSession::new(events.get_ref().clone()), &req, stream)
