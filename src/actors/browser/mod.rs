@@ -1,10 +1,11 @@
 use crate::{
     actors::manager::{self, Manager},
-    model::{ModuleState, PlayInfo},
+    model::PlayInfo,
+    utilities::websockets::PingingWebsocket,
 };
 use actix::{
-    fut::ready, Actor, ActorContext, ActorFutureExt, Addr, AsyncContext, ContextFutureSpawner,
-    Running, StreamHandler, WrapFuture,
+    fut::ready, Actor, ActorContext, ActorFutureExt, Addr, ContextFutureSpawner, Running,
+    StreamHandler, WrapFuture,
 };
 use actix_web_actors::{
     ws,
@@ -55,19 +56,19 @@ impl Actor for BrowserSession {
             })
             .wait(ctx);
 
-        ctx.run_interval(HEARTBEAT_INTERVAL, |this, ctx| {
-            if Instant::now().duration_since(this.hb) > CLIENT_TIMEOUT {
-                ctx.stop();
-            } else {
-                ctx.text(serde_json::json!({ "type": "Ping" }).to_string());
-            }
-        });
+        self.init_hb_check(ctx, HEARTBEAT_INTERVAL, CLIENT_TIMEOUT);
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
         self.manager.do_send(manager::RemoveModule { id: self.id });
 
         Running::Stop
+    }
+}
+
+impl PingingWebsocket for BrowserSession {
+    fn last_hb(&self) -> Instant {
+        self.hb
     }
 }
 

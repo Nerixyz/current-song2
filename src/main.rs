@@ -13,6 +13,7 @@ mod win_setup;
 mod workers;
 #[macro_use]
 mod macros;
+mod utilities;
 
 use config::CONFIG;
 use std::sync::Arc;

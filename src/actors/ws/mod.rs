@@ -1,4 +1,4 @@
-use crate::manager;
+use crate::{manager, utilities::websockets::PingingWebsocket};
 use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
 use actix_web_actors::{
     ws,
@@ -32,14 +32,13 @@ impl Actor for WsSession {
 
     fn started(&mut self, ctx: &mut Self::Context) {
         ctx.add_stream(WatchStream::new(self.rx.take().unwrap()));
+        self.init_hb_check(ctx, HEARTBEAT_INTERVAL, CLIENT_TIMEOUT);
+    }
+}
 
-        ctx.run_interval(HEARTBEAT_INTERVAL, |this, ctx| {
-            if Instant::now().duration_since(this.hb) > CLIENT_TIMEOUT {
-                ctx.stop();
-            } else {
-                ctx.text(serde_json::json!({ "type": "Ping" }).to_string());
-            }
-        });
+impl PingingWebsocket for WsSession {
+    fn last_hb(&self) -> Instant {
+        self.hb
     }
 }
 
