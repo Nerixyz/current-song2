@@ -82,16 +82,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for BrowserSession {
                 match msg {
                     Ok(Response::Pong) => self.hb = Instant::now(),
                     Ok(Response::Inactive) => {
-                        self.manager.do_send(manager::UpdateModule {
-                            id: self.id,
-                            state: ModuleState::Paused,
-                        });
+                        self.manager.do_send(manager::UpdateModule::paused(self.id));
                     }
                     Ok(Response::Active(info)) => {
-                        self.manager.do_send(manager::UpdateModule {
-                            id: self.id,
-                            state: ModuleState::Playing(info),
-                        });
+                        self.manager
+                            .do_send(manager::UpdateModule::playing(self.id, info));
                     }
                     Err(e) => {
                         event!(Level::WARN, id = %self.id, error = %e, "Invalid WS message");
