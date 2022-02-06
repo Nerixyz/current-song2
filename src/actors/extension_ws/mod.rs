@@ -21,13 +21,13 @@ use tracing::{event, Level};
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(40);
 
-pub struct BrowserSession {
+pub struct ExtensionWsSession {
     hb: Instant,
     manager: Arc<Addr<Manager>>,
     id: usize,
 }
 
-impl BrowserSession {
+impl ExtensionWsSession {
     pub fn new(manager: Arc<Addr<Manager>>) -> Self {
         Self {
             hb: Instant::now(),
@@ -37,7 +37,7 @@ impl BrowserSession {
     }
 }
 
-impl Actor for BrowserSession {
+impl Actor for ExtensionWsSession {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
@@ -66,13 +66,13 @@ impl Actor for BrowserSession {
     }
 }
 
-impl PingingWebsocket for BrowserSession {
+impl PingingWebsocket for ExtensionWsSession {
     fn last_hb(&self) -> Instant {
         self.hb
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for BrowserSession {
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ExtensionWsSession {
     fn handle(&mut self, item: Result<Message, ProtocolError>, ctx: &mut Self::Context) {
         match item {
             Ok(ws::Message::Ping(msg)) => {
