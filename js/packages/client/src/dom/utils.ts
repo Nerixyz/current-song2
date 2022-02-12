@@ -4,7 +4,7 @@
  * @returns {A}
  */
 export function getElements<A extends Array<HTMLElement>>(...ids: string[]): A {
-  // This is unsafe but we know these elements exist when calling the function
+  // This is unsafe, but we know these elements exist when calling the function
   return ids.map(id => {
     const el = document.getElementById(id);
     if (el === null) throw new Error(`${id} does not exist`);

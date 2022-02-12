@@ -1,15 +1,15 @@
-import { ReconnectingWebsocket } from '../../shared/reconnecting-websocket';
 import { listenOption, Option } from './options';
 import { formatLocalUrl } from '../../shared/url';
 import { LegacyEventData, MessageCreator } from './types/message.types';
 import { PlayInfo } from '../../shared/types';
+import { IncomingMessages, OutgoingMessages, ReconnectingWebsocket } from '../../shared/reconnecting-websocket';
 
 type ConnectionActiveMessage = LegacyEventData | PlayInfo;
 
 export class Connection {
   private sock?: ReconnectingWebsocket<
-    { Ping: undefined },
-    { Pong: undefined; Active: ConnectionActiveMessage; Inactive: undefined }
+    IncomingMessages,
+    OutgoingMessages<{ Active: ConnectionActiveMessage; Inactive: undefined }>
   >;
   private isLegacy = false;
 
@@ -27,9 +27,7 @@ export class Connection {
 
     this.isLegacy = isLegacy;
 
-    this.sock = new ReconnectingWebsocket<{ Ping: undefined }, { Pong: undefined }>(
-      isLegacy ? 'ws://localhost:232' : formatLocalUrl('/api/ws/extension', 'ws'),
-    );
+    this.sock = new ReconnectingWebsocket(isLegacy ? 'ws://localhost:232' : formatLocalUrl('/api/ws/extension', 'ws'));
     this.sock.connect().then(() => {
       if (this.lastMessage) {
         this.sock?.trySend('Active', this.lastMessage);
