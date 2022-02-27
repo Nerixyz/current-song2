@@ -1,4 +1,4 @@
-use crate::manager;
+use crate::{manager, utilities::websockets::PingingWebsocket};
 use actix::{Actor, ActorContext, AsyncContext, StreamHandler};
 use actix_web_actors::{
     ws,
@@ -13,12 +13,12 @@ use tracing::{error, event, Level};
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(40);
 
-pub struct WsSession {
+pub struct ClientWsSession {
     hb: Instant,
     rx: Option<watch::Receiver<manager::Event>>,
 }
 
-impl WsSession {
+impl ClientWsSession {
     pub fn new(rx: watch::Receiver<manager::Event>) -> Self {
         Self {
             hb: Instant::now(),
@@ -27,23 +27,22 @@ impl WsSession {
     }
 }
 
-impl Actor for WsSession {
+impl Actor for ClientWsSession {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
         ctx.add_stream(WatchStream::new(self.rx.take().unwrap()));
-
-        ctx.run_interval(HEARTBEAT_INTERVAL, |this, ctx| {
-            if Instant::now().duration_since(this.hb) > CLIENT_TIMEOUT {
-                ctx.stop();
-            } else {
-                ctx.text(serde_json::json!({ "type": "Ping" }).to_string());
-            }
-        });
+        self.init_hb_check(ctx, HEARTBEAT_INTERVAL, CLIENT_TIMEOUT);
     }
 }
 
-impl StreamHandler<manager::Event> for WsSession {
+impl PingingWebsocket for ClientWsSession {
+    fn last_hb(&self) -> Instant {
+        self.hb
+    }
+}
+
+impl StreamHandler<manager::Event> for ClientWsSession {
     fn handle(&mut self, item: manager::Event, ctx: &mut Self::Context) {
         match serde_json::to_string(&*item) {
             Ok(json) => ctx.text(json),
@@ -56,7 +55,7 @@ impl StreamHandler<manager::Event> for WsSession {
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsSession {
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ClientWsSession {
     fn handle(&mut self, item: Result<Message, ProtocolError>, ctx: &mut Self::Context) {
         match item {
             Ok(ws::Message::Ping(msg)) => {

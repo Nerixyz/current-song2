@@ -1,4 +1,4 @@
-import { PlayInfo } from '../types';
+import { PlayInfo } from '../../../shared/types';
 
 const MAX_SAFE_STRING = 50;
 
@@ -52,5 +52,8 @@ export function cleanupTitleAndSub(data: TitleData): TitleData {
 }
 
 function cleanupTooLongString(str: string): string {
-  return str.replace(/(:?\(.+\)|\[.+]|{.+})/g, '').replace(/ +/, ' ').trim();
+  return str
+    .replace(/(:?\(.+\)|\[.+]|{.+})/g, '')
+    .replace(/ +/, ' ')
+    .trim();
 }

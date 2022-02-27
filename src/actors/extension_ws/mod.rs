@@ -1,10 +1,11 @@
 use crate::{
     actors::manager::{self, Manager},
-    model::{ModuleState, PlayInfo},
+    model::PlayInfo,
+    utilities::websockets::PingingWebsocket,
 };
 use actix::{
-    fut::ready, Actor, ActorContext, ActorFutureExt, Addr, AsyncContext, ContextFutureSpawner,
-    Running, StreamHandler, WrapFuture,
+    fut::ready, Actor, ActorContext, ActorFutureExt, Addr, ContextFutureSpawner, Running,
+    StreamHandler, WrapFuture,
 };
 use actix_web_actors::{
     ws,
@@ -20,13 +21,13 @@ use tracing::{event, Level};
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 const CLIENT_TIMEOUT: Duration = Duration::from_secs(40);
 
-pub struct BrowserSession {
+pub struct ExtensionWsSession {
     hb: Instant,
     manager: Arc<Addr<Manager>>,
     id: usize,
 }
 
-impl BrowserSession {
+impl ExtensionWsSession {
     pub fn new(manager: Arc<Addr<Manager>>) -> Self {
         Self {
             hb: Instant::now(),
@@ -36,7 +37,7 @@ impl BrowserSession {
     }
 }
 
-impl Actor for BrowserSession {
+impl Actor for ExtensionWsSession {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
@@ -55,13 +56,7 @@ impl Actor for BrowserSession {
             })
             .wait(ctx);
 
-        ctx.run_interval(HEARTBEAT_INTERVAL, |this, ctx| {
-            if Instant::now().duration_since(this.hb) > CLIENT_TIMEOUT {
-                ctx.stop();
-            } else {
-                ctx.text(serde_json::json!({ "type": "Ping" }).to_string());
-            }
-        });
+        self.init_hb_check(ctx, HEARTBEAT_INTERVAL, CLIENT_TIMEOUT);
     }
 
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
@@ -71,7 +66,13 @@ impl Actor for BrowserSession {
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for BrowserSession {
+impl PingingWebsocket for ExtensionWsSession {
+    fn last_hb(&self) -> Instant {
+        self.hb
+    }
+}
+
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ExtensionWsSession {
     fn handle(&mut self, item: Result<Message, ProtocolError>, ctx: &mut Self::Context) {
         match item {
             Ok(ws::Message::Ping(msg)) => {
@@ -82,16 +83,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for BrowserSession {
                 match msg {
                     Ok(Response::Pong) => self.hb = Instant::now(),
                     Ok(Response::Inactive) => {
-                        self.manager.do_send(manager::UpdateModule {
-                            id: self.id,
-                            state: ModuleState::Paused,
-                        });
+                        self.manager.do_send(manager::UpdateModule::paused(self.id));
                     }
                     Ok(Response::Active(info)) => {
-                        self.manager.do_send(manager::UpdateModule {
-                            id: self.id,
-                            state: ModuleState::Playing(info),
-                        });
+                        self.manager
+                            .do_send(manager::UpdateModule::playing(self.id, info));
                     }
                     Err(e) => {
                         event!(Level::WARN, id = %self.id, error = %e, "Invalid WS message");

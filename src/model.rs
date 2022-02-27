@@ -44,6 +44,7 @@ pub struct TimelineInfo {
 }
 
 impl PlayInfo {
+    #[cfg(test)]
     pub fn simple<Title, Artist, Source>(title: Title, artist: Artist, source: Source) -> Self
     where
         Title: Into<String>,

@@ -3,9 +3,13 @@ import { createProgress } from './progress';
 import { smolTree } from './dom/smol-tree';
 import { hasImage, hasSubtitle, hasTimeline, isSpotify, makeState, not, State } from './state';
 import { animateOnChange, TextChangeAnimation } from './dom/animation';
-import { ReconnectingWebsocket } from '../../shared/reconnecting-websocket';
 import { EventMap } from './types';
 import { formatLocalUrl } from '../../shared/url';
+import {
+  IncomingMessages,
+  OutgoingMessages,
+  ReconnectingWebsocket,
+} from '../../shared/reconnecting-websocket';
 
 (async function main() {
   const [container, imageContainer, imageEl, titleEl, subtitleEl, progressEl] = getElements<
@@ -28,7 +32,7 @@ import { formatLocalUrl } from '../../shared/url';
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
 
-  const ws = new ReconnectingWebsocket<EventMap, { Pong: undefined }>(
+  const ws = new ReconnectingWebsocket<IncomingMessages<EventMap>, OutgoingMessages>(
     formatLocalUrl('/api/ws/client', 'ws'),
   );
   ws.addEventListener('Playing', ({ data }) => {
