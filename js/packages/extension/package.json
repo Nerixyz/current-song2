@@ -25,7 +25,7 @@
     "beaverjs": "^0.2.0"
   },
   "devDependencies": {
-    "parcel": "^2.3.0",
+    "parcel": "^2.3.2",
     "@parcel/config-webextension": "^2.3.0",
     "web-ext": "^6.7.0",
     "dotenv": "^16.0.0",
