@@ -1,14 +1,16 @@
-import { TabModel } from './TabModel';
+import { TabChange, TabModel } from './TabModel';
 import { BrowserTab, BrowserWindow, TabActivateInfo, TabId, WindowId } from '../types/tab.types';
 import { filter, first } from '../utils/iterators';
 import { MessageCreator } from '../types/message.types';
 import { VideoMetadata, VideoPlayPosition } from '../types/video.types';
 import { isChromeLike } from '../utils/chrome';
+import { FilterManager } from '../filters/FilterManager';
 
 interface TabManagerOptions {
   initialTabs: BrowserTab[];
   initialWindows: BrowserWindow[];
   updateCallback: (message: MessageCreator | null) => void;
+  filterManager: FilterManager;
 }
 
 interface FindAndEmitOptions {
@@ -26,10 +28,13 @@ export class TabManager extends EventTarget {
 
   private readonly isChrome = isChromeLike();
   private readonly updateCallback: (message: MessageCreator | null) => void;
+  private readonly filterManager: FilterManager;
 
-  constructor({ initialTabs, initialWindows, updateCallback }: TabManagerOptions) {
+  constructor({ initialTabs, initialWindows, updateCallback, filterManager }: TabManagerOptions) {
     super();
     this.updateCallback = updateCallback;
+    this.filterManager = filterManager;
+    this.filterManager.setUpdateListener(() => this.filtersUpdated());
 
     this.initListeners();
 
@@ -116,10 +121,15 @@ export class TabManager extends EventTarget {
     if (!tab) return;
 
     const browserTab = await browser.tabs.get(tabId);
-    const changed = tab.updateTabMeta(browserTab);
-    if (!changed) return;
-
-    this.findAndEmitActiveTab({ forceSendIfActive: browserTab.id === this.sentTabId });
+    const changeInfo = tab.updateTabMeta(browserTab);
+    if (changeInfo === TabChange.NotChanged) return;
+    else if (changeInfo === TabChange.UrlChanged) {
+      // Do not send if active since nothing actually changed.
+      // We still need to check for filters though.
+      this.findAndEmitActiveTab();
+    } else {
+      this.findAndEmitActiveTab({ forceSendIfActive: browserTab.id === this.sentTabId });
+    }
   }
 
   private async windowFocused(windowId: WindowId) {
@@ -138,6 +148,10 @@ export class TabManager extends EventTarget {
     this.blockedWindows.delete(windowId);
 
     // don't update tabs here since there will be separate events for them
+  }
+
+  private filtersUpdated() {
+    this.findAndEmitActiveTab();
   }
 
   private findAndEmitActiveTab({ forceSendIfActive }: FindAndEmitOptions = {}) {
@@ -159,7 +173,8 @@ export class TabManager extends EventTarget {
   private isValidTab(tab: TabModel): boolean {
     if (tab.active && this.activeWindowId === tab.windowId) return false;
     if (!tab.audible || tab.muted) return false;
+    if (this.blockedWindows.has(tab.windowId)) return false;
 
-    return !this.blockedWindows.has(tab.windowId);
+    return this.filterManager.checkUrl(tab.url);
   }
 }
