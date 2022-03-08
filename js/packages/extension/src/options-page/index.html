@@ -10,10 +10,27 @@
     <h1>Current Song</h1>
     <main class="options">
       <div class="option">
-        <label for="legacy-api">Use Legacy API</label>
-        <div class="value">
-          <input type="checkbox" id="legacy-api" />
+        <toggle-option label="Use Legacy API" option="use-legacy-api"></toggle-option>
+      </div>
+      <div class="option">
+        Filter Mode
+        <filter-mode-toggle></filter-mode-toggle>
+      </div>
+      <div class="option">
+        Filters
+        <filter-list></filter-list>
+        <div class="explanation">
+          A filter will check every tab's url. Regular filters check the hostname part of the url (The hostname of
+          <span class="code">https://maps.google.com/maps</span> is <span class="code">maps.google.com</span>). Its
+          functionality is best illustrated by an example. <span class="code">google.com</span> will filter every host
+          containing the text <span class="code">google.com</span> so
+          <span class="code">https://maps.google.com/something</span> but also
+          <span class="code">https://fakegoogle.com/</span>. Regex filters will check if a regular expression matches
+          the <span class="bold">whole url</span>.
         </div>
+      </div>
+      <div class='option'>
+        <filter-tester></filter-tester>
       </div>
     </main>
   </body>

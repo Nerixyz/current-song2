@@ -22,7 +22,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "beaverjs": "^0.2.0"
+    "beaverjs": "^0.2.0",
+    "lit": "^2.2.0"
   },
   "devDependencies": {
     "parcel": "^2.3.2",
