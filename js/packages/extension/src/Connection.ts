@@ -18,7 +18,7 @@ export class Connection {
   constructor() {
     // although this may not seem like it,
     // this will call the callback at the start.
-    listenOption<boolean | undefined>(Option.UseLegacyApi, v => this.handleOptionChange(!!v));
+    listenOption<boolean>(Option.UseLegacyApi, v => this.handleOptionChange(!!v));
   }
 
   handleOptionChange(isLegacy: boolean) {
