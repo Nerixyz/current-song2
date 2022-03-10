@@ -1,11 +1,10 @@
-import { TabManager } from '../../src/background/TabManager';
 import { expectNothing, expectNotTabs, expectTab, mockTabManager } from '../mock/tab-manager';
 import { mockBrowser } from '../mock/browser-interface';
 import { mockWindow } from '../mock/window';
 import { mockAudibleMutedTab, mockAudibleTab } from '../mock/tab';
 import { dynamicStorage } from '../mock/filter-storage';
 import { FilterMode } from '../../src/options';
-import { waitMicrotask, waitNMicrotasks } from '../pseudo-async';
+import { waitNMicrotasks } from '../pseudo-async';
 
 const make2Wind4TabBrowser = () =>
   mockBrowser([
