@@ -4,6 +4,9 @@ import { BackgroundEventHandler } from 'beaverjs';
 import { InternalMessageMap } from '../messages';
 import { TabManager } from './TabManager';
 import { Connection } from '../Connection';
+import { FilterManager } from '../filters/FilterManager';
+import { LocalFilterStorage } from '../filters/FilterStorage';
+import { DefaultBrowserInterface } from './BrowserInterface';
 
 (async () => {
   const connection = new Connection();
@@ -29,5 +32,7 @@ async function createManager(connection: Connection): Promise<TabManager> {
       connection.send(message ?? undefined);
     },
     initialWindows,
+    filterManager: new FilterManager(LocalFilterStorage),
+    browser: DefaultBrowserInterface,
   });
 }
