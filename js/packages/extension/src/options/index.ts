@@ -12,6 +12,7 @@ export enum FilterMode {
 }
 export const DEFAULT_FILTER_MODE = FilterMode.Block;
 
+/* istanbul ignore next */
 export function listenOption<T>(name: Option, cb: (value: T | undefined) => void): () => void {
   const listener = (changes: { [p: string]: StorageChange }, areaName: string) => {
     if (areaName !== 'local' || !(name in changes)) return;
@@ -31,14 +32,17 @@ export function listenOption<T>(name: Option, cb: (value: T | undefined) => void
   };
 }
 
+/* istanbul ignore next */
 export function listenJsonOption<T>(name: Option, cb: (value: T | undefined) => void) {
   return listenOption<string>(name, value => cb(value ? JSON.parse(value) : undefined));
 }
 
+/* istanbul ignore next */
 export async function setOption(name: Option, value: unknown) {
   return await browser.storage.local.set({ [name]: value });
 }
 
+/* istanbul ignore next */
 export function setJsonOption(name: Option, value: unknown) {
   return setOption(name, JSON.stringify(value));
 }

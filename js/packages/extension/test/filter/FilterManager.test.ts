@@ -2,18 +2,9 @@ import { FilterManager, matchModel, tryParseUrl } from '../../src/filters/Filter
 import { IFilterStorage, RevokeListener } from '../../src/filters/FilterStorage';
 import { DEFAULT_FILTER_MODE, FilterMode } from '../../src/options';
 import { FilterModel } from '../../src/filters/types';
+import { staticStorage } from '../mock/filter-storage';
 
 describe('FilterManager', function () {
-  const staticStorage = (filters: FilterModel[], mode: FilterMode): IFilterStorage => ({
-    listenFilterMode(cb) {
-      cb(mode);
-      return () => undefined;
-    },
-    listenFilters(cb) {
-      cb(filters);
-      return () => undefined;
-    },
-  });
   it('should support blocking filtering', function () {
     const Storage = staticStorage(
       [
