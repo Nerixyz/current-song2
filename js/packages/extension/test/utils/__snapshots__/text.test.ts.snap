@@ -3,8 +3,8 @@
 exports[`splitTitle should work 1`] = `
 Array [
   Object {
-    "artist": "Forsen ",
-    "title": " My Cool Video",
+    "artist": "Forsen",
+    "title": "My Cool Video",
   },
   Object {
     "title": "Without Dash",
@@ -14,16 +14,19 @@ Array [
     "title": "AlienDancing",
   },
   Object {
-    "artist": "LULE ",
-    "title": " AlienGathering (forsen remix)",
+    "artist": "LULE",
+    "title": "AlienGathering (forsen remix)",
   },
   Object {
-    "artist": "Oops ",
-    "title": " My chair broke [xd] (feat. alien)",
+    "artist": "Oops",
+    "title": "My chair broke [xd] (feat. alien)",
   },
   Object {
-    "artist": "Here ",
-    "title": " Are   Multiple   Dashes",
+    "artist": "Here",
+    "title": "Are   Multiple   Dashes",
+  },
+  Object {
+    "title": "Forsen - Aliens (Forsen-Remix)",
   },
 ]
 `;

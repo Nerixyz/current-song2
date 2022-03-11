@@ -9,6 +9,7 @@ describe('splitTitle', function () {
       'LULE - AlienGathering (forsen remix)',
       'Oops - My chair broke [xd] (feat. alien)',
       'Here - Are - Multiple - Dashes',
+      'Forsen - Aliens (Forsen-Remix)', // check if this is really expected
     ].map(title => splitTitle(title));
 
     expect(inputs).toMatchSnapshot();
