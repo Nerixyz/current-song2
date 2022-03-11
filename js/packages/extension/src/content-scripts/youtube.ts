@@ -7,7 +7,8 @@ function changeHandler({ target }: { target: unknown }) {
   sendCurrent(target).catch(console.error);
 }
 
-const events = new ContentEventHandler<InternalMessageMap>();
+// we don't need to listen on any event
+const events = new ContentEventHandler<InternalMessageMap>([]);
 
 document.addEventListener('playing', changeHandler, true);
 document.addEventListener('pause', changeHandler, true);
