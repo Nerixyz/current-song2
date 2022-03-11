@@ -28,7 +28,11 @@ export function mockTabManager({
       initialWindows,
       browser,
       filterManager: new FilterManager(filterStorage ?? staticStorage([], FilterMode.Block)),
-      updateCallback: msg => resolveFn?.(msg),
+      updateCallback: msg => {
+        if (!resolveFn) throw new Error('Unhandled event');
+        resolveFn(msg);
+        resolveFn = null;
+      },
     }),
     nextUpdate,
   };

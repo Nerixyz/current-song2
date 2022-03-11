@@ -14,7 +14,7 @@ export enum TabChange {
 const DEFAULT_URL = 'about:blank';
 
 export class TabModel implements MessageCreator {
-  id: TabId = -1;
+  id: TabId;
   windowId: WindowId = -1;
   active = false;
   audible = false;
@@ -34,7 +34,11 @@ export class TabModel implements MessageCreator {
     return this._url;
   }
 
+  /** @throws if `tab.id` is `undefined`
+   */
   constructor(tab: BrowserTab) {
+    if (typeof tab.id !== 'number') throw new Error('Cannot create tab without id');
+    this.id = tab.id;
     this.updateTabMeta(tab);
   }
 
@@ -75,7 +79,7 @@ export class TabModel implements MessageCreator {
    */
   updateTabMeta(tab: BrowserTab): TabChange {
     const isEqual =
-      this.windowId === tab.windowId &&
+      this.windowId === (tab.windowId ?? this.windowId) &&
       this.active === tab.active &&
       this.audible === !!tab.audible &&
       this.muted === (tab.mutedInfo?.muted ?? this.muted) &&
@@ -83,8 +87,7 @@ export class TabModel implements MessageCreator {
     const urlEqual = (tab.url ?? this._url) === this._url;
 
     this.tabTitle = tab.title ?? '';
-    this.windowId = tab.windowId ?? -1;
-    this.id = tab.id ?? -1;
+    this.windowId = tab.windowId ?? this.windowId;
     this.active = tab.active;
     this.audible = !!tab.audible;
     this.muted = tab.mutedInfo?.muted ?? this.muted;
@@ -146,9 +149,9 @@ export class TabModel implements MessageCreator {
   private tryExtractSetArtist(fullTitle: string): boolean {
     const { title, artist } = splitTitle(fullTitle);
     const anyChange = this.title !== title || this.artist !== (artist || null);
-    this.title = title.trim();
+    this.title = title;
     // use || instead of ??, so that '' will be null
-    this.artist = artist?.trim() || null;
+    this.artist = artist || null;
 
     return anyChange;
   }

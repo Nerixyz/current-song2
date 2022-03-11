@@ -24,6 +24,7 @@ describe('FilterManager', function () {
     expect(filter.checkUrl('ftp://gitlab.com/notifications?query=#forsen')).toBe(true);
     expect(filter.checkUrl('https://gitlab.com')).toBe(true);
     expect(filter.checkUrl('https://forsen.tv')).toBe(true);
+    expect(filter.checkUrl('http//://invalid')).toBe(true);
   });
 
   it('should support allow filtering', function () {
@@ -45,6 +46,7 @@ describe('FilterManager', function () {
     expect(filter.checkUrl('ftp://gitlab.com/notifications?query=#forsen')).toBe(false);
     expect(filter.checkUrl('https://gitlab.com')).toBe(false);
     expect(filter.checkUrl('https://forsen.tv')).toBe(false);
+    expect(filter.checkUrl('http//://invalid')).toBe(false);
   });
 
   it('should handle a full lifecycle', function () {

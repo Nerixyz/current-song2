@@ -33,8 +33,14 @@ describe('TabModel', function () {
         active: true,
       });
     });
+    it('should throw if the tab does not have an id', function () {
+      const tab = mockTab(1, 2);
+      tab.id = undefined;
+      expect(() => new TabModel(tab)).toThrow();
+    });
   });
-  describe('updateTabMeta', function () {
+
+  describe('#updateTabMeta', function () {
     it('should return false if nothing changed', function () {
       const model1 = new TabModel(mockTab(1, 2));
       expect(model1.updateTabMeta(mockTab(1, 2))).toBe(TabChange.NotChanged);
@@ -139,6 +145,15 @@ describe('TabModel', function () {
       ).toBe(TabChange.UrlChanged);
       expect(model.url).toBe('http://localhost:8080');
     });
+    it('should handle tabs without a windowId', function () {
+      const model = new TabModel(mockTab(1, 2, { title: 'Aliens - Dancing - YouTube' }));
+      expect(model.id).toBe(1);
+      expect(model.windowId).toBe(2);
+      const tab = mockTab(1, 2, { title: 'Aliens - Dancing - YouTube' });
+      tab.windowId = undefined;
+      expect(model.updateTabMeta(tab)).toBe(TabChange.NotChanged);
+      expect(model.windowId).toBe(2);
+    });
   });
 
   describe('#setActive', function () {
@@ -193,6 +208,17 @@ describe('TabModel', function () {
       expectTitleArtist(model, 'Danced', 'Me', null);
       expect(model.updateMetadata()).toBe(true);
       expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expect(model.updateMetadata({ title: 'I - Failed' })).toBe(true);
+      expectTitleArtist(model, 'Failed', 'I');
+      expect(model.updateMetadata({ title: 'I - Failed', artwork: 'aliens.jxl' })).toBe(true);
+      expectTitleArtist(model, 'Failed', 'I', 'aliens.jxl');
+      expect(model.updateMetadata({ title: 'I - Failed', artwork: 'aliens.jxl' })).toBe(false);
+    });
+    it('should fall back to the metadata artist if none is in the title', function () {
+      const model = new TabModel(mockTab(1, 2, { title: 'Alien - Dancing - YouTube' }));
+      expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expect(model.updateMetadata({ title: 'Aliens (Forsen-Remix)', artist: 'Forsen' })).toBe(true);
+      expectTitleArtist(model, 'Aliens (Forsen-Remix)', 'Forsen', null);
     });
   });
 
@@ -202,6 +228,36 @@ describe('TabModel', function () {
       expectTimeline(model, null);
       model.updateTimeline({ timestamp: 12.1, rate: 1.3, position: 13.4, duration: 1.4 });
       expectTimeline(model, { ts: 12, rate: 1.3, durationMs: 1, progressMs: 13 });
+    });
+  });
+
+  describe('#creteLegacyEvent', function () {
+    it('should return the correct metadata', function () {
+      const model = new TabModel(mockTab(1, 2));
+      expect(model.createLegacyEvent()).toStrictEqual({
+        metadata: { title: '', artist: undefined, artwork: undefined },
+        position: undefined,
+      });
+      model.updateMetadata({ title: 'Forsen', artist: 'Alien' });
+      expect(model.createLegacyEvent()).toStrictEqual({
+        metadata: { title: 'Forsen', artist: 'Alien', artwork: undefined },
+        position: undefined,
+      });
+      model.updateMetadata({ title: 'Forsen', artist: 'Alien', artwork: 'xd.jxl' });
+      expect(model.createLegacyEvent()).toStrictEqual({
+        metadata: { title: 'Forsen', artist: 'Alien', artwork: 'xd.jxl' },
+        position: undefined,
+      });
+      model.updateTimeline({ timestamp: 12345, rate: 1.5, position: 2000, duration: 4000 });
+      expect(model.createLegacyEvent()).toStrictEqual({
+        metadata: { title: 'Forsen', artist: 'Alien', artwork: 'xd.jxl' },
+        position: { timestamp: 12345, rate: 1.5, position: 2, duration: 4 },
+      });
+      model.updateMetadata();
+      expect(model.createLegacyEvent()).toStrictEqual({
+        metadata: { title: '', artist: undefined, artwork: undefined },
+        position: { timestamp: 12345, rate: 1.5, position: 2, duration: 4 },
+      });
     });
   });
 });

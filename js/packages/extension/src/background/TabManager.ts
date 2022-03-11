@@ -47,7 +47,11 @@ export class TabManager extends EventTarget {
     }
 
     for (const tab of initialTabs) {
-      this.addTab(tab);
+      try {
+        this.addTab(tab);
+      } catch (e) {
+        console.error(e, tab);
+      }
     }
 
     // to make sure the update callback is valid
@@ -55,7 +59,9 @@ export class TabManager extends EventTarget {
   }
 
   setPlayPosition(tab: BrowserTab, position?: VideoPlayPosition) {
-    const model = this.tabs.get(tab.id ?? -1);
+    if (!isId(tab.id)) return console.warn('Invalid tab', tab);
+
+    const model = this.tabs.get(tab.id);
     if (!model) return console.warn('Tab not tracked:', tab);
     model.updateTimeline(position);
 
@@ -63,7 +69,9 @@ export class TabManager extends EventTarget {
   }
 
   setMetadata(tab: BrowserTab, meta?: VideoMetadata) {
-    const model = this.tabs.get(tab.id ?? -1);
+    if (!isId(tab.id)) return console.warn('Invalid tab', tab);
+
+    const model = this.tabs.get(tab.id);
     if (!model) return console.warn('Tab not tracked:', tab);
     const anyChange = model.updateMetadata(meta);
     if (!anyChange) return;
@@ -72,14 +80,19 @@ export class TabManager extends EventTarget {
   }
 
   private addTab(tab: BrowserTab): TabModel {
+    if (!isId(tab.id)) throw new Error('Invalid tab');
+
+    // This won't throw since we know there's a valid tab-id
     const model = new TabModel(tab);
-    this.tabs.set(tab.id ?? -1, model);
+    this.tabs.set(tab.id, model);
     return model;
   }
 
   private updateWindow(window: BrowserWindow) {
-    if (window.state === 'fullscreen') this.blockedWindows.add(window.id ?? -1);
-    else this.blockedWindows.delete(window.id ?? -1);
+    if (!isId(window.id)) return console.warn('Invalid window', window);
+
+    if (window.state === 'fullscreen') this.blockedWindows.add(window.id);
+    else this.blockedWindows.delete(window.id);
   }
 
   private initListeners() {
@@ -92,7 +105,11 @@ export class TabManager extends EventTarget {
   }
 
   private tabCreated(tab: BrowserTab) {
-    this.addTab(tab);
+    try {
+      this.addTab(tab);
+    } catch (e) {
+      console.error(e, tab);
+    }
   }
 
   private tabRemoved(tabId: TabId) {
@@ -173,4 +190,9 @@ export class TabManager extends EventTarget {
 
     return this.filterManager.checkUrl(tab.url);
   }
+}
+
+// Helper to check if a tab/window has a valid id
+function isId(id: number | undefined): id is number {
+  return typeof id === 'number';
 }
