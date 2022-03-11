@@ -27,7 +27,7 @@ export class Connection {
 
     this.isLegacy = isLegacy;
 
-    this.sock = new ReconnectingWebsocket(isLegacy ? 'ws://localhost:232' : formatLocalUrl('/api/ws/extension', 'ws'));
+    this.sock = new ReconnectingWebsocket(isLegacy ? 'ws://127.0.0.1:232' : formatLocalUrl('/api/ws/extension', 'ws'));
     this.sock.connect().then(() => {
       if (this.lastMessage) {
         this.sock?.trySend('Active', this.lastMessage);
