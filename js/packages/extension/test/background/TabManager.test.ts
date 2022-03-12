@@ -93,7 +93,7 @@ describe('TabManager', function () {
     focusWindow(-1);
     await expectTab(promise, 11);
   });
-  it('should react correctly when the focused window is closed', async function() {
+  it('should react correctly when the focused window is closed', async function () {
     const { browser, initialTabs, initialWindows, removeTab, focusWindow } = make2Wind1TabBrowser();
     const { nextUpdate } = mockTabManager({ browser, initialTabs, initialWindows });
     await expectTab(nextUpdate(), 21);
@@ -115,7 +115,7 @@ describe('TabManager', function () {
     changeTab(11, tab => (tab.mutedInfo = { muted: true }));
     await expectNothing(nextUpdate());
   });
-  it('should handle updates to the title correctly', async function() {
+  it('should handle updates to the title correctly', async function () {
     const { browser, initialTabs, initialWindows, focusWindow, changeTab } = make1Wind1TabBrowser();
     const { nextUpdate } = mockTabManager({ browser, initialTabs, initialWindows });
     await expectNothing(nextUpdate());
@@ -133,6 +133,7 @@ describe('TabManager', function () {
       const { setFilters, setMode, filterStorage } = dynamicStorage(
         [{ value: 'github.com', isRegex: false }],
         FilterMode.Block,
+        false,
       );
       const { nextUpdate } = mockTabManager({
         browser,
@@ -151,10 +152,13 @@ describe('TabManager', function () {
       await expectTab(nextUpdate(), 21);
     });
     it('should keep track of filtered tabs', async function () {
-      jest.setTimeout(99999999);
       const { browser, initialTabs, initialWindows, changeTab, addTab, focusWindow, removeTab } =
         make1Wind1TabBrowser();
-      const { setMode, filterStorage } = dynamicStorage([{ value: 'github.com', isRegex: false }], FilterMode.Block);
+      const { setMode, filterStorage } = dynamicStorage(
+        [{ value: 'github.com', isRegex: false }],
+        FilterMode.Block,
+        false,
+      );
       const { nextUpdate } = mockTabManager({
         browser,
         initialTabs,
@@ -179,6 +183,23 @@ describe('TabManager', function () {
       await expectTab(promise, 22);
       setMode(FilterMode.Block);
       await expectNothing(nextUpdate());
+    });
+    it('should handle includeFocusedTabs correctly', async function () {
+      const { browser, initialTabs, initialWindows } = make1Wind1TabBrowser();
+      const { setIncludeFocusedTabs, filterStorage } = dynamicStorage(
+        [{ value: 'github.com', isRegex: false }],
+        FilterMode.Block,
+        false,
+      );
+      const { nextUpdate } = mockTabManager({
+        browser,
+        initialTabs,
+        initialWindows,
+        filterStorage,
+      });
+      await expectNothing(nextUpdate());
+      setIncludeFocusedTabs(true);
+      await expectTab(nextUpdate(), 11);
     });
   });
 

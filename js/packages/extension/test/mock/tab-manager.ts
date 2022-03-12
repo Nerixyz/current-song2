@@ -27,7 +27,7 @@ export function mockTabManager({
       initialTabs,
       initialWindows,
       browser,
-      filterManager: new FilterManager(filterStorage ?? staticStorage([], FilterMode.Block)),
+      filterManager: new FilterManager(filterStorage ?? staticStorage([], FilterMode.Block, false)),
       updateCallback: msg => {
         if (!resolveFn) throw new Error('Unhandled event');
         resolveFn(msg);

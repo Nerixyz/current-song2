@@ -1,6 +1,6 @@
 import { FilterManager, matchModel, tryParseUrl } from '../../src/filters/FilterManager';
 import { IFilterStorage, RevokeListener } from '../../src/filters/FilterStorage';
-import { DEFAULT_FILTER_MODE, FilterMode } from '../../src/options';
+import { DEFAULT_FILTER_MODE, DEFAULT_INCLUDE_FOCUSED_TABS, FilterMode } from '../../src/options';
 import { FilterModel } from '../../src/filters/types';
 import { staticStorage } from '../mock/filter-storage';
 
@@ -12,6 +12,7 @@ describe('FilterManager', function () {
         { value: '^http://', isRegex: true },
       ],
       FilterMode.Block,
+      false,
     );
     const filter = new FilterManager(Storage);
     expect(filter.checkUrl('https://github.com/notifications?query=#forsen')).toBe(false);
@@ -34,6 +35,7 @@ describe('FilterManager', function () {
         { value: '^http://', isRegex: true },
       ],
       FilterMode.Allow,
+      false,
     );
     const filter = new FilterManager(Storage);
     expect(filter.checkUrl('https://github.com/notifications?query=#forsen')).toBe(true);
@@ -52,9 +54,11 @@ describe('FilterManager', function () {
   it('should handle a full lifecycle', function () {
     const revokeFilters = jest.fn();
     const revokeFilterMode = jest.fn();
+    const revokeIncludeFocusedTabs = jest.fn();
 
     let setFilters = (_filters?: FilterModel[]): void => void 0;
     let setFilterMode = (_mode?: FilterMode): void => void 0;
+    let setIncludeFocusedTabs = (_v?: boolean): void => void 0;
     const listenFilters = jest.fn((cb: (filters?: FilterModel[]) => void): RevokeListener => {
       setFilters = cb;
       return revokeFilters;
@@ -63,16 +67,22 @@ describe('FilterManager', function () {
       setFilterMode = cb;
       return revokeFilterMode;
     });
+    const listenIncludeFocusedTabs = jest.fn((cb: (includeFocusedTabs?: boolean) => void): RevokeListener => {
+      setIncludeFocusedTabs = cb;
+      return revokeIncludeFocusedTabs;
+    });
     const onUpdate = jest.fn();
-    const Storage: IFilterStorage = { listenFilters, listenFilterMode };
+    const Storage: IFilterStorage = { listenFilters, listenFilterMode, listenIncludeFocusedTabs };
     const filter = new FilterManager(Storage, onUpdate);
 
     // Part 1: check initial state
     expect(listenFilters).toBeCalledTimes(1);
     expect(listenFilterMode).toBeCalledTimes(1);
+    expect(listenIncludeFocusedTabs).toBeCalledTimes(1);
     expect(onUpdate).toBeCalledTimes(0);
     expect(revokeFilters).toBeCalledTimes(0);
     expect(revokeFilterMode).toBeCalledTimes(0);
+    expect(revokeIncludeFocusedTabs).toBeCalledTimes(0);
 
     // Part 2.0: check onUpdate with setFilterMode
     setFilterMode();
@@ -89,7 +99,16 @@ describe('FilterManager', function () {
     setFilters([{ value: 'github.com', isRegex: false }]);
     expect(onUpdate).toBeCalledTimes(2);
 
-    // Part 3: check updates to filterMode and filters
+    // Part 3: check for includeFocusedTabs
+    expect(filter.includeFocusedTabs).toBe(DEFAULT_INCLUDE_FOCUSED_TABS);
+    setIncludeFocusedTabs();
+    expect(filter.includeFocusedTabs).toBe(DEFAULT_INCLUDE_FOCUSED_TABS);
+    expect(onUpdate).toBeCalledTimes(2);
+    setIncludeFocusedTabs(!DEFAULT_INCLUDE_FOCUSED_TABS);
+    expect(onUpdate).toBeCalledTimes(3);
+    expect(filter.includeFocusedTabs).toBe(!DEFAULT_INCLUDE_FOCUSED_TABS);
+
+    // Part 4: check updates to filterMode and filters
     setFilterMode(FilterMode.Allow);
     expect(filter.checkUrl('https://github.com/notifications?query=#forsen')).toBe(true);
     expect(filter.checkUrl('https://gitlab.com/notifications?query=#forsen')).toBe(false);
@@ -103,18 +122,22 @@ describe('FilterManager', function () {
     expect(filter.checkUrl('https://github.com/notifications?query=#forsen')).toBe(false);
     expect(filter.checkUrl('https://gitlab.com/notifications?query=#forsen')).toBe(false);
 
-    // Part 4.0: make sure nothing else was called
+    // Part 5.0: make sure nothing else was called
     expect(listenFilters).toBeCalledTimes(1);
     expect(listenFilterMode).toBeCalledTimes(1);
+    expect(listenIncludeFocusedTabs).toBeCalledTimes(1);
     expect(revokeFilters).toBeCalledTimes(0);
     expect(revokeFilterMode).toBeCalledTimes(0);
+    expect(revokeIncludeFocusedTabs).toBeCalledTimes(0);
 
-    // Part 4.1: check closing
+    // Part 5.1: check closing
     filter.close();
     expect(listenFilters).toBeCalledTimes(1);
     expect(listenFilterMode).toBeCalledTimes(1);
+    expect(listenIncludeFocusedTabs).toBeCalledTimes(1);
     expect(revokeFilters).toBeCalledTimes(1);
     expect(revokeFilterMode).toBeCalledTimes(1);
+    expect(revokeIncludeFocusedTabs).toBeCalledTimes(1);
   });
 });
 
