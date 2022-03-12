@@ -5,6 +5,7 @@ export type RevokeListener = () => void;
 export interface IFilterStorage {
   listenFilterMode(cb: (mode?: FilterMode) => void): RevokeListener;
   listenFilters(cb: (filters?: FilterModel[]) => void): RevokeListener;
+  listenIncludeFocusedTabs(cb: (includeFocusedTabs?: boolean) => void): RevokeListener;
 }
 
 export const LocalFilterStorage: IFilterStorage = {
@@ -13,5 +14,8 @@ export const LocalFilterStorage: IFilterStorage = {
   },
   listenFilters(cb: (filters?: FilterModel[]) => void): RevokeListener {
     return listenJsonOption(Option.Filters, cb);
+  },
+  listenIncludeFocusedTabs(cb: (includeFocusedTabs?: boolean) => void): RevokeListener {
+    return listenOption(Option.IncludeFocusedTabs, cb);
   },
 };

@@ -4,13 +4,16 @@ export enum Option {
   UseLegacyApi = 'use-legacy-api',
   FilterMode = 'filter-mode',
   Filters = 'filters',
+  IncludeFocusedTabs = 'include-focused-tabs',
 }
 
 export enum FilterMode {
   Allow = 'allow',
   Block = 'block',
 }
+
 export const DEFAULT_FILTER_MODE = FilterMode.Block;
+export const DEFAULT_INCLUDE_FOCUSED_TABS = false;
 
 /* istanbul ignore next */
 export function listenOption<T>(name: Option, cb: (value: T | undefined) => void): () => void {

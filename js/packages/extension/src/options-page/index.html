@@ -13,6 +13,16 @@
         <toggle-option label="Use Legacy API" option="use-legacy-api"></toggle-option>
       </div>
       <div class="option">
+        <toggle-option label="Include Focused Tabs" option="include-focused-tabs"></toggle-option>
+        <div class="explanation">
+          If disabled, then only tabs in the background <b>and</b> <i>all tabs</i> of unfocused windows (disabled due to
+          a bug on Chrome) are searched for media.
+          <p></p>
+          This is disabled by default. The reason for this is that if a tab is focused and the window is focused, then
+          it will probably be shown (on stream) anyway and there's no reason to show duplicate information.
+        </div>
+      </div>
+      <div class="option">
         Filter Mode
         <filter-mode-toggle></filter-mode-toggle>
       </div>
@@ -29,7 +39,7 @@
           the <span class="bold">whole url</span>.
         </div>
       </div>
-      <div class='option'>
+      <div class="option">
         <filter-tester></filter-tester>
       </div>
     </main>
