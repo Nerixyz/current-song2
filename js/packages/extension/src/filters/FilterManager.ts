@@ -1,19 +1,26 @@
 import { FilterModel } from './types';
-import { DEFAULT_FILTER_MODE, FilterMode } from '../options';
+import { DEFAULT_FILTER_MODE, DEFAULT_INCLUDE_FOCUSED_TABS, FilterMode } from '../options';
 import { IFilterStorage, RevokeListener } from './FilterStorage';
 
 export class FilterManager {
   private filtersUpdated?: () => void;
   private readonly listenFiltersHandle: RevokeListener;
   private readonly listenFilterModeHandle: RevokeListener;
+  private readonly listenIncludeFocusedTabs: RevokeListener;
 
   private filters: FilterModel[] = [];
   private filterMode: FilterMode = DEFAULT_FILTER_MODE;
+  private _includeFocusedTabs = DEFAULT_INCLUDE_FOCUSED_TABS;
+
+  public get includeFocusedTabs() {
+    return this._includeFocusedTabs;
+  }
 
   constructor(storage: IFilterStorage, updateListener?: () => void) {
     this.filtersUpdated = updateListener;
     this.listenFiltersHandle = storage.listenFilters(f => this.updateFilters(f));
     this.listenFilterModeHandle = storage.listenFilterMode(m => this.updateFilterMode(m));
+    this.listenIncludeFocusedTabs = storage.listenIncludeFocusedTabs(l => this.updateIncludeFocusedTabs(l));
   }
 
   public setUpdateListener(listener: () => void) {
@@ -34,6 +41,7 @@ export class FilterManager {
   public close() {
     this.listenFiltersHandle();
     this.listenFilterModeHandle();
+    this.listenIncludeFocusedTabs();
   }
 
   private updateFilters(filters?: FilterModel[]) {
@@ -44,6 +52,12 @@ export class FilterManager {
   private updateFilterMode(mode?: FilterMode) {
     const shouldUpdate = mode && this.filterMode !== mode;
     this.filterMode = mode ?? this.filterMode;
+    if (shouldUpdate) this.filtersUpdated?.();
+  }
+
+  private updateIncludeFocusedTabs(includeFocusedTabs?: boolean) {
+    const shouldUpdate = typeof includeFocusedTabs === 'boolean' && this._includeFocusedTabs !== includeFocusedTabs;
+    this._includeFocusedTabs = includeFocusedTabs ?? this._includeFocusedTabs;
     if (shouldUpdate) this.filtersUpdated?.();
   }
 }

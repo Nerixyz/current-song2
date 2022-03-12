@@ -184,7 +184,7 @@ export class TabManager extends EventTarget {
   }
 
   private isValidTab(tab: TabModel): boolean {
-    if (tab.active && this.activeWindowId === tab.windowId) return false;
+    if (!this.filterManager.includeFocusedTabs && tab.active && this.activeWindowId === tab.windowId) return false;
     if (!tab.audible || tab.muted) return false;
     if (this.blockedWindows.has(tab.windowId)) return false;
 
