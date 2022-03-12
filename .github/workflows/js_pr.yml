@@ -15,5 +15,5 @@ jobs:
         with:
           node-version: 16.x
           working-directory: js
-      - run: npm i && npm run build
+      - run: npm i && npm run test && npm run build
         working-directory: js

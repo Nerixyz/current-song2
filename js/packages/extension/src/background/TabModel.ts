@@ -4,8 +4,17 @@ import { PlayInfo, TimelineInfo } from '../../../shared/types';
 import { LegacyEventData, MessageCreator } from '../types/message.types';
 import { splitTitle } from '../utils/text';
 
+export enum TabChange {
+  NotChanged = 0x0,
+  UrlChanged = 0x1,
+  MetaChanged = 0x2,
+}
+
+// TODO: check chrome
+const DEFAULT_URL = 'about:blank';
+
 export class TabModel implements MessageCreator {
-  id: TabId = -1;
+  id: TabId;
   windowId: WindowId = -1;
   active = false;
   audible = false;
@@ -20,7 +29,16 @@ export class TabModel implements MessageCreator {
   private timeline: TimelineInfo | null = null;
   private imageUrl: string | null = null;
 
+  private _url = DEFAULT_URL;
+  get url() {
+    return this._url;
+  }
+
+  /** @throws if `tab.id` is `undefined`
+   */
   constructor(tab: BrowserTab) {
+    if (typeof tab.id !== 'number') throw new Error('Cannot create tab without id');
+    this.id = tab.id;
     this.updateTabMeta(tab);
   }
 
@@ -59,24 +77,25 @@ export class TabModel implements MessageCreator {
    *  3) change in windowId
    *  4) change in title/artist
    */
-  updateTabMeta(tab: BrowserTab): boolean {
+  updateTabMeta(tab: BrowserTab): TabChange {
     const isEqual =
-      this.windowId === tab.windowId &&
+      this.windowId === (tab.windowId ?? this.windowId) &&
       this.active === tab.active &&
       this.audible === !!tab.audible &&
       this.muted === (tab.mutedInfo?.muted ?? this.muted) &&
       (this.hasMetadata || this.tabTitle === (tab.title ?? ''));
+    const urlEqual = (tab.url ?? this._url) === this._url;
 
     this.tabTitle = tab.title ?? '';
-    this.windowId = tab.windowId ?? -1;
-    this.id = tab.id ?? -1;
+    this.windowId = tab.windowId ?? this.windowId;
     this.active = tab.active;
     this.audible = !!tab.audible;
     this.muted = tab.mutedInfo?.muted ?? this.muted;
+    this._url = tab.url ?? this._url;
 
     if (!this.hasMetadata) this.tryExtractSetArtistFromTitle();
 
-    return !isEqual;
+    return isEqual ? (urlEqual ? TabChange.NotChanged : TabChange.UrlChanged) : TabChange.MetaChanged;
   }
 
   setActive(active: boolean) {
@@ -130,9 +149,9 @@ export class TabModel implements MessageCreator {
   private tryExtractSetArtist(fullTitle: string): boolean {
     const { title, artist } = splitTitle(fullTitle);
     const anyChange = this.title !== title || this.artist !== (artist || null);
-    this.title = title.trim();
+    this.title = title;
     // use || instead of ??, so that '' will be null
-    this.artist = artist?.trim() || null;
+    this.artist = artist || null;
 
     return anyChange;
   }

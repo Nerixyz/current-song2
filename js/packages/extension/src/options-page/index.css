@@ -6,3 +6,7 @@ body {
 .option {
     margin: 1rem;
 }
+
+.code {
+    font-family: monospace;
+}

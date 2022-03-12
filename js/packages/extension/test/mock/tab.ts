@@ -19,6 +19,30 @@ export function mockTab(
   };
 }
 
+export function mockAudibleTab(
+  id: number,
+  windowId: number,
+  other: Partial<Exclude<BrowserTab, 'id' | 'windowId' | 'audible'>> = {},
+): BrowserTab {
+  return mockTab(id, windowId, { ...other, audible: true });
+}
+
+export function mockAudibleMutedTab(
+  id: number,
+  windowId: number,
+  other: Partial<Exclude<BrowserTab, 'id' | 'windowId' | 'audible' | 'mutedInfo'>> = {},
+): BrowserTab {
+  return mockTab(id, windowId, { ...other, audible: true, mutedInfo: { muted: true } });
+}
+
+export function mockMutedTab(
+  id: number,
+  windowId: number,
+  other: Partial<Exclude<BrowserTab, 'id' | 'windowId' | 'mutedInfo'>> = {},
+): BrowserTab {
+  return mockTab(id, windowId, { ...other, mutedInfo: { muted: true } });
+}
+
 interface TabStateProps {
   id: number;
   windowId: number;
