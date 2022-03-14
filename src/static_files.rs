@@ -1,3 +1,8 @@
+use crate::CONFIG;
+use actix_files::NamedFile;
+use actix_web::get;
+use std::io;
+
 #[cfg(feature = "single-executable")]
 mod static_web_files {
     include!(concat!(env!("OUT_DIR"), "/generated.rs"));
@@ -12,4 +17,9 @@ pub fn service() -> actix_web_static_files::ResourceFiles {
 #[cfg(not(feature = "single-executable"))]
 pub fn service() -> actix_files::Files {
     actix_files::Files::new("/", "js/packages/client/dist").index_file("index.html")
+}
+
+#[get("theme.css")]
+pub async fn theme_css() -> io::Result<NamedFile> {
+    NamedFile::open_async(&CONFIG.server.custom_theme_path).await
 }

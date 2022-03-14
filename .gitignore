@@ -5,3 +5,4 @@
 config.toml
 *.log
 artifacts
+/theme.css

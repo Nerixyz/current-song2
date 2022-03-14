@@ -15,12 +15,15 @@ pub struct Config {
 pub struct ServerConfig {
     #[serde(default = "default_port")]
     pub port: u16,
+    #[serde(default = "default_custom_theme_path")]
+    pub custom_theme_path: String,
 }
 
 impl Default for ServerConfig {
     fn default() -> Self {
         Self {
             port: default_port(),
+            custom_theme_path: default_custom_theme_path(),
         }
     }
 }
@@ -28,6 +31,11 @@ impl Default for ServerConfig {
 #[inline]
 fn default_port() -> u16 {
     48457
+}
+
+#[inline]
+fn default_custom_theme_path() -> String {
+    "theme.css".to_string()
 }
 
 #[inline]
