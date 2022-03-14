@@ -28,7 +28,7 @@ import {
   const tree = smolTree<State>(
     [imageEl, { spotify: isSpotify }],
     [imageContainer, { hidden: not(hasImage) }],
-    [container, { 'with-image': hasImage, 'with-progress': hasTimeline }],
+    [container, { 'with-image': hasImage, 'is-spotify': isSpotify, 'with-progress': hasTimeline }],
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
 
@@ -43,7 +43,10 @@ import {
     animateOnChange(titleEl, state.title, ...TextChangeAnimation);
     if (state.subtitle) animateOnChange(subtitleEl, state.subtitle, ...TextChangeAnimation);
 
-    if (state.imageUrl) imageEl.src = state.imageUrl;
+    if (state.imageUrl) {
+      imageEl.src = state.imageUrl;
+      container.style.setProperty('--image-url', `url("${encodeURI(state.imageUrl)}")`);
+    }
 
     progressManager.run(data.timeline);
   });
