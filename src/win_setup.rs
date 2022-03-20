@@ -6,6 +6,7 @@ use win_wrapper::{
     autostart::{add_self_to_autostart, check_autostart, remove_autostart, ERROR_ACCESS_DENIED},
     elevate::elevate_self,
     message_box::{MessageBox, Okay, YesNo},
+    single_instance,
 };
 
 #[cfg(debug_assertions)]
@@ -31,6 +32,8 @@ pub fn win_main() {
             .ok();
         std::process::exit(0);
     }
+
+    handle_multiple_instances();
 
     if CONFIG.no_autostart || check_autostart(APPLICATION_NAME) {
         return;
@@ -78,6 +81,37 @@ pub fn win_main() {
                 .ok();
         }
     };
+}
+
+fn handle_multiple_instances() {
+    // consider using something random?
+    // not dependant on the version!
+    if !single_instance::try_create_new_instance(&format!(
+        "current-song2::main-executable::{}",
+        CONFIG.server.port
+    )) {
+        if MessageBox::<YesNo>::information(
+            "Another instance is already running. Kill the other instance?",
+        )
+        .with_title(APPLICATION_NAME)
+        .show()
+        .unwrap_or(YesNo::No)
+            == YesNo::Yes
+        {
+            match single_instance::kill_other_instances_of_this_application() {
+                Ok(_) => (),
+                Err(e) => {
+                    MessageBox::<Okay>::error(&format!(
+                        "Could not kill the other instance: {:?}",
+                        e
+                    ))
+                    .with_title(APPLICATION_NAME)
+                    .show()
+                    .ok();
+                }
+            }
+        }
+    }
 }
 
 fn elevated_main() -> ! {
