@@ -1,7 +1,7 @@
 :root {
     --theme-color: #c3f831;
     --text-color: #000;
-    --font: 'Zilla Slab', 'Roboto', 'Arial', sans;
+    --font: 'Arial', sans;
     --shadow-color: #0008;
 
     --rounded: 10px;
