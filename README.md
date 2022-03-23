@@ -1,6 +1,6 @@
 # CurrentSong 2
 
-![example screenshot](https://i.imgur.com/u6hepdX.png)
+![example screenshot with default theme](https://i.imgur.com/qAs7xXh.png)
 
 This project is a rewrite of the [**CurrentSong Overlay**](https://github.com/Nerixyz/current-song-overlay). The core is
 written in Rust now. That doesn't change much, but now the project supports
