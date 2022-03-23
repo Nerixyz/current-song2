@@ -41,6 +41,8 @@ default setting). Search for `current-song2.exe` in the _Background Processes_ a
 
 **Alternatively**: In the _Task Manager_, go to _Details_ and search for `current-song2.exe`.
 
+**If you only want to restart the app** then you can simply reopen the app, and it will ask you to stop the old instance.
+
 ### Autostart
 
 To remove the application from autostart, run `current-song2.exe --remove-autostart` from a terminal.
@@ -50,7 +52,7 @@ Alternatively you can **disable** the autostart entry in the Task Manager (start
 # Configuration
 
 ⚠ The config is loaded at the start of CurrentSong. So in order to apply the configuration, you need to **restart** the
-application.
+application. On Windows you should only need to double-click the `current-song2.exe` again, and it will ask you to stop the old process.
 
 The configuration uses the [toml](https://toml.io) format.
 
