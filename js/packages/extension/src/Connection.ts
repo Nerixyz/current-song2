@@ -1,4 +1,4 @@
-import { listenOption, Option } from './options';
+import { DEFAULT_CURRENT_PORT, DEFAULT_LEGACY_PORT, listenOption, Option } from './options';
 import { formatLocalUrl } from '../../shared/url';
 import { LegacyEventData, MessageCreator } from './types/message.types';
 import { PlayInfo } from '../../shared/types';
@@ -12,22 +12,36 @@ export class Connection {
     OutgoingMessages<{ Active: ConnectionActiveMessage; Inactive: undefined }>
   >;
   private isLegacy = false;
+  private port = DEFAULT_CURRENT_PORT;
 
   private lastMessage: null | ConnectionActiveMessage = null;
 
   constructor() {
     // although this may not seem like it,
     // this will call the callback at the start.
-    listenOption<boolean>(Option.UseLegacyApi, v => this.handleOptionChange(!!v));
+    listenOption<boolean>(Option.UseLegacyApi, v => this.handleOptionChange(!!v, this.port));
+    listenOption<string>(Option.ApiPort, v =>
+      this.handleOptionChange(
+        this.isLegacy,
+        v ? Number(v) : this.isLegacy ? DEFAULT_LEGACY_PORT : DEFAULT_CURRENT_PORT,
+      ),
+    );
   }
 
-  handleOptionChange(isLegacy: boolean) {
-    if (this.sock) this.sock.close();
-    if (this.isLegacy !== isLegacy) this.lastMessage = null;
+  handleOptionChange(isLegacy: boolean, port: number) {
+    const legacyChanged = this.isLegacy !== isLegacy;
+    const portChanged = this.port !== port;
+    if (!legacyChanged && !portChanged) return;
 
+    if (this.sock) this.sock.close();
+    if (legacyChanged) this.lastMessage = null;
+
+    this.port = port;
     this.isLegacy = isLegacy;
 
-    this.sock = new ReconnectingWebsocket(isLegacy ? 'ws://127.0.0.1:232' : formatLocalUrl('/api/ws/extension', 'ws'));
+    this.sock = new ReconnectingWebsocket(
+      this.isLegacy ? `ws://127.0.0.1:${this.port}` : formatLocalUrl('/api/ws/extension', this.port, 'ws'),
+    );
     this.sock.connect().then(() => {
       if (this.lastMessage) {
         this.sock?.trySend('Active', this.lastMessage);
