@@ -5,6 +5,7 @@ export enum Option {
   FilterMode = 'filter-mode',
   Filters = 'filters',
   IncludeFocusedTabs = 'include-focused-tabs',
+  ApiPort = 'api-port',
 }
 
 export enum FilterMode {
@@ -14,6 +15,8 @@ export enum FilterMode {
 
 export const DEFAULT_FILTER_MODE = FilterMode.Block;
 export const DEFAULT_INCLUDE_FOCUSED_TABS = false;
+export const DEFAULT_LEGACY_PORT = 232;
+export const DEFAULT_CURRENT_PORT = 48457;
 
 /* istanbul ignore next */
 export function listenOption<T>(name: Option, cb: (value: T | undefined) => void): () => void {
@@ -26,7 +29,6 @@ export function listenOption<T>(name: Option, cb: (value: T | undefined) => void
 
   // This is important for the Connection class
   browser.storage.local.get(name).then(res => {
-    console.log(name, res);
     cb(res[name]);
   });
 
