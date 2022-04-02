@@ -131,8 +131,7 @@ multiple themes in the folder and switch between them.
 
 Controls the local port on which the server is listening, defaults to `48457`.
 
-⚠ Since you cannot set the port on the browser extension, you need to keep the default value if you want to use the
-extension.
+⚠ If you change the port, make sure to change it in the extension as well.
 
 # Theming
 
