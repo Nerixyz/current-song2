@@ -10,7 +10,7 @@ export interface IBrowserInterface {
   addTabRemovedListener(cb: (tabId: TabId) => void): void;
   addTabUpdatedListener(cb: (tabId: TabId) => void): void;
   addTabActivatedListener(cb: (info: TabActivateInfo) => void): void;
-  addWindowFocusChangedListener(cb: (windowId: WindowId) => void): void;
+  addWindowFocusChangedListener(cb: (windowId: WindowId) => void): boolean;
   addWindowRemovedListener(cb: (windowId: WindowId) => void): void;
 }
 
@@ -35,9 +35,13 @@ export const DefaultBrowserInterface: IBrowserInterface = {
   },
   // do not use windows api on chrome see: https://bugs.chromium.org/p/chromium/issues/detail?id=387377
   addWindowFocusChangedListener(cb) {
-    if (!isChromeLike()) browser.windows.onFocusChanged.addListener(cb);
+    if (isChromeLike()) {
+      return false;
+    }
+    browser.windows.onFocusChanged.addListener(cb);
+    return true;
   },
   addWindowRemovedListener(cb) {
-    if (!isChromeLike()) browser.windows.onRemoved.addListener(cb);
+    browser.windows.onRemoved.addListener(cb);
   },
 };

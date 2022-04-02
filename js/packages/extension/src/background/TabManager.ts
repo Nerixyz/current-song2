@@ -21,11 +21,15 @@ interface FindAndEmitOptions {
 export class TabManager extends EventTarget {
   /** This includes tabs that are audible OR have metadata */
   readonly tabs = new Map<TabId, TabModel>();
+  /** Since Chrome doesn't send the `previousTabId` when a tab is activated, we need to track all windows ourselves. */
+  readonly knownWindows = new Map<WindowId, { activeTabId: TabId }>();
 
   readonly blockedWindows = new Set<WindowId>();
   activeWindowId: number | null = null;
 
   sentTabId: number | null = null;
+
+  private shouldTrackActiveWindow = false;
 
   private readonly updateCallback: (message: TabModel | null) => void;
   private readonly filterManager: FilterManager;
@@ -85,6 +89,9 @@ export class TabManager extends EventTarget {
     // This won't throw since we know there's a valid tab-id
     const model = new TabModel(tab);
     this.tabs.set(tab.id, model);
+
+    if (tab.active) this.activateTabOnWindow(model.windowId, model.id);
+
     return model;
   }
 
@@ -95,12 +102,24 @@ export class TabManager extends EventTarget {
     else this.blockedWindows.delete(window.id);
   }
 
+  private activateTabOnWindow(windowId: WindowId, tabId: TabId) {
+    const info = this.knownWindows.get(windowId);
+    if (info) {
+      this.tabs.get(info.activeTabId)?.setActive(false);
+      info.activeTabId = tabId;
+    } else {
+      this.knownWindows.set(windowId, { activeTabId: tabId });
+    }
+
+    this.tabs.get(tabId)?.setActive(true);
+  }
+
   private initListeners() {
     this.browser.addTabCreatedListener(this.tabCreated.bind(this));
     this.browser.addTabRemovedListener(this.tabRemoved.bind(this));
     this.browser.addTabUpdatedListener(this.tabUpdated.bind(this));
     this.browser.addTabActivatedListener(this.tabActivated.bind(this));
-    this.browser.addWindowFocusChangedListener(this.windowFocused.bind(this));
+    this.shouldTrackActiveWindow = this.browser.addWindowFocusChangedListener(this.windowFocused.bind(this));
     this.browser.addWindowRemovedListener(this.windowRemoved.bind(this));
   }
 
@@ -119,12 +138,9 @@ export class TabManager extends EventTarget {
   }
 
   private tabActivated(info: TabActivateInfo) {
-    this.activeWindowId = info.windowId;
+    if (this.shouldTrackActiveWindow) this.activeWindowId = info.windowId;
 
-    if (info.previousTabId !== undefined) this.tabs.get(info.previousTabId)?.setActive(false);
-
-    this.tabs.get(info.tabId)?.setActive(true);
-
+    this.activateTabOnWindow(info.windowId, info.tabId);
     this.findAndEmitActiveTab();
   }
 
@@ -156,6 +172,7 @@ export class TabManager extends EventTarget {
   private windowRemoved(windowId: WindowId) {
     if (this.activeWindowId === windowId) this.activeWindowId = null;
     this.blockedWindows.delete(windowId);
+    this.knownWindows.delete(windowId);
 
     // don't update tabs here since there will be separate events for them
   }
@@ -184,7 +201,12 @@ export class TabManager extends EventTarget {
   }
 
   private isValidTab(tab: TabModel): boolean {
-    if (!this.filterManager.includeFocusedTabs && tab.active && this.activeWindowId === tab.windowId) return false;
+    if (
+      !this.filterManager.includeFocusedTabs &&
+      tab.active &&
+      (!this.shouldTrackActiveWindow || this.activeWindowId === tab.windowId)
+    )
+      return false;
     if (!tab.audible || tab.muted) return false;
     if (this.blockedWindows.has(tab.windowId)) return false;
 
