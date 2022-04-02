@@ -8,7 +8,7 @@ name = "gsmtc"
 path = "src/lib.rs"
 
 [dependencies]
-tokio = { version = "1.15", features = ["sync", "macros", "rt"] }
+tokio = { version = "1.17", features = ["sync", "macros", "rt"] }
 windows = { version = "0.34", features = ["Media_Control", "Foundation", "Foundation_Collections", "Storage_Streams"] }
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }
