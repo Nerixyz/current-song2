@@ -5,6 +5,7 @@ import { PlayInfo } from '../../shared/types';
 import { IncomingMessages, OutgoingMessages, ReconnectingWebsocket } from '../../shared/reconnecting-websocket';
 
 type ConnectionActiveMessage = LegacyEventData | PlayInfo;
+type Port = number | undefined | null;
 
 export class Connection {
   private sock?: ReconnectingWebsocket<
@@ -12,7 +13,7 @@ export class Connection {
     OutgoingMessages<{ Active: ConnectionActiveMessage; Inactive: undefined }>
   >;
   private isLegacy = false;
-  private port = DEFAULT_CURRENT_PORT;
+  private port: Port = null;
 
   private lastMessage: null | ConnectionActiveMessage = null;
 
@@ -20,18 +21,13 @@ export class Connection {
     // although this may not seem like it,
     // this will call the callback at the start.
     listenOption<boolean>(Option.UseLegacyApi, v => this.handleOptionChange(!!v, this.port));
-    listenOption<string>(Option.ApiPort, v =>
-      this.handleOptionChange(
-        this.isLegacy,
-        v ? Number(v) : this.isLegacy ? DEFAULT_LEGACY_PORT : DEFAULT_CURRENT_PORT,
-      ),
-    );
+    listenOption<string>(Option.ApiPort, v => this.handleOptionChange(this.isLegacy, v ? Number(v) : null));
   }
 
-  handleOptionChange(isLegacy: boolean, port: number) {
+  handleOptionChange(isLegacy: boolean, port: Port) {
     const legacyChanged = this.isLegacy !== isLegacy;
     const portChanged = this.port !== port;
-    if (!legacyChanged && !portChanged) return;
+    if (!legacyChanged && !portChanged && this.sock) return;
 
     if (this.sock) this.sock.close();
     if (legacyChanged) this.lastMessage = null;
@@ -39,8 +35,9 @@ export class Connection {
     this.port = port;
     this.isLegacy = isLegacy;
 
+    const actualPort = this.port ?? (this.isLegacy ? DEFAULT_LEGACY_PORT : DEFAULT_CURRENT_PORT);
     this.sock = new ReconnectingWebsocket(
-      this.isLegacy ? `ws://127.0.0.1:${this.port}` : formatLocalUrl('/api/ws/extension', this.port, 'ws'),
+      this.isLegacy ? `ws://127.0.0.1:${actualPort}` : formatLocalUrl('/api/ws/extension', actualPort, 'ws'),
     );
     this.sock.connect().then(() => {
       if (this.lastMessage) {

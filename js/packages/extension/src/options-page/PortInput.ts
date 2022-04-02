@@ -13,7 +13,7 @@ export class PortInput extends LitElement {
   `;
 
   @state()
-  private _port: string | undefined = undefined;
+  private _port: string | undefined | null = undefined;
   @state()
   private _useLegacyApi = false;
 
@@ -48,10 +48,10 @@ export class PortInput extends LitElement {
 
   private _updatePort(e: Event) {
     const target = e.target as HTMLInputElement;
-    if (typeof this._port === 'undefined' && target.value === this._getCurrentDefaultPort()) {
+    if (!this._port && target.value === this._getCurrentDefaultPort()) {
       return;
     }
-    this._port = target.value || undefined;
+    this._port = target.value || null;
     this._trySetPort();
     this.requestUpdate();
   }
@@ -61,7 +61,7 @@ export class PortInput extends LitElement {
   }
 
   private _getActualPort() {
-    return typeof this._port === 'undefined' ? this._getCurrentDefaultPort() : this._port;
+    return this._port ?? this._getCurrentDefaultPort();
   }
 
   private _trySetPort() {
@@ -70,7 +70,7 @@ export class PortInput extends LitElement {
         setOption(Option.ApiPort, Number(this._port)).catch(console.error);
       }
     } else {
-      setOption(Option.ApiPort, undefined).catch(console.error);
+      setOption(Option.ApiPort, null).catch(console.error);
     }
   }
 }
