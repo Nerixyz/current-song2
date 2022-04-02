@@ -1,3 +1,4 @@
+import '../chrome-fix';
 import { ContentEventHandler } from 'beaverjs';
 import { InternalMessageMap } from '../messages';
 import { VideoPlayPosition } from '../types/video.types';

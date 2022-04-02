@@ -1,3 +1,5 @@
+import '../chrome-fix';
+
 export * from './ToggleOption';
 export * from './FilterList';
 export * from './FilterModeToggle';
