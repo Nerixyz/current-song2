@@ -9,6 +9,7 @@ import { LocalFilterStorage } from '../filters/FilterStorage';
 import { DefaultBrowserInterface } from './BrowserInterface';
 
 (async () => {
+  (globalThis as any).csDebug = { sends: false };
   const connection = new Connection();
 
   const manager = await createManager(connection);
@@ -28,7 +29,8 @@ async function createManager(connection: Connection): Promise<TabManager> {
   return new TabManager({
     initialTabs: initialWindows.map(w => w.tabs || []).flat(),
     updateCallback: message => {
-      console.trace('%cSend %o', 'color: red; font-weight: bold; font-size: 2em;', message);
+      if ((globalThis as any).csDebug?.sends)
+        console.trace('%cSend %o', 'color: red; font-weight: bold; font-size: 2em;', message);
       connection.send(message ?? undefined);
     },
     initialWindows,
