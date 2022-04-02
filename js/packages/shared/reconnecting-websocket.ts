@@ -120,7 +120,11 @@ export class ReconnectingWebsocket<EventMap extends MinEventMap, SendMap extends
   }
 
   public trySend<K extends keyof SendMap>(type: K, data: SendMap[K]) {
-    this.ws?.send(JSON.stringify({ type, data }));
+    try {
+      this.ws?.send(JSON.stringify({ type, data }));
+    } catch (e) {
+      console.warn('Error sending websocket message:', e);
+    }
   }
 
   public close() {
