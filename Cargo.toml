@@ -15,16 +15,16 @@ name = "current-song2"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.15", features = ["sync"] }
-tokio-stream = { version = "0.1.8", features = ["sync"] }
+tokio = { version = "1.17", features = ["sync"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 
-actix = "0.12.0"
-actix-web = { version = "4.0.0-beta.15", features = ["compress-brotli"] }
-actix-files = "0.6.0-beta.10"
-actix-web-actors = "4.0.0-beta.8"
-actix-cors = "0.6.0-beta.7"
-actix-web-static-files = { git = "https://github.com/Nerixyz/actix-web-static-files", branch = "actix-4" }
+actix = "=0.12"
+actix-web = { version = "4.0", features = ["compress-brotli"] }
+actix-files = "0.6"
+actix-web-actors = "=4.0"
+actix-cors = "0.6"
+actix-web-static-files = "4.0"
 static-files = "0.2"
 
 serde = { version = "1.0", features = ["derive"] }
@@ -38,7 +38,7 @@ tap = "1.0"
 tracing = "0.1"
 tracing-log = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
-tracing-actix-web = "0.5.0-beta.6"
+tracing-actix-web = "0.5"
 tracing-actix = "0.3"
 tracing-appender = "0.2"
 
@@ -47,4 +47,4 @@ win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
 
 [build-dependencies]
-actix-web-static-files = { git = "https://github.com/Nerixyz/actix-web-static-files", branch = "actix-4" }
+actix-web-static-files = "4.0"
