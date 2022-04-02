@@ -333,7 +333,7 @@ describe('TabManager', function () {
         addTabRemovedListener: () => undefined,
         addTabUpdatedListener: cb => (onTabUpdated = cb),
         addTabActivatedListener: () => undefined,
-        addWindowFocusChangedListener: () => undefined,
+        addWindowFocusChangedListener: () => false,
         addWindowRemovedListener: () => undefined,
       };
       const { nextUpdate } = mockTabManager({ browser, initialTabs: [invalidTab], initialWindows: [invalidWindow] });

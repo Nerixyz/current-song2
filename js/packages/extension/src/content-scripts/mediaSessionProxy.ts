@@ -1,3 +1,4 @@
+import '../chrome-fix';
 import { ContentEventHandler } from 'beaverjs';
 
 if (document.documentElement instanceof HTMLElement) {

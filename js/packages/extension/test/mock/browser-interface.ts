@@ -114,7 +114,11 @@ export function mockBrowser(initialWindows: BrowserWindow[] = []) {
       addTabRemovedListener: (cb: (tabId: TabId) => void) => (onTabRemoved = cb),
       addTabUpdatedListener: (cb: (tabId: TabId) => void) => (onTabUpdated = cb),
       addTabActivatedListener: (cb: (info: TabActivateInfo) => void) => (onTabActivated = cb),
-      addWindowFocusChangedListener: (cb: (windowId: WindowId) => void) => (onWindowFocusChanged = cb),
+      addWindowFocusChangedListener: (cb: (windowId: WindowId) => void) => {
+        onWindowFocusChanged = cb;
+        // we can always listen to window events
+        return true;
+      },
       addWindowRemovedListener: (cb: (windowId: WindowId) => void) => (onWindowRemoved = cb),
     } as IBrowserInterface,
     initialTabs: [...tabs.values()],
