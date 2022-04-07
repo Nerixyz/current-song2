@@ -2,6 +2,8 @@
 
 ![example screenshot with default theme](https://i.imgur.com/qAs7xXh.png)
 
+_For more examples, look at the [example themes](themes)!_
+
 This project is a rewrite of the [**CurrentSong Overlay**](https://github.com/Nerixyz/current-song-overlay). The core is
 written in Rust now. That doesn't change much, but now the project supports
 Windows' [`GlobalSystemMediaTransportControls`](https://docs.microsoft.com/uwp/api/windows.media.control).
@@ -140,6 +142,8 @@ You can theme the overlay through a `theme.css` file (or a different filename sp
 Themes _don't_ require a restart of the app, you only need to reload the browser.
 
 💡 To debug the theme it's best to open the overlay in your browser and use its dev-tools. Go to `http://localhost:48457` in your browser.
+
+📝 Take a look at the [example themes](themes)!
 
 # Planned Features
 
