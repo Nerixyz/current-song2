@@ -21,5 +21,7 @@ pub fn service() -> actix_files::Files {
 
 #[get("theme.css")]
 pub async fn theme_css() -> io::Result<NamedFile> {
-    NamedFile::open_async(&CONFIG.server.custom_theme_path).await.map(|file| file.use_etag(false).use_last_modified(false))
+    NamedFile::open_async(&CONFIG.server.custom_theme_path)
+        .await
+        .map(|file| file.use_etag(false).use_last_modified(false))
 }
