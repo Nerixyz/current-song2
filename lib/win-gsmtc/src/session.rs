@@ -1,13 +1,13 @@
 use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
-    util::request_media_properties,
+    util::{optional_result, request_media_properties},
 };
 use std::{
     convert::TryInto,
     sync::{Arc, Weak},
 };
 use tokio::sync::mpsc;
-use tracing::{event, Level};
+use tracing::{debug, event, Level};
 use windows::{
     core::{AgileReference, Result},
     Foundation::{EventRegistrationToken, TypedEventHandler},
@@ -143,19 +143,23 @@ impl SessionWorker {
         event!(Level::TRACE, source = %self.model.source, command = ?cmd);
         match cmd {
             SessionCommand::PlaybackInfoChanged => {
-                let model = self.session.GetPlaybackInfo()?.try_into()?;
-                self.model.playback = Some(model);
+                let model = optional_result(self.session.GetPlaybackInfo()?.try_into())?;
+                if !(model.is_none() == self.model.playback.is_none()) {
+                    self.model.playback = model;
 
-                self.sess_tx
-                    .send(SessionUpdateEvent::Model(self.model.clone()))
-                    .ok();
+                    self.sess_tx
+                        .send(SessionUpdateEvent::Model(self.model.clone()))
+                        .ok();
+                }
             }
             SessionCommand::MediaPropertiesChanged => {
                 let loop_tx = self.loop_tx.clone();
                 let session = AgileReference::new(&self.session)?;
                 tokio::spawn(async move {
-                    if let Err(e) = request_media_properties(loop_tx, session).await {
-                        event!(Level::WARN, error = %e, "Could not get media properties")
+                    match request_media_properties(loop_tx, session).await {
+                        Ok(None) => debug!("Empty media properties"),
+                        Err(e) => event!(Level::WARN, error = %e, "Could not get media properties"),
+                        _ => (),
                     }
                 });
             }
