@@ -13,11 +13,20 @@ use windows::{
     Win32::Foundation::E_ABORT,
 };
 
+macro_rules! opt_result {
+    ($res:expr) => {
+        match optional_result($res)? {
+            Some(v) => v,
+            None => return Ok(None),
+        }
+    };
+}
+
 pub async fn request_media_properties(
     loop_tx: Weak<mpsc::UnboundedSender<SessionCommand>>,
     session: AgileReference<GlobalSystemMediaTransportControlsSession>,
-) -> Result<()> {
-    debug!("Getting new image");
+) -> Result<Option<()>> {
+    debug!("Getting media properties");
     let session = session.resolve()?;
     let media_properties = session.TryGetMediaPropertiesAsync()?.await?;
     let get_properties = media_properties.clone();
@@ -25,39 +34,60 @@ pub async fn request_media_properties(
         .await
         .tap_err(|e| error!(error = %e,"Couldn't read stream"))
         .map_err(|_| windows::core::Error::from(E_ABORT))?
-        .tap_err(|e| warn!(error = %e, "Couldn't get image"))
-        .ok();
+        .tap_err(|e| warn!(error = ?e, "Couldn't get image"))
+        .ok()
+        .flatten();
 
     if let Some(loop_tx) = loop_tx.upgrade() {
         loop_tx
             .send(SessionCommand::MediaPropertiesResult(
-                media_properties.try_into()?,
+                opt_result!(media_properties.try_into()),
                 image,
             ))
             .ok();
     }
-    Ok(())
+    Ok(Some(()))
 }
 
 fn try_get_thumbnail_sync(
     media_properties: &GlobalSystemMediaTransportControlsSessionMediaProperties,
-) -> Result<Image> {
-    let read = media_properties.Thumbnail()?.OpenReadAsync()?;
+) -> Result<Option<Image>> {
+    let thumb = opt_result!(media_properties.Thumbnail());
+
+    let read = thumb.OpenReadAsync()?;
     let stream = read.get()?;
     let content_type = stream.ContentType()?.to_string();
     let data = read_stream_sync(stream)?;
-    Ok(Image { content_type, data })
+    Ok(Some(Image { content_type, data }))
 }
 
 fn read_stream_sync(stream: IRandomAccessStreamWithContentType) -> Result<Vec<u8>> {
-    let stream_len = stream.Size()? as usize;
+    let stream_len = stream
+        .Size()
+        .tap_err(|e| warn!(error = %e, "Couldn't get the streams size"))?
+        as usize;
     let mut data = vec![0u8; stream_len];
-    let reader = DataReader::CreateDataReader(&stream)?;
-    reader.LoadAsync(stream_len as u32)?.get()?;
-    reader.ReadBytes(&mut data)?;
+    let reader = DataReader::CreateDataReader(&stream)
+        .tap_err(|e| warn!(error = %e, "Couldn't create a data reader"))?;
+    reader
+        .LoadAsync(stream_len as u32)
+        .tap_err(|e| warn!(error = %e, "Couldn't start loading async"))?
+        .get()
+        .tap_err(|e| warn!(error = %e, "Couldn't load async"))?;
+    reader
+        .ReadBytes(&mut data)
+        .tap_err(|e| warn!(error = %e, "Couldn't read the bytes"))?;
 
     reader.Close().ok();
     stream.Close().ok();
 
     Ok(data)
+}
+
+pub fn optional_result<T>(result: Result<T>) -> Result<Option<T>> {
+    match result {
+        Ok(v) => Ok(Some(v)),
+        Err(e) if e.code().is_ok() => Ok(None),
+        Err(e) => Err(e),
+    }
 }
