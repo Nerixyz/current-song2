@@ -33,7 +33,7 @@ import {
   );
 
   const ws = new ReconnectingWebsocket<IncomingMessages<EventMap>, OutgoingMessages>(
-    formatLocalUrl('/api/ws/client', 'ws'),
+    formatLocalUrl('/api/ws/client', 48457, 'ws'),
   );
   ws.addEventListener('Playing', ({ data }) => {
     container.classList.remove('vanish');
