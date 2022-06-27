@@ -12,11 +12,11 @@
     "test": "npm run test --workspaces"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.17.0",
-    "@typescript-eslint/parser": "^5.17.0",
-    "eslint": "^8.12.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.6.1",
-    "typescript": "^4.6.3"
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "eslint": "^8.18.0",
+    "eslint-plugin-prettier": "^4.1.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
   }
 }
