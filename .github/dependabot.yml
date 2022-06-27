@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/js"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "deps(npm)"
+    labels:
+      - "js"
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "deps(cargo)"
+    labels:
+      - "rust"
