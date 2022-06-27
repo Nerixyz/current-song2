@@ -15,14 +15,14 @@ name = "current-song2"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.17", features = ["sync"] }
+tokio = { version = "1.19", features = ["sync"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 
-actix = "=0.12"
-actix-web = { version = "4.0", features = ["compress-brotli"] }
+actix = "0.13"
+actix-web = { version = "4.1", features = ["compress-brotli"] }
 actix-files = "0.6"
-actix-web-actors = "=4.0"
+actix-web-actors = "4.1"
 actix-cors = "0.6"
 actix-web-static-files = "4.0"
 static-files = "0.2"
@@ -39,7 +39,7 @@ tracing = "0.1"
 tracing-log = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-actix-web = "0.5"
-tracing-actix = "0.3"
+tracing-actix = "0.4"
 tracing-appender = "0.2"
 
 [target.'cfg(windows)'.dependencies]

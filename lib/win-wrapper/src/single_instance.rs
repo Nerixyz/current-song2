@@ -3,10 +3,7 @@ use std::{env, mem, ptr};
 use windows::{
     core::{Error, Result, HRESULT},
     Win32::{
-        Foundation::{
-            CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, ERROR_NOT_FOUND, ERROR_SUCCESS,
-            HANDLE, MAX_PATH,
-        },
+        Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, ERROR_NOT_FOUND, MAX_PATH},
         System::{
             ProcessStatus::{K32EnumProcesses, K32GetModuleFileNameExW},
             Threading::{
@@ -23,13 +20,11 @@ use windows::{
 ///
 /// Returns `false` if another instance is already running, and `true` if we are the only instance running.
 pub fn try_create_new_instance(unique_instance_id: &str) -> bool {
-    // make sure this is a handle and not a result so we get a compiler error when the metadata changes
-    let _: HANDLE = unsafe { CreateMutexW(ptr::null(), true, unique_instance_id) };
     unsafe {
-        match GetLastError() {
-            ERROR_SUCCESS => true,
-            ERROR_ALREADY_EXISTS => false,
-            x => {
+        match CreateMutexW(ptr::null(), true, unique_instance_id) {
+            Ok(_) => true,
+            Err(e) if e.code() == ERROR_ALREADY_EXISTS.to_hresult() => false,
+            Err(x) => {
                 eprintln!("Unexpected error - {:?}", x);
                 false
             }
@@ -51,10 +46,7 @@ pub fn kill_other_instances_of_this_application() -> Result<()> {
         None => return Err(Error::from(HRESULT::from(ERROR_NOT_FOUND))),
     };
     unsafe {
-        let handle = OpenProcess(PROCESS_TERMINATE, None, pid);
-        if handle.is_invalid() {
-            return Err(GetLastError().into());
-        }
+        let handle = OpenProcess(PROCESS_TERMINATE, None, pid)?;
 
         if !TerminateProcess(handle, u32::MAX).as_bool() {
             return Err(GetLastError().into());
@@ -84,10 +76,10 @@ fn get_all_processes() -> Result<(Vec<u32>, u32)> {
 
 fn cmp_path(pid: u32, path: &ManagedPwstr, path_buf: &mut ManagedPwstr) -> bool {
     unsafe {
-        let proc = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid);
-        if proc.is_invalid() {
-            return false;
-        }
+        let proc = match OpenProcess(PROCESS_QUERY_INFORMATION, false, pid) {
+            Ok(h) => h,
+            Err(_) => return false,
+        };
         let chars = K32GetModuleFileNameExW(proc, None, path_buf.as_mut_slice());
         CloseHandle(proc);
         if chars == 0 {
