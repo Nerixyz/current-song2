@@ -7,7 +7,7 @@ updates:
     commit-message:
       prefix: "deps(npm)"
     labels:
-      - "js"
+      - "javascript"
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
