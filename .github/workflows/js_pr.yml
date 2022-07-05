@@ -3,6 +3,7 @@ name: JS PR
 on:
   pull_request:
     branches: [master]
+    types: [labeled, opened, synchronize, reopened]
 
 jobs:
   build:
