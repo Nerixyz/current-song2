@@ -144,7 +144,7 @@ impl SessionWorker {
         match cmd {
             SessionCommand::PlaybackInfoChanged => {
                 let model = optional_result(self.session.GetPlaybackInfo()?.try_into())?;
-                if !(model.is_none() == self.model.playback.is_none()) {
+                if model != self.model.playback {
                     self.model.playback = model;
 
                     self.sess_tx
