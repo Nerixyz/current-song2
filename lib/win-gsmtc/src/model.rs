@@ -21,7 +21,7 @@ impl Debug for Image {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct PlaybackModel {
     // TODO: controls
     pub status: PlaybackStatus,
@@ -80,7 +80,7 @@ impl Default for PlaybackType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum AutoRepeatMode {
     None,
     Track,
