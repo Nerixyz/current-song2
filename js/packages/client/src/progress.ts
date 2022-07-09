@@ -2,6 +2,7 @@ import { TimelineInfo } from './types';
 
 export function createProgress(element: HTMLDivElement): {
   run: (timeline: TimelineInfo | null) => void;
+  pause: () => void;
 } {
   let running = false;
   let currentTl: TimelineInfo | null = null;
@@ -11,6 +12,9 @@ export function createProgress(element: HTMLDivElement): {
     if (!currentTl) {
       element.classList.add('hidden');
       running = false;
+      return;
+    }
+    if (!running) {
       return;
     }
 
@@ -31,6 +35,10 @@ export function createProgress(element: HTMLDivElement): {
         running = true;
         runTick();
       }
+    },
+    pause: () => {
+      running = false;
+      element.classList.add('paused');
     },
   };
 }
