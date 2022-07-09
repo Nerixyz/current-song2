@@ -52,6 +52,7 @@ import {
   });
   ws.addEventListener('Paused', () => {
     container.classList.add('vanish');
+    progressManager.pause();
   });
   await ws.connect();
 })();
