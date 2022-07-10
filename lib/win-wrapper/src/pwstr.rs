@@ -33,7 +33,7 @@ impl PartialEq for ManagedPwstr {
             }
         }
         // we didn't see a null terminator yet
-        return false;
+        false
     }
 }
 
