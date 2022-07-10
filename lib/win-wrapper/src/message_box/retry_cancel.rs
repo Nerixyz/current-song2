@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
     IDRETRY, MB_RETRYCANCEL, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum RetryCancel {
     Retry,
     Cancel,

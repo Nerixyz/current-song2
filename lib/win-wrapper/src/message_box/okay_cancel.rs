@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
     IDOK, MB_OKCANCEL, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum OkayCancel {
     Okay,
     Cancel,

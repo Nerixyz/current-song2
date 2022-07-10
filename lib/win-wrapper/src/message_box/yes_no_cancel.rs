@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
     IDNO, IDYES, MB_YESNOCANCEL, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum YesNoCancel {
     Yes,
     No,

@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
     IDCONTINUE, IDTRYAGAIN, MB_CANCELTRYCONTINUE, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum CancelTryAgainContinue {
     Cancel,
     TryAgain,
