@@ -3,7 +3,7 @@ use windows::Win32::UI::WindowsAndMessaging::{
     IDABORT, IDRETRY, MB_ABORTRETRYIGNORE, MESSAGEBOX_RESULT, MESSAGEBOX_STYLE,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AbortRetryIgnore {
     Abort,
     Retry,

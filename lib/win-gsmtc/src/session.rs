@@ -7,7 +7,7 @@ use std::{
     sync::{Arc, Weak},
 };
 use tokio::sync::mpsc;
-use tracing::{debug, event, Level};
+use tracing::{debug, event, warn, Level};
 use windows::{
     core::{AgileReference, Result},
     Foundation::{EventRegistrationToken, TypedEventHandler},
@@ -57,35 +57,20 @@ impl SessionHandle {
     ) -> Result<(Self, String)> {
         let (loop_tx, loop_rx) = mpsc::unbounded_channel();
         let loop_tx = Arc::new(loop_tx);
-        let playback_token = {
-            let loop_tx = Arc::downgrade(&loop_tx);
-            sess.PlaybackInfoChanged(TypedEventHandler::new(move |_, _| {
-                if let Some(loop_tx) = loop_tx.upgrade() {
-                    loop_tx.send(SessionCommand::PlaybackInfoChanged).ok();
-                }
-                Ok(())
-            }))?
-        };
-        let media_token = {
-            let loop_tx = Arc::downgrade(&loop_tx);
-            sess.MediaPropertiesChanged(TypedEventHandler::new(move |_, _| {
-                if let Some(loop_tx) = loop_tx.upgrade() {
-                    loop_tx.send(SessionCommand::MediaPropertiesChanged).ok();
-                }
-                Ok(())
-            }))?
-        };
-        let timeline_token = {
-            let loop_tx = Arc::downgrade(&loop_tx);
-            sess.TimelinePropertiesChanged(TypedEventHandler::new(move |_, _| {
-                if let Some(loop_tx) = loop_tx.upgrade() {
-                    loop_tx.send(SessionCommand::TimelinePropertiesChanged).ok();
-                }
-                Ok(())
-            }))?
-        };
 
         let source = sess.SourceAppUserModelId()?.to_string();
+        let session_tx = Arc::downgrade(&loop_tx);
+        let (playback_token, media_token, timeline_token) = (
+            sess.PlaybackInfoChanged(feed_eventloop_handler(session_tx.clone(), || {
+                SessionCommand::PlaybackInfoChanged
+            }))?,
+            sess.MediaPropertiesChanged(feed_eventloop_handler(session_tx.clone(), || {
+                SessionCommand::MediaPropertiesChanged
+            }))?,
+            sess.TimelinePropertiesChanged(feed_eventloop_handler(session_tx.clone(), || {
+                SessionCommand::TimelinePropertiesChanged
+            }))?,
+        );
         SessionWorker {
             session: sess,
             model: SessionModel {
@@ -95,7 +80,7 @@ impl SessionHandle {
                 source: source.clone(),
             },
 
-            loop_tx: Arc::downgrade(&loop_tx),
+            loop_tx: session_tx,
             loop_rx,
             sess_tx,
 
@@ -241,4 +226,24 @@ impl Drop for SessionWorker {
             .RemoveMediaPropertiesChanged(&self.media_token)
             .ok();
     }
+}
+
+fn feed_eventloop_handler<F, LoopCmd, TSender, TResult>(
+    tx: Weak<mpsc::UnboundedSender<LoopCmd>>,
+    f: F,
+) -> TypedEventHandler<TSender, TResult>
+where
+    TSender: windows::core::RuntimeType,
+    TResult: windows::core::RuntimeType,
+    F: Fn() -> LoopCmd + Send + 'static,
+    LoopCmd: Send + 'static,
+{
+    TypedEventHandler::new(move |_, _| {
+        if let Some(tx) = tx.upgrade() {
+            if let Err(e) = tx.send(f()) {
+                warn!(error = %e, "Cannot send to event-loop from windows event handler");
+            }
+        }
+        Ok(())
+    })
 }

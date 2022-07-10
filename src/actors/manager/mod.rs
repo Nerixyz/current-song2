@@ -77,8 +77,7 @@ impl Manager {
             if self
                 .current_module
                 .as_ref()
-                .map(|current| current == id && updated != *current)
-                .unwrap_or(false)
+                .map_or(false, |current| current == id && updated != *current)
             {
                 return Ok(None);
             }
@@ -129,9 +128,7 @@ impl Handler<UpdateModule> for Manager {
                 module.priority = module.priority,  "Update");
             module.state = Arc::new(msg.state);
 
-            if current_priority
-                .map(|current_priority| module.priority >= current_priority)
-                .unwrap_or(true)
+            if current_priority.map_or(true, |current_priority| module.priority >= current_priority)
             {
                 self.send_update_state(msg.id);
             }
