@@ -43,11 +43,38 @@ fn bool_true() -> bool {
     true
 }
 
+#[inline]
+fn bool_false() -> bool {
+    false
+}
+
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct ModuleConfig {
+    pub file: FileOutputConfig,
     #[cfg(windows)]
     pub gsmtc: GsmtcConfig,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct FileOutputConfig {
+    #[serde(default = "bool_false")]
+    pub enabled: bool,
+    #[serde(default = "default_file_path")]
+    pub path: PathBuf,
+}
+
+fn default_file_path() -> PathBuf {
+    "current_song.txt".into()
+}
+
+impl Default for FileOutputConfig {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            path: default_file_path()
+        }
+    }
 }
 
 cfg_windows! {
