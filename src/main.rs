@@ -1,6 +1,7 @@
 #![windows_subsystem = "windows"]
 #![warn(clippy::pedantic)]
 #![warn(clippy::cargo)]
+#![allow(clippy::module_name_repetitions)]
 
 mod actors;
 mod config;
