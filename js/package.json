@@ -2,7 +2,10 @@
   "name": "js",
   "author": "Nerixyz",
   "version": "0.0.0",
-  "workspaces": ["packages/client", "packages/extension"],
+  "workspaces": [
+    "packages/client",
+    "packages/extension"
+  ],
   "scripts": {
     "build": "npm run build --workspaces",
     "build-client": "npm run build --workspace=client",
@@ -14,7 +17,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
-    "eslint": "^8.20.0",
+    "eslint": "^8.21.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.7.1",
     "typescript": "^4.7.4"
