@@ -165,12 +165,12 @@ Controls the format of the written text.
 Interpolations are wrapped inside of `{` and `}`, if you want to output a `{`, use `{{`.
 These are the supported interpolations:
 
-| Interpolation | Description                                                                                        |
-|---------------|----------------------------------------------------------------------------------------------------|
-| `{title}`     | The song's title                                                                                   |
-| `{artist}`    | The song's artist                                                                                  |
-| `{source}`    | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser` |                                     |
-| `{duration?}` | The song's duration (e.g. `1m23s`). Resolves to an empty string if no duration info is known       |                                    |
+| Interpolation | Description                                                                                         |
+|---------------|-----------------------------------------------------------------------------------------------------|
+| `{title}`     | The song's title.                                                                                   |
+| `{artist}`    | The song's artist.                                                                                  |
+| `{source}`    | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |                                     |
+| `{duration?}` | The song's duration (e.g. `1m23s`). Resolves to an empty string if no duration info is known.       |                                    |
 
 Defaults to `{artist} - {title}`.
 
