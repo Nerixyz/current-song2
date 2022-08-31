@@ -51,8 +51,10 @@ fn bool_false() -> bool {
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct ModuleConfig {
+    #[serde(default)]
     pub file: FileOutputConfig,
     #[cfg(windows)]
+    #[cfg_attr(windows, serde(default))]
     pub gsmtc: GsmtcConfig,
 }
 
