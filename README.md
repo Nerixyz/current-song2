@@ -68,6 +68,9 @@ enabled = true
 mode = "Exclude"
 items = ["chrome.exe", "msedge.exe", "firefox.exe"]
 
+[modules.file]
+enabled = true # defaults to false
+
 [server]
 port = 48457
 custom_theme_path = "theme.css"
@@ -134,6 +137,42 @@ multiple themes in the folder and switch between them.
 Controls the local port on which the server is listening, defaults to `48457`.
 
 ⚠ If you change the port, make sure to change it in the extension as well.
+
+## File Output
+
+Current Song 2 can output the playing song to a file (disabled by default).
+To enable file-output, set `modules.file.enabled` to `true`:
+
+```toml
+[modules.file]
+enabled = true
+```
+
+This will write to the file specified by `modules.file.path` (defaults to `current_song.txt`)
+with the format specified by `modules.file.format` (defaults to `{artist} - {title}`).
+If no song is playing, the file will be empty.
+
+### `path`
+
+Controls which path the application writes the song info into (relative or absolute path).
+You must ensure the location exists, i.e. all folders in the path must exist.
+
+Defaults to `curent_song.txt`.
+
+### `format`
+
+Controls the format of the written text.
+Interpolations are wrapped inside of `{` and `}`, if you want to output a `{`, use `{{`.
+These are the supported interpolations:
+
+| Interpolation | Description                                                                                        |
+|---------------|----------------------------------------------------------------------------------------------------|
+| `{title}`     | The song's title                                                                                   |
+| `{artist}`    | The song's artist                                                                                  |
+| `{source}`    | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser` |                                     |
+| `{duration?}` | The song's duration (e.g. `1m23s`). Resolves to an empty string if no duration info is known       |                                    |
+
+Defaults to `{artist} - {title}`.
 
 # Theming
 
