@@ -6,3 +6,4 @@ config.toml
 *.log
 artifacts
 /theme.css
+current_song.txt

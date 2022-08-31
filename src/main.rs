@@ -1,6 +1,7 @@
 #![windows_subsystem = "windows"]
 #![warn(clippy::pedantic)]
 #![warn(clippy::cargo)]
+#![allow(clippy::module_name_repetitions)]
 
 mod actors;
 mod config;
@@ -24,6 +25,7 @@ use crate::{
     logging::init_logging,
     model::ModuleState,
     repositories::init_repositories,
+    workers::file_output::output_to_file,
 };
 use actix::{Actor, Addr};
 use actix_web::{web, App, HttpServer};
@@ -34,6 +36,11 @@ fn init_channels() -> (watch::Receiver<manager::Event>, Addr<Manager>) {
     let (event_tx, event_rx) = watch::channel(Arc::new(ModuleState::Paused));
 
     let manager = Manager::new(event_tx).start();
+
+    if CONFIG.modules.file.enabled {
+        let event_rx = event_rx.clone();
+        tokio::spawn(async move { output_to_file(&CONFIG.modules.file.path, event_rx).await });
+    }
 
     (event_rx, manager)
 }
