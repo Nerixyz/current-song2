@@ -146,6 +146,8 @@ To enable file-output, set `modules.file.enabled` to `true`:
 ```toml
 [modules.file]
 enabled = true
+path = "current_song.txt"     # default
+format = "{artist} - {title}" # default
 ```
 
 This will write to the file specified by `modules.file.path` (defaults to `current_song.txt`)
