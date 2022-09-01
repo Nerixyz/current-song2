@@ -1,10 +1,13 @@
 use std::marker::PhantomData;
-use windows::Win32::{
-    Foundation::{GetLastError, WIN32_ERROR},
-    UI::WindowsAndMessaging::{
-        MessageBoxA, MB_ICONASTERISK, MB_ICONERROR, MB_ICONEXCLAMATION, MB_ICONHAND,
-        MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONSTOP, MB_ICONWARNING, MESSAGEBOX_RESULT,
-        MESSAGEBOX_STYLE,
+use windows::{
+    core::HSTRING,
+    Win32::{
+        Foundation::{GetLastError, WIN32_ERROR},
+        UI::WindowsAndMessaging::{
+            MessageBoxW, MB_ICONASTERISK, MB_ICONERROR, MB_ICONEXCLAMATION, MB_ICONHAND,
+            MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONSTOP, MB_ICONWARNING, MESSAGEBOX_RESULT,
+            MESSAGEBOX_STYLE,
+        },
     },
 };
 
@@ -54,15 +57,27 @@ impl MessageBoxIcon {
     }
 }
 
-pub struct MessageBox<'text, 'title, T> {
+pub struct MessageBox<'a, T> {
     icon: MessageBoxIcon,
-    text: &'text str,
-    title: Option<&'title str>,
+    text: &'a HSTRING,
+    title: Option<&'a HSTRING>,
     _response: PhantomData<T>,
 }
 
-impl<'text, 'title, T: MessageBoxOption> MessageBox<'text, 'title, T> {
-    pub fn new(text: &'text str) -> Self {
+macro_rules! ctors {
+    ($($ctor:ident, $name:ident => $icon:ident),*) => {
+        $(pub fn $ctor(self) -> Self {
+            self.icon(MessageBoxIcon::$icon)
+        }
+        pub fn $name(text: &'a HSTRING) -> Self {
+            Self::new(text).$ctor()
+        }
+        )*
+    };
+}
+
+impl<'a, T: MessageBoxOption> MessageBox<'a, T> {
+    pub fn new(text: &'a HSTRING) -> Self {
         Self {
             icon: MessageBoxIcon::Information,
             text,
@@ -75,57 +90,19 @@ impl<'text, 'title, T: MessageBoxOption> MessageBox<'text, 'title, T> {
         self.icon = icon;
         self
     }
-    pub fn with_exclamation(self) -> Self {
-        self.icon(MessageBoxIcon::Exclamation)
-    }
-    pub fn with_warning(self) -> Self {
-        self.icon(MessageBoxIcon::Warning)
-    }
-    pub fn with_information(self) -> Self {
-        self.icon(MessageBoxIcon::Information)
-    }
-    pub fn with_asterisk(self) -> Self {
-        self.icon(MessageBoxIcon::Asterisk)
-    }
-    pub fn with_question(self) -> Self {
-        self.icon(MessageBoxIcon::Question)
-    }
-    pub fn with_stop(self) -> Self {
-        self.icon(MessageBoxIcon::Stop)
-    }
-    pub fn with_error(self) -> Self {
-        self.icon(MessageBoxIcon::Error)
-    }
-    pub fn with_hand(self) -> Self {
-        self.icon(MessageBoxIcon::Hand)
+
+    ctors! {
+      with_exclamation, exclamation => Exclamation,
+      with_warning, warning => Warning,
+      with_information, information => Information,
+      with_asterisk, asterisk => Asterisk,
+      with_question, question => Question,
+      with_stop, stop => Stop,
+      with_error, error => Error,
+      with_hand, hand => Hand
     }
 
-    pub fn exclamation(text: &'text str) -> Self {
-        Self::new(text).with_exclamation()
-    }
-    pub fn warning(text: &'text str) -> Self {
-        Self::new(text).with_warning()
-    }
-    pub fn information(text: &'text str) -> Self {
-        Self::new(text).with_information()
-    }
-    pub fn asterisk(text: &'text str) -> Self {
-        Self::new(text).with_asterisk()
-    }
-    pub fn question(text: &'text str) -> Self {
-        Self::new(text).with_question()
-    }
-    pub fn stop(text: &'text str) -> Self {
-        Self::new(text).with_stop()
-    }
-    pub fn error(text: &'text str) -> Self {
-        Self::new(text).with_error()
-    }
-    pub fn hand(text: &'text str) -> Self {
-        Self::new(text).with_hand()
-    }
-
-    pub fn with_title(mut self, title: &'title str) -> Self {
+    pub fn with_title(mut self, title: &'a HSTRING) -> Self {
         self.title = Some(title);
         self
     }
@@ -133,9 +110,9 @@ impl<'text, 'title, T: MessageBoxOption> MessageBox<'text, 'title, T> {
     pub fn show(self) -> Result<T, WIN32_ERROR> {
         let return_code = unsafe {
             if let Some(title) = self.title {
-                MessageBoxA(None, self.text, title, T::flags() | self.icon.style())
+                MessageBoxW(None, self.text, title, T::flags() | self.icon.style())
             } else {
-                MessageBoxA(None, self.text, None, T::flags() | self.icon.style())
+                MessageBoxW(None, self.text, None, T::flags() | self.icon.style())
             }
         };
         match return_code {

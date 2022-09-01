@@ -10,8 +10,8 @@
     "test": "echo 0"
   },
   "devDependencies": {
-    "parcel": "^2.6.2",
-    "typescript": "^4.7.4",
+    "parcel": "^2.7.0",
+    "typescript": "^4.8.2",
     "tslib": "^2.4.0",
     "rimraf": "^3.0.2",
     "parcel-resolver-ignore": "^2.1.3"

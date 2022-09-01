@@ -1,7 +1,7 @@
 use crate::pwstr::ManagedPwstr;
 use std::{env, mem, ptr};
 use windows::{
-    core::{Error, Result, HRESULT},
+    core::{Error, Result, HRESULT, HSTRING},
     Win32::{
         Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, ERROR_NOT_FOUND, MAX_PATH},
         System::{
@@ -19,7 +19,7 @@ use windows::{
 /// If the mutex is already locked, then another application locked the mutex and another instance is already running.
 ///
 /// Returns `false` if another instance is already running, and `true` if we are the only instance running.
-pub fn try_create_new_instance(unique_instance_id: &str) -> bool {
+pub fn try_create_new_instance(unique_instance_id: &HSTRING) -> bool {
     unsafe {
         match CreateMutexW(ptr::null(), true, unique_instance_id) {
             Ok(_) => true,
@@ -46,7 +46,7 @@ pub fn kill_other_instances_of_this_application() -> Result<()> {
         None => return Err(Error::from(HRESULT::from(ERROR_NOT_FOUND))),
     };
     unsafe {
-        let handle = OpenProcess(PROCESS_TERMINATE, None, pid)?;
+        let handle = OpenProcess(PROCESS_TERMINATE, false, pid)?;
 
         if !TerminateProcess(handle, u32::MAX).as_bool() {
             return Err(GetLastError().into());
