@@ -56,7 +56,7 @@ impl SessionManager {
 
         let update_token = {
             let loop_tx = Arc::downgrade(&loop_tx);
-            this.SessionsChanged(TypedEventHandler::new(move |_, _| {
+            this.SessionsChanged(&TypedEventHandler::new(move |_, _| {
                 event!(Level::DEBUG, "SessionsChanged");
                 if let Some(loop_tx) = loop_tx.upgrade() {
                     loop_tx.send(ManagerCommand::UpdateSessions).ok();
@@ -66,7 +66,7 @@ impl SessionManager {
         };
         let current_changed_token = {
             let loop_tx = Arc::downgrade(&loop_tx);
-            this.CurrentSessionChanged(TypedEventHandler::new(move |_, _| {
+            this.CurrentSessionChanged(&TypedEventHandler::new(move |_, _| {
                 event!(Level::DEBUG, "Current SessionChanged");
                 if let Some(loop_tx) = loop_tx.upgrade() {
                     loop_tx.send(ManagerCommand::CurrentSessionChanged).ok();

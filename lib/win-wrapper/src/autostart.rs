@@ -1,9 +1,13 @@
 use std::{env, iter, ops::Deref, os::windows::ffi::OsStrExt, ptr};
-use windows::Win32::{
-    Foundation::{ERROR_MORE_DATA, ERROR_SUCCESS, WIN32_ERROR},
-    System::Registry::{
-        RegCloseKey, RegCreateKeyExW, RegGetValueW, RegSetValueExW, HKEY, HKEY_CURRENT_USER,
-        KEY_CREATE_SUB_KEY, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_SZ,
+use windows::{
+    core::HSTRING,
+    w,
+    Win32::{
+        Foundation::{ERROR_MORE_DATA, ERROR_SUCCESS, WIN32_ERROR},
+        System::Registry::{
+            RegCloseKey, RegCreateKeyExW, RegGetValueW, RegSetValueExW, HKEY, HKEY_CURRENT_USER,
+            KEY_CREATE_SUB_KEY, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_SZ,
+        },
     },
 };
 
@@ -36,13 +40,13 @@ impl Drop for ManagedHkey {
     }
 }
 
-pub fn add_self_to_autostart(application_name: &str) -> Result<(), WIN32_ERROR> {
+pub fn add_self_to_autostart(application_name: &HSTRING) -> Result<(), WIN32_ERROR> {
     unsafe {
         let mut hkey = HKEY(0);
         let hkey = ManagedHkey::try_new(
             RegCreateKeyExW(
                 HKEY_CURRENT_USER,
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                windows::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
                 0,
                 None,
                 REG_OPTION_RESERVED,
@@ -75,12 +79,12 @@ pub fn add_self_to_autostart(application_name: &str) -> Result<(), WIN32_ERROR> 
     }
 }
 
-pub fn check_autostart(application_name: &str) -> bool {
+pub fn check_autostart(application_name: &HSTRING) -> bool {
     unsafe {
         matches!(
             RegGetValueW(
                 HKEY_CURRENT_USER,
-                "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                windows::core::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
                 application_name,
                 RRF_RT_REG_SZ,
                 ptr::null_mut(),
@@ -92,12 +96,12 @@ pub fn check_autostart(application_name: &str) -> bool {
     }
 }
 
-pub fn remove_autostart(application_name: &str) {
+pub fn remove_autostart(application_name: &HSTRING) {
     unsafe {
         let mut hkey = HKEY(0);
         if RegOpenKeyExW(
             HKEY_CURRENT_USER,
-            "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+            w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
             0,
             KEY_SET_VALUE,
             &mut hkey,

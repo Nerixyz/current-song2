@@ -61,13 +61,13 @@ impl SessionHandle {
         let source = sess.SourceAppUserModelId()?.to_string();
         let session_tx = Arc::downgrade(&loop_tx);
         let (playback_token, media_token, timeline_token) = (
-            sess.PlaybackInfoChanged(feed_eventloop_handler(session_tx.clone(), || {
+            sess.PlaybackInfoChanged(&feed_eventloop_handler(session_tx.clone(), || {
                 SessionCommand::PlaybackInfoChanged
             }))?,
-            sess.MediaPropertiesChanged(feed_eventloop_handler(session_tx.clone(), || {
+            sess.MediaPropertiesChanged(&feed_eventloop_handler(session_tx.clone(), || {
                 SessionCommand::MediaPropertiesChanged
             }))?,
-            sess.TimelinePropertiesChanged(feed_eventloop_handler(session_tx.clone(), || {
+            sess.TimelinePropertiesChanged(&feed_eventloop_handler(session_tx.clone(), || {
                 SessionCommand::TimelinePropertiesChanged
             }))?,
         );
@@ -217,13 +217,13 @@ fn skip_timeline_emit(model: &SessionModel, new: &TimelineModel) -> bool {
 impl Drop for SessionWorker {
     fn drop(&mut self) {
         self.session
-            .RemovePlaybackInfoChanged(&self.playback_token)
+            .RemovePlaybackInfoChanged(self.playback_token)
             .ok();
         self.session
-            .RemoveTimelinePropertiesChanged(&self.timeline_token)
+            .RemoveTimelinePropertiesChanged(self.timeline_token)
             .ok();
         self.session
-            .RemoveMediaPropertiesChanged(&self.media_token)
+            .RemoveMediaPropertiesChanged(self.media_token)
             .ok();
     }
 }

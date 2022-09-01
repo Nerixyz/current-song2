@@ -527,6 +527,7 @@ dependencies = [
  "tracing-subscriber",
  "win-gsmtc",
  "win-wrapper",
+ "windows",
 ]
 
 [[package]]
