@@ -1,4 +1,7 @@
-use crate::session::{SessionCommand, SessionHandle, SessionUpdateEvent};
+use crate::{
+    session::{SessionCommand, SessionHandle, SessionUpdateEvent},
+    util::optional_result,
+};
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::mpsc;
 use tracing::{event, Level};
@@ -35,8 +38,11 @@ pub enum ManagerEvent {
     SessionRemoved {
         session_id: usize,
     },
+    /// We don't use this event internally.
+    /// We compute the current session by the last event
+    /// that was received for a session.
     CurrentSessionChanged {
-        session_id: usize,
+        session_id: Option<usize>,
     },
 }
 
@@ -148,29 +154,45 @@ impl SessionManager {
                 }
             }
             ManagerCommand::CurrentSessionChanged => {
-                let current = match self.manager.GetCurrentSession() {
-                    Ok(sess) => sess,
+                match optional_result(self.manager.GetCurrentSession()) {
+                    // There's a new session
+                    Ok(Some(current)) => {
+                        match self
+                            .sessions
+                            .get(&current.SourceAppUserModelId()?.to_string())
+                        {
+                            // We have the session saved
+                            Some(session) => {
+                                self.event_tx
+                                    .send(ManagerEvent::CurrentSessionChanged {
+                                        session_id: Some(session.id),
+                                    })
+                                    .ok();
+                            }
+                            // It's a new session
+                            None => {
+                                let session_id = self.create_session(
+                                    current.SourceAppUserModelId()?.to_string(),
+                                    current,
+                                )?;
+                                self.event_tx
+                                    .send(ManagerEvent::CurrentSessionChanged {
+                                        session_id: Some(session_id),
+                                    })
+                                    .ok();
+                            }
+                        }
+                    }
+                    // There's no current session
+                    Ok(None) => {
+                        self.event_tx
+                            .send(ManagerEvent::CurrentSessionChanged { session_id: None })
+                            .ok();
+                    }
                     Err(e) => {
-                        event!(Level::WARN, error = %e, "Could not get current sessions");
-                        return Ok(());
+                        event!(Level::WARN, error = %e, "Could not get current session");
                     }
                 };
-                if let Some(session) = self
-                    .sessions
-                    .get(&current.SourceAppUserModelId()?.to_string())
-                {
-                    self.event_tx
-                        .send(ManagerEvent::CurrentSessionChanged {
-                            session_id: session.id,
-                        })
-                        .ok();
-                } else {
-                    let session_id =
-                        self.create_session(current.SourceAppUserModelId()?.to_string(), current)?;
-                    self.event_tx
-                        .send(ManagerEvent::CurrentSessionChanged { session_id })
-                        .ok();
-                }
             }
         }
         Ok(())
