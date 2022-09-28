@@ -1,5 +1,5 @@
 use crate::pwstr::ManagedPwstr;
-use std::{env, mem, ptr};
+use std::{env, mem};
 use windows::{
     core::{Error, Result, HRESULT, HSTRING},
     Win32::{
@@ -21,7 +21,7 @@ use windows::{
 /// Returns `false` if another instance is already running, and `true` if we are the only instance running.
 pub fn try_create_new_instance(unique_instance_id: &HSTRING) -> bool {
     unsafe {
-        match CreateMutexW(ptr::null(), true, unique_instance_id) {
+        match CreateMutexW(None, true, unique_instance_id) {
             Ok(_) => true,
             Err(e) if e.code() == ERROR_ALREADY_EXISTS.to_hresult() => false,
             Err(x) => {

@@ -1,4 +1,4 @@
-use std::{env, iter, ops::Deref, os::windows::ffi::OsStrExt, ptr};
+use std::{env, iter, ops::Deref, os::windows::ffi::OsStrExt};
 use windows::{
     core::HSTRING,
     w,
@@ -51,9 +51,9 @@ pub fn add_self_to_autostart(application_name: &HSTRING) -> Result<(), WIN32_ERR
                 None,
                 REG_OPTION_RESERVED,
                 KEY_CREATE_SUB_KEY | KEY_SET_VALUE,
-                std::ptr::null(),
+                None,
                 &mut hkey,
-                std::ptr::null_mut(),
+                None,
             ),
             hkey,
         )?;
@@ -70,8 +70,10 @@ pub fn add_self_to_autostart(application_name: &HSTRING) -> Result<(), WIN32_ERR
             application_name,
             0,
             REG_SZ,
-            path.as_ptr() as *const _,
-            path.len() as u32 * 2,
+            Some(std::slice::from_raw_parts(
+                path.as_ptr() as *const u8,
+                path.len() * 2,
+            )),
         ) {
             ERROR_SUCCESS => Ok(()),
             x => Err(x),
@@ -87,9 +89,9 @@ pub fn check_autostart(application_name: &HSTRING) -> bool {
                 windows::core::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
                 application_name,
                 RRF_RT_REG_SZ,
-                ptr::null_mut(),
-                ptr::null_mut(),
-                ptr::null_mut()
+                None,
+                None,
+                None
             ),
             ERROR_SUCCESS | ERROR_MORE_DATA
         )
