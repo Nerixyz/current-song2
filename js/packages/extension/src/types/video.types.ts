@@ -11,4 +11,5 @@ export interface VideoMetadata {
   title: string;
   artist?: string;
   artwork?: string;
+  album?: string;
 }

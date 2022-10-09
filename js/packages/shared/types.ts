@@ -25,6 +25,6 @@ export interface TimelineInfo {
 }
 
 export interface AlbumInfo {
-  title: string,
-  trackCount: number,
+  title: string;
+  trackCount: number;
 }

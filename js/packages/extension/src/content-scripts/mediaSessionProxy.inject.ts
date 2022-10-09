@@ -22,6 +22,7 @@ import { safeInject } from '../utils/safe-inject';
         title: metadata.title,
         artist: metadata.artist,
         artwork: metadata.artwork?.[0]?.src, // TODO: get best image
+        album: metadata.album,
       });
     }
     if (positionState) {
