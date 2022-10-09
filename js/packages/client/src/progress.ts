@@ -21,7 +21,7 @@ export function createProgress(element: HTMLDivElement): {
     const newProgress = progressNow(currentTl);
     if (progress !== newProgress) {
       progress = newProgress;
-      element.style.setProperty('--progress', progress.toString());
+      document.body.style.setProperty('--progress', progress.toString());
     }
     requestAnimationFrame(runTick);
   };

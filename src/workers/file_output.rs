@@ -13,6 +13,9 @@ use tracing::{debug, info, warn};
 enum Interpolation {
     Title,
     Artist,
+    AlbumName,
+    AlbumTracks,
+    TrackNumber,
     Source,
     Duration,
 }
@@ -26,6 +29,9 @@ impl InterpolationProvider for Interpolation {
         match name {
             "title" => Ok(Self::Title),
             "artist" => Ok(Self::Artist),
+            "album-name?" => Ok(Self::AlbumName),
+            "album-tracks?" => Ok(Self::AlbumTracks),
+            "track-number?" => Ok(Self::TrackNumber),
             "source" => Ok(Self::Source),
             "duration?" => Ok(Self::Duration),
             x => Err(anyhow::anyhow!("'{}' is not a valid interpolation", x)),
@@ -36,6 +42,18 @@ impl InterpolationProvider for Interpolation {
         match self {
             Interpolation::Title => f.write_str(&source.title),
             Interpolation::Artist => f.write_str(&source.artist),
+            Interpolation::AlbumName => match source.album {
+                Some(ref album) => f.write_str(&album.title),
+                None => Ok(()),
+            },
+            Interpolation::AlbumTracks => match source.album {
+                Some(ref album) if album.track_count > 0 => write!(f, "{}", album.track_count),
+                _ => Ok(()),
+            },
+            Interpolation::TrackNumber => match source.track_number {
+                Some(n) if n > 0 => write!(f, "{n}"),
+                _ => Ok(()),
+            },
             Interpolation::Source => f.write_str(&source.source),
             Interpolation::Duration => match source.timeline {
                 Some(TimelineInfo { duration_ms, .. }) => {

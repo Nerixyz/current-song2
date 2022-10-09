@@ -44,8 +44,11 @@ pub struct MediaModel {
     pub title: String,
     pub subtitle: String,
     pub artist: String,
+
+    pub album: Option<AlbumModel>,
+    pub track_number: Option<u32>,
+
     pub genres: Vec<String>,
-    pub album: AlbumModel,
     pub playback_type: PlaybackType,
 }
 
@@ -53,7 +56,7 @@ pub struct MediaModel {
 pub struct AlbumModel {
     pub artist: String,
     pub title: String,
-    pub track_count: i32,
+    pub track_count: u32,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

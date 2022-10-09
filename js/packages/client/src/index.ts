@@ -1,7 +1,18 @@
 import { getElements } from './dom/utils';
 import { createProgress } from './progress';
 import { smolTree } from './dom/smol-tree';
-import { hasImage, hasSubtitle, hasTimeline, isSpotify, makeState, not, State } from './state';
+import {
+  hasAlbum,
+  hasImage,
+  hasSubtitle,
+  hasTimeline,
+  hasTrack,
+  hasValidAlbumTracks,
+  isSpotify,
+  makeState,
+  not,
+  State,
+} from './state';
 import { animateOnChange, TextChangeAnimation } from './dom/animation';
 import { EventMap } from './types';
 import { formatLocalUrl } from '../../shared/url';
@@ -28,7 +39,17 @@ import {
   const tree = smolTree<State>(
     [imageEl, { spotify: isSpotify }],
     [imageContainer, { hidden: not(hasImage) }],
-    [container, { 'with-image': hasImage, 'is-spotify': isSpotify, 'with-progress': hasTimeline }],
+    [
+      container,
+      {
+        'with-image': hasImage,
+        'is-spotify': isSpotify,
+        'with-progress': hasTimeline,
+        'has-album-tracks': hasValidAlbumTracks,
+        'has-track': hasTrack,
+        'with-album': hasAlbum,
+      },
+    ],
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
 
@@ -46,6 +67,18 @@ import {
     if (state.imageUrl) {
       imageEl.src = state.imageUrl;
       container.style.setProperty('--image-url', `url("${encodeURI(state.imageUrl)}")`);
+    }
+    container.style.setProperty('--title', JSON.stringify(data.title));
+    container.style.setProperty('--artist', JSON.stringify(data.artist));
+    if (data.album) {
+      container.style.setProperty('--album', JSON.stringify(data.album.title));
+      container.style.setProperty(
+        '--album-tracks',
+        JSON.stringify(data.album.trackCount.toString()),
+      );
+    }
+    if (data.trackNumber) {
+      container.style.setProperty('--track-number', JSON.stringify(data.trackNumber.toString()));
     }
 
     progressManager.run(data.timeline);

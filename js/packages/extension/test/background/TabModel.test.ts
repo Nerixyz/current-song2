@@ -170,55 +170,73 @@ describe('TabModel', function () {
   describe('#updateMetadata', function () {
     it('should set the title and artist', function () {
       const model = new TabModel(mockTab(1, 2));
-      expectTitleArtist(model, '', '', null);
-      expect(model.updateMetadata({ title: 'Dancing', artist: 'Alien', artwork: 'https://nerixyz.de' })).toBe(true);
-      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de');
+      expectTitleArtist(model, '', '', null, null);
+      expect(
+        model.updateMetadata({ title: 'Dancing', artist: 'Alien', artwork: 'https://nerixyz.de', album: 'wow' }),
+      ).toBe(true);
+      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de', 'wow');
     });
     it('should split the title if it contains a dash', function () {
       const model = new TabModel(mockTab(1, 2));
-      expectTitleArtist(model, '', '', null);
+      expectTitleArtist(model, '', '', null, null);
       expect(
-        model.updateMetadata({ title: 'Alien - Dancing', artist: 'Some Uploader', artwork: 'https://nerixyz.de' }),
+        model.updateMetadata({
+          title: 'Alien - Dancing',
+          artist: 'Some Uploader',
+          artwork: 'https://nerixyz.de',
+          album: 'wow',
+        }),
       ).toBe(true);
-      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de');
+      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de', 'wow');
     });
     it('should return false if nothing got updated', function () {
       const model = new TabModel(mockTab(1, 2));
-      expectTitleArtist(model, '', '', null);
+      expectTitleArtist(model, '', '', null, null);
       expect(
-        model.updateMetadata({ title: 'Alien - Dancing', artist: 'Some Uploader', artwork: 'https://nerixyz.de' }),
+        model.updateMetadata({
+          title: 'Alien - Dancing',
+          artist: 'Some Uploader',
+          artwork: 'https://nerixyz.de',
+          album: 'wow',
+        }),
       ).toBe(true);
-      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de');
+      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de', 'wow');
       expect(
-        model.updateMetadata({ title: 'Alien - Dancing', artist: 'Some Uploader', artwork: 'https://nerixyz.de' }),
+        model.updateMetadata({
+          title: 'Alien - Dancing',
+          artist: 'Some Uploader',
+          artwork: 'https://nerixyz.de',
+          album: 'wow',
+        }),
       ).toBe(false);
-      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de');
+      expectTitleArtist(model, 'Dancing', 'Alien', 'https://nerixyz.de', 'wow');
     });
     it('should return false if the title was set by the tab', function () {
       const model = new TabModel(mockTab(1, 2, { title: 'Alien - Dancing - YouTube' }));
-      expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expectTitleArtist(model, 'Dancing', 'Alien', null, null);
       expect(model.updateMetadata({ title: 'Alien - Dancing', artist: 'Some Uploader' })).toBe(false);
-      expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expectTitleArtist(model, 'Dancing', 'Alien', null, null);
     });
-
     it('should fall back to the tab title if no metadata is given', function () {
       const model = new TabModel(mockTab(1, 2, { title: 'Alien - Dancing - YouTube' }));
-      expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expectTitleArtist(model, 'Dancing', 'Alien', null, null);
       expect(model.updateMetadata({ title: 'Me - Danced', artist: 'Some Uploader' })).toBe(true);
-      expectTitleArtist(model, 'Danced', 'Me', null);
+      expectTitleArtist(model, 'Danced', 'Me', null, null);
       expect(model.updateMetadata()).toBe(true);
-      expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expectTitleArtist(model, 'Dancing', 'Alien', null, null);
       expect(model.updateMetadata({ title: 'I - Failed' })).toBe(true);
-      expectTitleArtist(model, 'Failed', 'I');
+      expectTitleArtist(model, 'Failed', 'I', null, null);
       expect(model.updateMetadata({ title: 'I - Failed', artwork: 'aliens.jxl' })).toBe(true);
-      expectTitleArtist(model, 'Failed', 'I', 'aliens.jxl');
-      expect(model.updateMetadata({ title: 'I - Failed', artwork: 'aliens.jxl' })).toBe(false);
+      expectTitleArtist(model, 'Failed', 'I', 'aliens.jxl', null);
+      expect(model.updateMetadata({ title: 'I - Failed', artwork: 'aliens.jxl', album: 'wow' })).toBe(true);
+      expectTitleArtist(model, 'Failed', 'I', 'aliens.jxl', 'wow');
+      expect(model.updateMetadata({ title: 'I - Failed', artwork: 'aliens.jxl', album: 'wow' })).toBe(false);
     });
     it('should fall back to the metadata artist if none is in the title', function () {
       const model = new TabModel(mockTab(1, 2, { title: 'Alien - Dancing - YouTube' }));
-      expectTitleArtist(model, 'Dancing', 'Alien', null);
+      expectTitleArtist(model, 'Dancing', 'Alien', null, null);
       expect(model.updateMetadata({ title: 'Aliens (Forsen-Remix)', artist: 'Forsen' })).toBe(true);
-      expectTitleArtist(model, 'Aliens (Forsen-Remix)', 'Forsen', null);
+      expectTitleArtist(model, 'Aliens (Forsen-Remix)', 'Forsen', null, null);
     });
   });
 

@@ -8,12 +8,15 @@ pub enum ModuleState {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
 pub struct PlayInfo {
     pub title: String,
     pub artist: String,
+    pub track_number: Option<u32>,
 
     pub image: Option<ImageInfo>,
     pub timeline: Option<TimelineInfo>,
+    pub album: Option<AlbumInfo>,
 
     pub source: String,
 }
@@ -41,6 +44,13 @@ pub struct TimelineInfo {
     pub progress_ms: u64,
 
     pub rate: f32,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct AlbumInfo {
+    pub title: String,
+    pub track_count: u32,
 }
 
 impl PlayInfo {

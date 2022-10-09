@@ -1,6 +1,9 @@
-use crate::model::{
-    AlbumModel, AutoRepeatMode, MediaModel, PlaybackModel, PlaybackStatus, PlaybackType,
-    TimelineModel,
+use crate::{
+    model::{
+        AlbumModel, AutoRepeatMode, MediaModel, PlaybackModel, PlaybackStatus, PlaybackType,
+        TimelineModel,
+    },
+    util::ResultExt,
 };
 use std::convert::{TryFrom, TryInto};
 use windows::{
@@ -68,17 +71,46 @@ impl TryFrom<GlobalSystemMediaTransportControlsSessionMediaProperties> for Media
             title: value.Title()?.to_string(),
             subtitle: value.Subtitle()?.to_string(),
             artist: value.Artist()?.to_string(),
+            track_number: value
+                .TrackNumber()
+                .opt()?
+                .and_then(|v: i32| v.try_into().ok()),
+            album: (&value).try_into().ok(),
             genres: value.Genres()?.into_iter().map(|s| s.to_string()).collect(),
-            album: AlbumModel {
-                artist: value.AlbumArtist()?.to_string(),
-                title: value.AlbumTitle()?.to_string(),
-                track_count: value.AlbumTrackCount()?,
-            },
             playback_type: value
                 .PlaybackType()?
                 .Value()
                 .map(Into::into)
                 .unwrap_or_default(),
+        })
+    }
+}
+
+impl TryFrom<&GlobalSystemMediaTransportControlsSessionMediaProperties> for AlbumModel {
+    type Error = ();
+
+    fn try_from(
+        value: &GlobalSystemMediaTransportControlsSessionMediaProperties,
+    ) -> Result<Self, Self::Error> {
+        Ok(Self {
+            artist: value
+                .AlbumArtist()
+                .opt()
+                .map_err(|_| ())?
+                .ok_or(())?
+                .to_string(),
+            title: value
+                .AlbumTitle()
+                .opt()
+                .map_err(|_| ())?
+                .ok_or(())?
+                .to_string(),
+            track_count: value
+                .AlbumTrackCount()
+                .opt()
+                .map_err(|_| ())?
+                .and_then(|v: i32| v.try_into().ok())
+                .ok_or(())?,
         })
     }
 }

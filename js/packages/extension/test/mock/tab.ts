@@ -60,13 +60,27 @@ export function expectTabState(tab: TabModel, props: TabStateProps) {
   }).toEqual(props);
 }
 
-export function expectTitleArtist(tab: TabModel, expTitle: string, expArtist: string, expImageUrl?: string | null) {
-  const { title, artist, image } = tab.createPlayInfo();
+export function expectTitleArtist(
+  tab: TabModel,
+  expTitle: string,
+  expArtist: string,
+  expImageUrl?: string | null,
+  expAlbum?: string | null,
+) {
+  const { title, artist, image, album } = tab.createPlayInfo();
 
   expect(title).toBe(expTitle);
   expect(artist).toBe(expArtist);
   if (typeof expImageUrl !== 'undefined') {
     expect(image).toBe(expImageUrl);
+  }
+  if (typeof expAlbum !== 'undefined') {
+    if (expAlbum === null) {
+      expect(album).toBeNull();
+    } else {
+      expect(album?.title).toBe(expAlbum);
+      expect(album?.trackCount).toBe(0);
+    }
   }
 }
 

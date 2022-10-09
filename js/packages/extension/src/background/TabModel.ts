@@ -22,6 +22,7 @@ export class TabModel implements MessageCreator {
 
   private title = '';
   private artist: string | null = null;
+  private albumName: string | null = null;
 
   private hasMetadata = false;
   private tabTitle = '';
@@ -66,6 +67,13 @@ export class TabModel implements MessageCreator {
       source: 'browser',
       image: this.imageUrl,
       timeline: this.timeline,
+      album: this.albumName
+        ? {
+            title: this.albumName,
+            trackCount: 0,
+          }
+        : null,
+      trackNumber: null,
     };
   }
 
@@ -105,8 +113,13 @@ export class TabModel implements MessageCreator {
   updateMetadata(meta?: VideoMetadata): boolean {
     if (meta) {
       this.hasMetadata = true;
+
       const imageChange = this.imageUrl !== (meta.artwork || null);
       this.imageUrl = meta.artwork || null;
+
+      const albumChange = this.albumName !== (meta.album || null);
+      this.albumName = meta.album || null;
+
       if (meta.artist) {
         if (meta.title.includes('-')) {
           // a workaround for YouTube
@@ -115,19 +128,22 @@ export class TabModel implements MessageCreator {
           meta.artist = artist?.trim() ?? meta.artist;
         }
 
-        const anyChange = imageChange || this.title !== meta.title || this.artist !== meta.artist;
+        const anyChange = albumChange || imageChange || this.title !== meta.title || this.artist !== meta.artist;
 
         this.title = meta.title;
         this.artist = meta.artist;
 
         return anyChange;
       } else {
-        return this.tryExtractSetArtist(meta.title) || imageChange;
+        return this.tryExtractSetArtist(meta.title) || imageChange || albumChange;
       }
     } else {
       this.hasMetadata = false;
       this.imageUrl = null;
-      return this.tryExtractSetArtistFromTitle();
+      const albumChange = !!this.albumName;
+      this.albumName = null;
+      const metaChange = this.tryExtractSetArtistFromTitle();
+      return metaChange || albumChange;
     }
   }
 
