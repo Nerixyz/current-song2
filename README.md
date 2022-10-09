@@ -167,12 +167,15 @@ Controls the format of the written text.
 Interpolations are wrapped inside of `{` and `}`, if you want to output a `{`, use `{{`.
 These are the supported interpolations:
 
-| Interpolation | Description                                                                                         |
-|---------------|-----------------------------------------------------------------------------------------------------|
-| `{title}`     | The song's title.                                                                                   |
-| `{artist}`    | The song's artist.                                                                                  |
-| `{source}`    | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |                                     |
-| `{duration?}` | The song's duration (e.g. `1m23s`). Resolves to an empty string if no duration info is known.       |                                    |
+| Interpolation     | Description                                                                                         |
+|-------------------|-----------------------------------------------------------------------------------------------------|
+| `{title}`         | The song's title.                                                                                   |
+| `{artist}`        | The song's artist.                                                                                  |
+| `{album-name?}`   | The song's album name (or empty string).                                                            |
+| `{album-tracks?}` | The album's track count (or empty string).                                                          |
+| `{track-number?}` | The number of this track in the album (or empty string).                                            |
+| `{source}`        | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |                                     |
+| `{duration?}`     | The song's duration (e.g. `1m23s`) (or empty string).                                               |                                    |
 
 Defaults to `{artist} - {title}`.
 
