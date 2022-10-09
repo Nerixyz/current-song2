@@ -1,6 +1,6 @@
 use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
-    util::{optional_result, request_media_properties},
+    util::{request_media_properties, ResultExt},
 };
 use std::{
     convert::TryInto,
@@ -128,7 +128,7 @@ impl SessionWorker {
         event!(Level::TRACE, source = %self.model.source, command = ?cmd);
         match cmd {
             SessionCommand::PlaybackInfoChanged => {
-                let model = optional_result(self.session.GetPlaybackInfo()?.try_into())?;
+                let model = self.session.GetPlaybackInfo()?.try_into().opt()?;
                 if model != self.model.playback {
                     self.model.playback = model;
 

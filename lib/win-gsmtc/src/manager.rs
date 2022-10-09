@@ -1,6 +1,6 @@
 use crate::{
     session::{SessionCommand, SessionHandle, SessionUpdateEvent},
-    util::optional_result,
+    util::ResultExt,
 };
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::mpsc;
@@ -154,7 +154,7 @@ impl SessionManager {
                 }
             }
             ManagerCommand::CurrentSessionChanged => {
-                match optional_result(self.manager.GetCurrentSession()) {
+                match self.manager.GetCurrentSession().opt() {
                     // There's a new session
                     Ok(Some(current)) => {
                         match self

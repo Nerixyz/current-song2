@@ -13,13 +13,27 @@ use windows::{
     Win32::Foundation::E_ABORT,
 };
 
-macro_rules! opt_result {
+macro_rules! bail_opt {
     ($res:expr) => {
-        match optional_result($res)? {
+        match ($res)? {
             Some(v) => v,
             None => return Ok(None),
         }
     };
+}
+
+pub trait ResultExt<T> {
+    fn opt(self) -> Result<Option<T>>;
+}
+
+impl<T> ResultExt<T> for Result<T> {
+    fn opt(self) -> Result<Option<T>> {
+        match self {
+            Ok(v) => Ok(Some(v)),
+            Err(e) if e.code().is_ok() => Ok(None),
+            Err(e) => Err(e),
+        }
+    }
 }
 
 pub async fn request_media_properties(
@@ -41,7 +55,7 @@ pub async fn request_media_properties(
     if let Some(loop_tx) = loop_tx.upgrade() {
         loop_tx
             .send(SessionCommand::MediaPropertiesResult(
-                opt_result!(media_properties.try_into()),
+                bail_opt!(media_properties.try_into().opt()),
                 image,
             ))
             .ok();
@@ -52,7 +66,7 @@ pub async fn request_media_properties(
 fn try_get_thumbnail_sync(
     media_properties: &GlobalSystemMediaTransportControlsSessionMediaProperties,
 ) -> Result<Option<Image>> {
-    let thumb = opt_result!(media_properties.Thumbnail());
+    let thumb = bail_opt!(media_properties.Thumbnail().opt());
 
     let read = thumb.OpenReadAsync()?;
     let stream = read.get()?;
@@ -82,12 +96,4 @@ fn read_stream_sync(stream: IRandomAccessStreamWithContentType) -> Result<Vec<u8
     stream.Close().ok();
 
     Ok(data)
-}
-
-pub fn optional_result<T>(result: Result<T>) -> Result<Option<T>> {
-    match result {
-        Ok(v) => Ok(Some(v)),
-        Err(e) if e.code().is_ok() => Ok(None),
-        Err(e) => Err(e),
-    }
 }

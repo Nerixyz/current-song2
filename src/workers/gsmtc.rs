@@ -2,7 +2,7 @@ use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
     config::CONFIG,
     image_store::ImageStore,
-    model::{ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
+    model::{AlbumInfo, ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
 use ::gsmtc::{ManagerEvent, SessionManager, SessionUpdateEvent};
 use actix::Addr;
@@ -12,6 +12,7 @@ use gsmtc::{Image, PlaybackStatus, SessionModel};
 use std::sync::Arc;
 use tokio::sync::{mpsc, RwLock};
 use tracing::{event, span, Instrument, Level};
+
 #[derive(Debug)]
 struct GsmtcWorker {
     manager: Addr<Manager>,
@@ -143,6 +144,11 @@ fn convert_model(from: SessionModel, image: Option<ImageInfo>) -> ModuleState {
         } if playback.status == PlaybackStatus::Playing => ModuleState::Playing(PlayInfo {
             title: media.title,
             artist: media.artist,
+            track_number: media.track_number,
+            album: media.album.map(|a| AlbumInfo {
+                title: a.title,
+                track_count: a.track_count,
+            }),
             source: format!("gsmtc::{}", source),
             image,
             timeline: timeline
