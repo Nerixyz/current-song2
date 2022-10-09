@@ -4,3 +4,5 @@ export type EventMap = {
   Playing: PlayInfo;
   Paused: undefined | null;
 };
+
+export * from '../../shared/types';

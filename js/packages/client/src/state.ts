@@ -39,6 +39,18 @@ export function hasTimeline(state: State) {
   return !!state.info.timeline;
 }
 
+export function hasAlbum(state: State) {
+  return !!state.info.album;
+}
+
+export function hasValidAlbumTracks(state: State) {
+  return (state.info.album?.trackCount ?? 0) > 0;
+}
+
+export function hasTrack(state: State) {
+  return (state.info.trackNumber ?? 0) > 0;
+}
+
 export function not<T>(fn: (state: T) => boolean): (state: T) => boolean {
   return s => !fn(s);
 }
