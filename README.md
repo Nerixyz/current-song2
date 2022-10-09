@@ -174,8 +174,8 @@ These are the supported interpolations:
 | `{album-name?}`   | The song's album name (or empty string).                                                            |
 | `{album-tracks?}` | The album's track count (or empty string).                                                          |
 | `{track-number?}` | The number of this track in the album (or empty string).                                            |
-| `{source}`        | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |                                     |
-| `{duration?}`     | The song's duration (e.g. `1m23s`) (or empty string).                                               |                                    |
+| `{source}`        | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |
+| `{duration?}`     | The song's duration (e.g. `1m23s`) (or empty string).                                               |
 
 Defaults to `{artist} - {title}`.
 
