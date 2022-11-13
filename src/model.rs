@@ -64,8 +64,10 @@ impl PlayInfo {
         Self {
             title: title.into(),
             artist: artist.into(),
+            track_number: None,
             image: None,
             timeline: None,
+            album: None,
             source: source.into(),
         }
     }
