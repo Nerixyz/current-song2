@@ -8,12 +8,15 @@ use win_wrapper::{
     message_box::{MessageBox, Okay, YesNo},
     single_instance,
 };
-use windows::{core::HSTRING, w};
+use windows::{
+    core::{HSTRING, PCWSTR},
+    w,
+};
 
 #[cfg(debug_assertions)]
-const APPLICATION_NAME: &HSTRING = w!("CurrentSong2Dev");
+const APPLICATION_NAME: PCWSTR = w!("CurrentSong2Dev");
 #[cfg(not(debug_assertions))]
-const APPLICATION_NAME: &HSTRING = w!("CurrentSong2");
+const APPLICATION_NAME: PCWSTR = w!("CurrentSong2");
 
 fn has_arg(arg: &str) -> bool {
     std::env::args().any(|a| a == arg)
@@ -74,7 +77,8 @@ pub fn win_main() {
         Err(e) => {
             let error = HSTRING::from(format!(
                 "Cannot add {} to autostart: WindowsErrorCode({})",
-                APPLICATION_NAME, e.0
+                unsafe { APPLICATION_NAME.display() },
+                e.0
             ));
             MessageBox::<Okay>::error(&error)
                 .with_title(APPLICATION_NAME)
@@ -125,7 +129,8 @@ fn elevated_main() -> ! {
     if let Err(e) = add_self_to_autostart(APPLICATION_NAME) {
         let error = HSTRING::from(format!(
             "Cannot add {} to autostart (even in elevated mode): WindowsErrorCode({})",
-            APPLICATION_NAME, e.0
+            unsafe { APPLICATION_NAME.display() },
+            e.0
         ));
         MessageBox::<Okay>::error(&error)
             .with_title(APPLICATION_NAME)

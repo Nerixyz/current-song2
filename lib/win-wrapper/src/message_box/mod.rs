@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 use windows::{
-    core::HSTRING,
+    core::PCWSTR,
     Win32::{
         Foundation::{GetLastError, WIN32_ERROR},
         UI::WindowsAndMessaging::{
@@ -57,10 +57,10 @@ impl MessageBoxIcon {
     }
 }
 
-pub struct MessageBox<'a, T> {
+pub struct MessageBox<T> {
     icon: MessageBoxIcon,
-    text: &'a HSTRING,
-    title: Option<&'a HSTRING>,
+    text: PCWSTR,
+    title: Option<PCWSTR>,
     _response: PhantomData<T>,
 }
 
@@ -69,18 +69,18 @@ macro_rules! ctors {
         $(pub fn $ctor(self) -> Self {
             self.icon(MessageBoxIcon::$icon)
         }
-        pub fn $name(text: &'a HSTRING) -> Self {
+        pub fn $name(text: impl Into<PCWSTR>) -> Self {
             Self::new(text).$ctor()
         }
         )*
     };
 }
 
-impl<'a, T: MessageBoxOption> MessageBox<'a, T> {
-    pub fn new(text: &'a HSTRING) -> Self {
+impl<T: MessageBoxOption> MessageBox<T> {
+    pub fn new(text: impl Into<PCWSTR>) -> Self {
         Self {
             icon: MessageBoxIcon::Information,
-            text,
+            text: text.into(),
             title: None,
             _response: Default::default(),
         }
@@ -102,8 +102,8 @@ impl<'a, T: MessageBoxOption> MessageBox<'a, T> {
       with_hand, hand => Hand
     }
 
-    pub fn with_title(mut self, title: &'a HSTRING) -> Self {
-        self.title = Some(title);
+    pub fn with_title(mut self, title: impl Into<PCWSTR>) -> Self {
+        self.title = Some(title.into());
         self
     }
 

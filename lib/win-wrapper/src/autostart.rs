@@ -1,6 +1,6 @@
 use std::{env, iter, ops::Deref, os::windows::ffi::OsStrExt};
 use windows::{
-    core::HSTRING,
+    core::PCWSTR,
     w,
     Win32::{
         Foundation::{ERROR_MORE_DATA, ERROR_SUCCESS, WIN32_ERROR},
@@ -40,7 +40,7 @@ impl Drop for ManagedHkey {
     }
 }
 
-pub fn add_self_to_autostart(application_name: &HSTRING) -> Result<(), WIN32_ERROR> {
+pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> Result<(), WIN32_ERROR> {
     unsafe {
         let mut hkey = HKEY(0);
         let hkey = ManagedHkey::try_new(
@@ -81,7 +81,7 @@ pub fn add_self_to_autostart(application_name: &HSTRING) -> Result<(), WIN32_ERR
     }
 }
 
-pub fn check_autostart(application_name: &HSTRING) -> bool {
+pub fn check_autostart(application_name: impl Into<PCWSTR>) -> bool {
     unsafe {
         matches!(
             RegGetValueW(
@@ -98,7 +98,7 @@ pub fn check_autostart(application_name: &HSTRING) -> bool {
     }
 }
 
-pub fn remove_autostart(application_name: &HSTRING) {
+pub fn remove_autostart(application_name: impl Into<PCWSTR>) {
     unsafe {
         let mut hkey = HKEY(0);
         if RegOpenKeyExW(
