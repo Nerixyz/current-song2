@@ -16,6 +16,21 @@ are a few unique features separating this project:
 * **Display Album Art** 🖼
 * **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`). Modules and the server can be configured in
   a `config.toml` file.
+  
+### Architecture
+
+```mermaid
+graph TD;
+    gsmtc[Windows GSMTC]
+    ext[Browser Extension]
+    cso2[CurrentSong2]
+    ext-->cso2
+    Spotify-->gsmtc
+    Browser-- no playback progress -->gsmtc
+    Browser-- playback progress -->ext
+    gsmtc-->cso2
+    cso2-->Overlay
+```
 
 # Setup
 
