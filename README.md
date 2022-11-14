@@ -14,7 +14,7 @@ are a few unique features separating this project:
 * **Near zero latency** ⏱ All modules are created with this in mind.
 * **Displaying Progress** 💯 Progress is displayed where available.
 * **Display Album Art** 🖼
-* **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`). Modules and the server can be configured in
+* **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`) and JavaScript (`user.js`), see [Customization](#customization). Modules and the server can be configured in
   a `config.toml` file.
   
 ### Architecture
@@ -147,6 +147,11 @@ Controls whether the module should be enabled or not.
 Controls the path from which a CSS theme will be loaded, defaults to `theme.css`. This is indented, so that you can keep
 multiple themes in the folder and switch between them.
 
+### `custom_script_path`
+
+Controls the path from which a user script will be loaded, defaults to `user.js`. This is indented, so that you can keep
+multiple scripts in the folder and switch between them.
+
 ### `port`
 
 Controls the local port on which the server is listening, defaults to `48457`.
@@ -194,19 +199,40 @@ These are the supported interpolations:
 
 Defaults to `{artist} - {title}`.
 
-# Theming
+# Customization
+
+Themes and scripts _don't_ require a restart of the app, you only need to reload the browser.
+
+💡 To debug the theme or a script, it's best to open the overlay in your browser and use its dev-tools. Go to `http://localhost:48457` in your browser.
+
+## Theming
 
 You can theme the overlay through a `theme.css` file (or a different filename specified in `custom_theme_path`).
 
-Themes _don't_ require a restart of the app, you only need to reload the browser.
-
-💡 To debug the theme it's best to open the overlay in your browser and use its dev-tools. Go to `http://localhost:48457` in your browser.
-
 📝 Take a look at the [example themes](themes)!
+
+## Scripting
+
+In addition to custom themes, you can customize the overlay using JavaScript through a `user.js` file (or a different filename specified in `custom_script_path`).
+
+The script is loaded at the start.
+In your script, you can expose `onPlay(state)` and `onPause()` through exports which will get called at the appropriate event.
+
+Example:
+```javascript
+console.log("Hello, World!");
+
+export function onPlay(state) {
+  console.log('Hello, State!', state);
+}
+
+export function onPause() {
+  console.log("Hello, Pause!");
+}
+```
 
 # Planned Features
 
 See more in the [projects tab](https://github.com/Nerixyz/current-song2/projects/1).
 
-* **Output to File**
 * **Better OBS Integration**

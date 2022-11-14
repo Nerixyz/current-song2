@@ -17,6 +17,8 @@ pub struct ServerConfig {
     pub port: u16,
     #[serde(default = "default_custom_theme_path")]
     pub custom_theme_path: String,
+    #[serde(default = "default_custom_script_path")]
+    pub custom_script_path: String,
 }
 
 impl Default for ServerConfig {
@@ -24,6 +26,7 @@ impl Default for ServerConfig {
         Self {
             port: default_port(),
             custom_theme_path: default_custom_theme_path(),
+            custom_script_path: default_custom_script_path(),
         }
     }
 }
@@ -36,6 +39,11 @@ fn default_port() -> u16 {
 #[inline]
 fn default_custom_theme_path() -> String {
     "theme.css".to_string()
+}
+
+#[inline]
+fn default_custom_script_path() -> String {
+    "user.js".to_string()
 }
 
 #[inline]

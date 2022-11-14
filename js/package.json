@@ -3,6 +3,7 @@
   "author": "Nerixyz",
   "version": "0.0.0",
   "workspaces": ["packages/client", "packages/extension"],
+  "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
     "build": "npm run build --workspaces",
     "build-client": "npm run build --workspace=client",

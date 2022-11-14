@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.0.0",
   "private": true,
-  "parcelIgnore": ["theme.css"],
+  "parcelIgnore": ["theme.css", "user.js", "/user.js"],
   "scripts": {
     "dev": "parcel src/index.html",
     "build": "rimraf dist && parcel build src/index.html",
