@@ -21,6 +21,7 @@ import {
   OutgoingMessages,
   ReconnectingWebsocket,
 } from '../../shared/reconnecting-websocket';
+import { startUserScript } from './user-scripts';
 
 (async function main() {
   const [container, imageContainer, imageEl, titleEl, subtitleEl, progressEl] = getElements<
@@ -53,6 +54,8 @@ import {
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
 
+  const userScript = startUserScript();
+
   const ws = new ReconnectingWebsocket<IncomingMessages<EventMap>, OutgoingMessages>(
     formatLocalUrl('/api/ws/client', 48457, 'ws'),
   );
@@ -82,10 +85,14 @@ import {
     }
 
     progressManager.run(data.timeline);
+
+    userScript.onPlay(state);
   });
   ws.addEventListener('Paused', () => {
     container.classList.add('vanish');
     progressManager.pause();
+
+    userScript.onPause();
   });
   await ws.connect();
 })();

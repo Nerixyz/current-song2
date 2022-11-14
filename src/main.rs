@@ -74,6 +74,7 @@ async fn async_main() -> std::io::Result<()> {
             .wrap(TracingLogger::default())
             .service(web::scope("api").configure(init_repositories))
             .service(static_files::theme_css)
+            .service(static_files::user_js)
             .service(static_files::service())
     })
     .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
