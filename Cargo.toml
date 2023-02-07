@@ -15,21 +15,21 @@ name = "current-song2"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.20", features = ["sync", "fs"] }
+tokio = { version = "1.25", features = ["sync", "fs"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 
 actix = "0.13"
-actix-web = { version = "4.1", features = ["compress-brotli"] }
+actix-web = { version = "4.3", features = ["compress-brotli"] }
 actix-files = "0.6"
-actix-web-actors = "4.1"
+actix-web-actors = "4.2"
 actix-cors = "0.6"
 actix-web-static-files = "4.0"
 static-files = "0.2"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-toml = "0.5"
+toml = "0.7"
 
 anyhow = "1.0"
 lazy_static = "1.4"
@@ -39,14 +39,14 @@ thiserror = "1.0"
 tracing = "0.1"
 tracing-log = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
-tracing-actix-web = "0.6"
+tracing-actix-web = "0.7"
 tracing-actix = "0.4"
 tracing-appender = "0.2"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
-windows = "0.43"
+windows = "0.44"
 
 [build-dependencies]
 actix-web-static-files = "4.0"
