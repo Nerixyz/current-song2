@@ -8,3 +8,4 @@ artifacts
 /theme.css
 /user.js
 current_song.txt
+node_modules
