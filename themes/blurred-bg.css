@@ -1,30 +1,30 @@
 :root {
-    --theme-color: white;
-    --image-overlay-opacity: 75%;
+  --theme-color: white;
+  --image-overlay-opacity: 75%;
 }
 
 #song-container.with-image::before {
-    content: '';
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    z-index: 0;
-    background: var(--image-url);
-    background-position: center;
-    opacity: var(--image-overlay-opacity, 100%);
-    filter: blur(10px);
+  content: '';
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 0;
+  background: var(--image-url);
+  background-position: center;
+  opacity: var(--image-overlay-opacity, 100%);
+  filter: blur(10px);
 
-    /**
+  /**
       Use this if you want the edges to be the theme color:
       background-size: 120%;
     */
-    transform: scale(200%);
+  transform: scale(200%);
 }
 
 #song-container.with-image * {
-    z-index: 1;
+  z-index: 1;
 }
 
 #song-info :is(h1, h2) {
-    text-shadow: 0px 1px 5px #fff5;
+  text-shadow: 0px 1px 5px #fff5;
 }

@@ -4,43 +4,74 @@ on:
   push:
     branches: [master]
     tags: ['*']
+  pull_request:
+    branches: [master]
 
 env:
   CARGO_TERM_COLOR: always
-  ext_release: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
-  ext_type: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
+  ext_release: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
+  ext_type: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+
+      # ╭─────────────────────────────╮
+      # │ Build extension and overlay │
+      # ╰─────────────────────────────╯
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
-          cache: npm
-          cache-dependency-path: js
-      - run: npm ci
-        working-directory: js
-      - name: JS Build
-        run: npm run build
-        working-directory: js
+          node-version: 18
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: JS Build (no release)
+        run: pnpm run --if-present -r build
         if: ${{ env.ext_release == '0' }}
-      - name: JS Release Build
-        run: npm run release
-        working-directory: js
-        # only on if it's a release build
+
+      - name: JS Build (release)
+        run: pnpm run --if-present -r release
         if: ${{ env.ext_release == '1' }}
         env:
           WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
           WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-      - run: 7z a artifacts\client.zip .\js\packages\client\dist\*
+
+      - run: 7z a artifacts\client.zip .\js\client\dist\*
+
+      # ╭──────────────────╮
+      # │ Build executable │
+      # ╰──────────────────╯
       - uses: actions-rs/toolchain@v1
         id: rust_chain
         with:
           profile: minimal
           toolchain: stable
+
       - uses: actions/cache@v2
         with:
           path: |
@@ -50,24 +81,32 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ steps.rust_chain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}-build
+
       - name: Build
         run: cargo build --release
+
+      # ╭───────────────────╮
+      # │ Upload articfacts │
+      # ╰───────────────────╯
       - uses: actions/upload-artifact@v3
         with:
           name: current-song2.exe
           path: target/release/current-song2.exe
+
       - uses: actions/upload-artifact@v3
         with:
           name: extension.${{ env.ext_type }}
-          path: js/packages/extension/artifacts/*.${{ env.ext_type }}
+          path: js/extension/artifacts/*.${{ env.ext_type }}
+
       - uses: actions/upload-artifact@v3
         with:
           name: client.zip
           path: artifacts/client.zip
+
   create-release:
     needs: [build]
     runs-on: ubuntu-latest
-    if: (contains(github.ref, 'refs/tags/'))
+    if: (github.event_name == 'push' && contains(github.ref, 'refs/tags/'))
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
@@ -76,7 +115,7 @@ jobs:
 
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "artifacts/**/*"
+          artifacts: 'artifacts/**/*'
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: true
           prerelease: ${{ env.ext_release == '0' }}

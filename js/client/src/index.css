@@ -1,0 +1,123 @@
+:root {
+  --theme-color: #c3f831;
+  --text-color: #000;
+  --font: 'Arial', sans;
+  --shadow-color: #0008;
+
+  --rounded: 10px;
+  /*--max-width: 40rem;*/
+  --height: 4.4rem;
+  --max-height: 4.4rem;
+  --min-height: 3rem;
+
+  --progress-height: 0.4rem;
+  --progress-color: #007e7a;
+  --progress-border-radius: 3px;
+  --progress-shadow: 0 0 3px 0 var(--shadow-color);
+}
+
+body {
+  background: #121212;
+  margin: 0;
+}
+
+#song-container {
+  background: var(--theme-color);
+  display: inline-flex;
+  position: absolute;
+  border-radius: var(--rounded);
+  max-width: var(--max-width, unset);
+  width: min-content;
+  max-height: var(--max-height);
+  min-height: var(--min-height);
+  overflow: hidden;
+  transition: 250ms cubic-bezier(0.33, 1, 0.68, 1);
+  transition-property: opacity, transform;
+  transform-origin: left;
+}
+
+#song-container.with-image {
+  height: var(--height);
+}
+
+#song-container.with-progress {
+  padding-bottom: var(--progress-height);
+}
+
+#song-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.25rem 1rem 0.3rem 1rem;
+  white-space: nowrap;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text-color);
+  text-wrap: none;
+}
+
+h1 {
+  font-size: x-large;
+}
+h2 {
+  font-size: large;
+}
+
+#progress {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: calc(-100% + var(--progress, 0) * 100%);
+  width: 100%;
+  height: var(--progress-height);
+  background: var(--progress-color);
+  transform-origin: left;
+  border-radius: var(--progress-border-radius);
+  box-shadow: var(--progress-shadow);
+  transition: left 100ms;
+}
+
+#image-container {
+  flex-shrink: 1;
+  height: 70%;
+  max-height: 100%;
+  max-width: 100%;
+  margin: auto 0 auto 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px 0 var(--shadow-color);
+  animation: scale-in cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(var(--full-scale, 1));
+  }
+}
+
+img {
+  height: 100%;
+  width: auto;
+}
+
+img.spotify {
+  overflow: hidden;
+  height: 100%;
+  width: auto;
+  transform: scale(1.28) translate(0%, 11%);
+}
+
+.vanish {
+  transform: scale(0) translateX(50%);
+  opacity: 0;
+}
+
+.hidden {
+  display: none;
+}

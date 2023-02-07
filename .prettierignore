@@ -1,0 +1,9 @@
+node_modules
+dist
+.parcel-cache
+.idea
+.vscode
+.code
+target
+pnpm-lock.yaml
+artifacts

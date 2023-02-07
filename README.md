@@ -11,12 +11,12 @@ Windows' [`GlobalSystemMediaTransportControls`](https://docs.microsoft.com/uwp/a
 The goal of the project is to create a **simple yet powerful** overlay that displays the currently playing song. There
 are a few unique features separating this project:
 
-* **Near zero latency** ⏱ All modules are created with this in mind.
-* **Displaying Progress** 💯 Progress is displayed where available.
-* **Display Album Art** 🖼
-* **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`) and JavaScript (`user.js`), see [Customization](#customization). Modules and the server can be configured in
+- **Near zero latency** ⏱ All modules are created with this in mind.
+- **Displaying Progress** 💯 Progress is displayed where available.
+- **Display Album Art** 🖼
+- **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`) and JavaScript (`user.js`), see [Customization](#customization). Modules and the server can be configured in
   a `config.toml` file.
-  
+
 ### Architecture
 
 ```mermaid
@@ -36,20 +36,19 @@ graph TD;
 
 ## Windows
 
-* Download the latest [`current-song2.exe` from the releases tab](https://github.com/Nerixyz/current-song2/releases)
+- Download the latest [`current-song2.exe` from the releases tab](https://github.com/Nerixyz/current-song2/releases)
   and place it in any (preferably empty) folder.
-* Run `current-song2.exe` by just double-clicking.
-* On the first run, it will ask you if you want to add the application to
+- Run `current-song2.exe` by just double-clicking.
+- On the first run, it will ask you if you want to add the application to
   autostart: ![autostart dialog](https://i.imgur.com/bxCVaMG.png)
-    * If you click **Yes**, then it will add the app to autostart and start CurrentSong2 regularly. You can remove it,
-      by running the app from the command line: `current-song2.exe --remove-autostart`.
-    * If you click **No**, then the app will start and remember your decision in `config.toml`.
-* In OBS, add a new **Browser Source** with the url set to `http://localhost:48457` (width and height should be your resolution, probably 1920x1080).
-* To get extended info from your browser, install the extension [for Chrome or Edge 📦](https://chrome.google.com/webstore/detail/currentsong/alanjgmjccmkkpmpejgdhaodfjlmcone) or [for Firefox 📦](https://addons.mozilla.org/firefox/addon/current-song-overlay/).
-
+  - If you click **Yes**, then it will add the app to autostart and start CurrentSong2 regularly. You can remove it,
+    by running the app from the command line: `current-song2.exe --remove-autostart`.
+  - If you click **No**, then the app will start and remember your decision in `config.toml`.
+- In OBS, add a new **Browser Source** with the url set to `http://localhost:48457` (width and height should be your resolution, probably 1920x1080).
+- To get extended info from your browser, install the extension [for Chrome or Edge 📦](https://chrome.google.com/webstore/detail/currentsong/alanjgmjccmkkpmpejgdhaodfjlmcone) or [for Firefox 📦](https://addons.mozilla.org/firefox/addon/current-song-overlay/).
 
 On the first run a `config.toml` file will be created. To configure the application further,
-  see [Configuration](#configuration).
+see [Configuration](#configuration).
 
 ### Stopping CurrentSong2
 
@@ -95,8 +94,8 @@ custom_theme_path = "theme.css"
 
 This flag controls if the application will try to add itself to autostart.
 
-* If it's `true`, then it won't add itself to autostart. _This doesn't mean it will be removed_
-* If it's `false` (default), then it **will** check the autostart and possibly add itself there. You can still disable
+- If it's `true`, then it won't add itself to autostart. _This doesn't mean it will be removed_
+- If it's `false` (default), then it **will** check the autostart and possibly add itself there. You can still disable
   the entry on the _Task Manager_'s _Autostart_ tab since this is independent of the actual registry entry.
 
 ## GSMTC (Global System Media Transport Controls, Windows)
@@ -109,14 +108,14 @@ or only limited metadata (specifically browsers; that's why they're excluded by 
 You can control which applications will be included in the search for metadata through `modules.gsmtc.filter`. There are
 three modes: `Disabled`,`Include`, and `Exclude`:
 
-* `Disabled` will disable all filters, and let everything pass the filters:
+- `Disabled` will disable all filters, and let everything pass the filters:
 
 ```toml
 [modules.gsmtc.filter]
 mode = "Disabled"
 ```
 
-* `Include` will only include applications listed in `items`. ⚠ This list is **case-sensitive**. For example, only
+- `Include` will only include applications listed in `items`. ⚠ This list is **case-sensitive**. For example, only
   include Spotify:
 
 ```toml
@@ -125,7 +124,7 @@ mode = "Include"
 items = ["Spotify.exe"] # ⚠ notice the capital 'S', the filter is case-sensitive
 ```
 
-* `Exclude` will include everything, except applications listed in `items`. ⚠ This list is **case-sensitive**. For
+- `Exclude` will include everything, except applications listed in `items`. ⚠ This list is **case-sensitive**. For
   example, don't include firefox:
 
 ```toml
@@ -187,15 +186,15 @@ Controls the format of the written text.
 Interpolations are wrapped inside of `{` and `}`, if you want to output a `{`, use `{{`.
 These are the supported interpolations:
 
-| Interpolation     | Description                                                                                         |
-|-------------------|-----------------------------------------------------------------------------------------------------|
-| `{title}`         | The song's title.                                                                                   |
-| `{artist}`        | The song's artist.                                                                                  |
-| `{album-name?}`   | The song's album name (or empty string).                                                            |
-| `{album-tracks?}` | The album's track count (or empty string).                                                          |
-| `{track-number?}` | The number of this track in the album (or empty string).                                            |
-| `{source}`        | The provider of the current song.   For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |
-| `{duration?}`     | The song's duration (e.g. `1m23s`) (or empty string).                                               |
+| Interpolation     | Description                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------- |
+| `{title}`         | The song's title.                                                                                 |
+| `{artist}`        | The song's artist.                                                                                |
+| `{album-name?}`   | The song's album name (or empty string).                                                          |
+| `{album-tracks?}` | The album's track count (or empty string).                                                        |
+| `{track-number?}` | The number of this track in the album (or empty string).                                          |
+| `{source}`        | The provider of the current song. For gsmtc: `gsmtc::<executable>`, for the extension: `browser`. |
+| `{duration?}`     | The song's duration (e.g. `1m23s`) (or empty string).                                             |
 
 Defaults to `{artist} - {title}`.
 
@@ -219,15 +218,16 @@ The script is loaded at the start.
 In your script, you can expose `onPlay(state)` and `onPause()` through exports which will get called at the appropriate event.
 
 Example:
+
 ```javascript
-console.log("Hello, World!");
+console.log('Hello, World!');
 
 export function onPlay(state) {
   console.log('Hello, State!', state);
 }
 
 export function onPause() {
-  console.log("Hello, Pause!");
+  console.log('Hello, Pause!');
 }
 ```
 
@@ -235,4 +235,4 @@ export function onPause() {
 
 See more in the [projects tab](https://github.com/Nerixyz/current-song2/projects/1).
 
-* **Better OBS Integration**
+- **Better OBS Integration**
