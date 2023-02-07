@@ -4,11 +4,13 @@ on:
   push:
     branches: [master]
     tags: ['*']
+  pull_request:
+    branches: [master]
 
 env:
   CARGO_TERM_COLOR: always
-  ext_release: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
-  ext_type: ${{ (contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
+  ext_release: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
+  ext_type: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
 
 jobs:
   build:
