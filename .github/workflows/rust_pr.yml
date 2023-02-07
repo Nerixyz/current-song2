@@ -41,4 +41,3 @@ jobs:
           toolchain: nightly
       - run: rustup component add rustfmt
       - run: cargo fmt -- --check
-

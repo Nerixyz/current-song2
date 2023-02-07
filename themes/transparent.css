@@ -1,13 +1,13 @@
 :root {
-    --text-shadow-color: #0007;
+  --text-shadow-color: #0007;
 }
 
 #song-container {
-    background: transparent;
-    transition: none;
-    overflow: visible;
+  background: transparent;
+  transition: none;
+  overflow: visible;
 }
 
 #song-info :is(h1, h2) {
-    text-shadow: 1px 4px 15px var(--text-shadow-color, #0007)
+  text-shadow: 1px 4px 15px var(--text-shadow-color, #0007);
 }

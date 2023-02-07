@@ -3,13 +3,13 @@ use std::{env, io, path::PathBuf};
 
 fn include_static_files() -> io::Result<()> {
     // assume it's already built
-    if PathBuf::from("js/packages/client/dist").exists() {
-        resource_dir("js/packages/client/dist").build()
+    if PathBuf::from("js/client/dist").exists() {
+        resource_dir("js/client/dist").build()
     } else {
         NpmBuild::new("js")
             .install()?
             .run("build-client")?
-            .target("js/packages/client/dist")
+            .target("js/client/dist")
             .change_detection()
             .to_resource_dir()
             .build()

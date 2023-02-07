@@ -16,7 +16,7 @@ pub fn service() -> actix_web_static_files::ResourceFiles {
 
 #[cfg(not(feature = "single-executable"))]
 pub fn service() -> actix_files::Files {
-    actix_files::Files::new("/", "js/packages/client/dist").index_file("index.html")
+    actix_files::Files::new("/", "js/client/dist").index_file("index.html")
 }
 
 #[get("theme.css")]
