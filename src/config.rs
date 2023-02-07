@@ -162,8 +162,8 @@ lazy_static::lazy_static! {
 }
 
 fn read_config() -> anyhow::Result<Config> {
-    let file = fs::read(&*CONFIG_PATH)?;
-    Ok(toml::from_slice(&file)?)
+    let file = fs::read_to_string(&*CONFIG_PATH)?;
+    Ok(toml::from_str(&file)?)
 }
 
 pub fn save_config(config: &Config) -> anyhow::Result<()> {

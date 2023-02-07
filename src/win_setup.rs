@@ -56,7 +56,7 @@ pub fn win_main() {
         };
         if let Err(e) = save_config(&updated_config) {
             let error = HSTRING::from(format!("Cannot save config, you need to add 'no_autostart = true' to the config.toml.\nError: {}", e));
-            MessageBox::<Okay>::error(&error)
+            MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                 .with_title(APPLICATION_NAME)
                 .show()
                 .ok();
@@ -68,7 +68,7 @@ pub fn win_main() {
         Err(ERROR_ACCESS_DENIED) => {
             if let Err(e) = elevate_self() {
                 let error = HSTRING::from(format!("Cannot elevate process: {}", e.0));
-                MessageBox::<Okay>::error(&error)
+                MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                     .with_title(APPLICATION_NAME)
                     .show()
                     .ok();
@@ -80,7 +80,7 @@ pub fn win_main() {
                 unsafe { APPLICATION_NAME.display() },
                 e.0
             ));
-            MessageBox::<Okay>::error(&error)
+            MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                 .with_title(APPLICATION_NAME)
                 .show()
                 .ok();
@@ -115,7 +115,7 @@ fn handle_multiple_instances() {
                 Err(e) => {
                     let error =
                         HSTRING::from(format!("Could not kill the other instance: {:?}", e));
-                    MessageBox::<Okay>::error(&error)
+                    MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                         .with_title(APPLICATION_NAME)
                         .show()
                         .ok();
@@ -132,7 +132,7 @@ fn elevated_main() -> ! {
             unsafe { APPLICATION_NAME.display() },
             e.0
         ));
-        MessageBox::<Okay>::error(&error)
+        MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
             .with_title(APPLICATION_NAME)
             .show()
             .ok();

@@ -67,7 +67,7 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> Result<(), 
 
         match RegSetValueExW(
             *hkey,
-            application_name,
+            application_name.into(),
             0,
             REG_SZ,
             Some(std::slice::from_raw_parts(
@@ -87,7 +87,7 @@ pub fn check_autostart(application_name: impl Into<PCWSTR>) -> bool {
             RegGetValueW(
                 HKEY_CURRENT_USER,
                 windows::core::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-                application_name,
+                application_name.into(),
                 RRF_RT_REG_SZ,
                 None,
                 None,
@@ -111,7 +111,7 @@ pub fn remove_autostart(application_name: impl Into<PCWSTR>) {
         {
             return;
         }
-        RegDeleteValueW(hkey, application_name);
+        RegDeleteValueW(hkey, application_name.into());
         RegCloseKey(hkey);
     }
 }
