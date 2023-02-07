@@ -54,21 +54,8 @@ jobs:
         run: pnpm run --if-present -r build
         if: ${{ env.ext_release == '0' }}
 
-      - name: Build (release)
+      - name: JS Build (release)
         run: pnpm run --if-present -r release
-        if: ${{ env.ext_release == '0' }}
-        env:
-          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
-          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-
-      - name: JS Build
-        run: npm run build
-        working-directory: js
-
-      - name: JS Release Build
-        run: npm run release
-        working-directory: js
-        # only on if it's a release build
         if: ${{ env.ext_release == '1' }}
         env:
           WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
