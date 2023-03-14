@@ -9,7 +9,7 @@ path = "src/lib.rs"
 
 [dependencies]
 tokio = { version = "1.26", features = ["sync", "macros", "rt"] }
-windows = { version = "0.44", features = ["Media_Control", "Foundation", "Foundation_Collections", "Storage_Streams"] }
+windows = { version = "0.46", features = ["Media_Control", "Foundation", "Foundation_Collections", "Storage_Streams"] }
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
