@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: JS Build (no release)
         run: pnpm run --if-present -r build
@@ -83,7 +83,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ steps.rust_chain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}-build
 
       - name: Build
-        run: cargo build --release
+        run: cargo build --release --locked
 
       # ╭───────────────────╮
       # │ Upload articfacts │
