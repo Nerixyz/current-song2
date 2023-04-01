@@ -261,7 +261,7 @@ npm i -g pnpm
    cargo build -r --locked
    ```
 
-   This will build the executable in release mode. To build in debug mode, leave out the `-r`. For local development, it's useful to not bundle the overlay inside the executable. To achieve this, add `--no-default-features` (this will disable the `single-executable` feature).
+   This will build the executable in release mode. To build in debug mode, leave out the `-r`. For local development, it's useful to not bundle the overlay inside the executable and be able to stop the app with <kbd>CTRL</kbd> + <kbd>C</kbd>. To achieve this, add `--no-default-features` (this will disable the `single-executable` and `win32-executable` features). Furthermore, it's useful to run the app in the project-directory (instead of `target/{debug,release}`). To do this, add `--current-dir` when running. A good command-line for development is: `cargo r --no-default-features -- --current-dir`.
 
 ## Planned Features
 

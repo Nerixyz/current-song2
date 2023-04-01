@@ -7,8 +7,12 @@ edition = "2021"
 members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
 
 [features]
+# When enabled, the overlay will be bundled into the executable.
 single-executable = []
-default = ["single-executable"]
+# When enabled, the executable will be compiled with the WINDOWS subsytem
+# over the default CONSOLE subsystem.
+win32-executable = []
+default = ["single-executable", "win32-executable"]
 
 [[bin]]
 name = "current-song2"

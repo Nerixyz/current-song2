@@ -1,4 +1,4 @@
-#![windows_subsystem = "windows"]
+#![cfg_attr(feature = "win32-executable", windows_subsystem = "windows")]
 #![warn(clippy::pedantic)]
 #![warn(clippy::cargo)]
 #![allow(clippy::module_name_repetitions)]
