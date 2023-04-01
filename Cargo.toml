@@ -7,6 +7,7 @@ edition = "2021"
 members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
 
 [features]
+# When enabled, the overlay will be bundled into the executable.
 single-executable = []
 # When enabled, the executable will be compiled with the WINDOWS subsytem
 # over the default CONSOLE subsystem.
