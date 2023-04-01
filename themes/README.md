@@ -2,7 +2,7 @@
 
 ## Installation
 
-- Download the css file
+- Download the CSS file
 - **Either:** save the file as `theme.css` in the current-song directory **or** set the `custom_theme_path` config
   setting to your theme.
 
