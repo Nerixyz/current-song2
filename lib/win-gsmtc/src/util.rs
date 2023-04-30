@@ -22,7 +22,7 @@ macro_rules! bail_opt {
     };
 }
 
-pub trait ResultExt<T> {
+pub(crate) trait ResultExt<T> {
     fn opt(self) -> Result<Option<T>>;
 }
 
@@ -36,7 +36,7 @@ impl<T> ResultExt<T> for Result<T> {
     }
 }
 
-pub async fn request_media_properties(
+pub(crate) async fn request_media_properties(
     loop_tx: Weak<mpsc::UnboundedSender<SessionCommand>>,
     session: AgileReference<GlobalSystemMediaTransportControlsSession>,
 ) -> Result<Option<()>> {

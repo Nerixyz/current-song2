@@ -14,7 +14,7 @@ use windows::{
     Media::Control::GlobalSystemMediaTransportControlsSession,
 };
 
-pub struct SessionHandle {
+pub(crate) struct SessionHandle {
     pub id: usize,
     pub sender: Arc<mpsc::UnboundedSender<SessionCommand>>,
 }
@@ -41,7 +41,7 @@ pub enum SessionUpdateEvent {
 }
 
 #[derive(Debug)]
-pub enum SessionCommand {
+pub(crate) enum SessionCommand {
     PlaybackInfoChanged,
     MediaPropertiesChanged,
     MediaPropertiesResult(Box<MediaModel>, Option<Image>), // TODO: boxing doesn't seem ideal here
