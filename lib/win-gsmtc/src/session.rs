@@ -34,9 +34,14 @@ struct SessionWorker {
     timeline_token: EventRegistrationToken,
 }
 
+/// Events emitted by an internal session-worker.
+///
+/// The internal worker stops after the event-receiver is dropped and an attempt was made to send an event.
 #[derive(Debug)]
 pub enum SessionUpdateEvent {
+    /// The session was updated.
     Model(SessionModel),
+    /// The current media of the session was updated.
     Media(SessionModel, Option<Image>),
 }
 
