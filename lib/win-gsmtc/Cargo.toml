@@ -7,7 +7,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/Nerixyz/current-song2"
 keywords = ["windows", "winrt", "gsmtc", "media"]
 categories = ["os::windows-apis", "multimedia"]
-readme = "lib/win-gsmtc/README.md"
+readme = "README.md"
 
 [lib]
 name = "gsmtc"
