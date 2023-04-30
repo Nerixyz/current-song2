@@ -55,7 +55,7 @@ pub async fn request_media_properties(
     if let Some(loop_tx) = loop_tx.upgrade() {
         loop_tx
             .send(SessionCommand::MediaPropertiesResult(
-                bail_opt!(media_properties.try_into().opt()),
+                Box::new(bail_opt!(media_properties.try_into().opt())),
                 image,
             ))
             .ok();

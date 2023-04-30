@@ -44,7 +44,7 @@ pub enum SessionUpdateEvent {
 pub enum SessionCommand {
     PlaybackInfoChanged,
     MediaPropertiesChanged,
-    MediaPropertiesResult(MediaModel, Option<Image>),
+    MediaPropertiesResult(Box<MediaModel>, Option<Image>), // TODO: boxing doesn't seem ideal here
     TimelinePropertiesChanged,
     Close,
 }
@@ -162,7 +162,7 @@ impl SessionWorker {
                 }
             }
             SessionCommand::MediaPropertiesResult(media, image) => {
-                self.model.media = Some(media);
+                self.model.media = Some(*media);
                 self.sess_tx
                     .send(SessionUpdateEvent::Media(self.model.clone(), image))
                     .ok();
