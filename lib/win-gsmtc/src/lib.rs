@@ -1,5 +1,5 @@
 //! This library is a wrapper around the [`Windows.Media.Control`](https://learn.microsoft.com/uwp/api/windows.media.control) namespace (aka `GlobalSystemMediaTransportControls` - GSMTC).
-//! It uses [`tokio`](https://docs.rs/tokio) to manage internal workers that deliver udpates.
+//! It uses [`tokio`](https://docs.rs/tokio) to manage internal workers that deliver updates.
 //!
 //! ### Example
 //!
