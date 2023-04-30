@@ -1,0 +1,31 @@
+name: win-gsmtc
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-lint:
+    name: Build, Lint, and Test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build -p win-gsmtc
+      - name: Clippy
+        run: cargo clippy -p win-gsmtc
+      - name: Test
+        run: cargo test -p win-gsmtc --doc

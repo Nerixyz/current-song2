@@ -9,8 +9,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  ext_release: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
-  ext_type: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
+  ext_release: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/v') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && '1' || '0' }}
+  ext_type: ${{ (github.event_name == 'push' && contains(github.ref, 'refs/tags/v') && !(contains(github.ref, 'beta') || contains(github.ref, 'alpha'))) && 'xpi' || 'zip' }}
 
 jobs:
   build:
@@ -106,7 +106,7 @@ jobs:
   create-release:
     needs: [build]
     runs-on: ubuntu-latest
-    if: (github.event_name == 'push' && contains(github.ref, 'refs/tags/'))
+    if: (github.event_name == 'push' && contains(github.ref, 'refs/tags/v'))
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2

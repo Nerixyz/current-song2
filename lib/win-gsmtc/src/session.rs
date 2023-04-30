@@ -14,7 +14,7 @@ use windows::{
     Media::Control::GlobalSystemMediaTransportControlsSession,
 };
 
-pub struct SessionHandle {
+pub(crate) struct SessionHandle {
     pub id: usize,
     pub sender: Arc<mpsc::UnboundedSender<SessionCommand>>,
 }
@@ -34,17 +34,22 @@ struct SessionWorker {
     timeline_token: EventRegistrationToken,
 }
 
+/// Events emitted by an internal session-worker.
+///
+/// The internal worker stops after the event-receiver is dropped and an attempt was made to send an event.
 #[derive(Debug)]
 pub enum SessionUpdateEvent {
+    /// The session was updated.
     Model(SessionModel),
+    /// The current media of the session was updated.
     Media(SessionModel, Option<Image>),
 }
 
 #[derive(Debug)]
-pub enum SessionCommand {
+pub(crate) enum SessionCommand {
     PlaybackInfoChanged,
     MediaPropertiesChanged,
-    MediaPropertiesResult(MediaModel, Option<Image>),
+    MediaPropertiesResult(Box<MediaModel>, Option<Image>), // TODO: boxing doesn't seem ideal here
     TimelinePropertiesChanged,
     Close,
 }
@@ -162,7 +167,7 @@ impl SessionWorker {
                 }
             }
             SessionCommand::MediaPropertiesResult(media, image) => {
-                self.model.media = Some(media);
+                self.model.media = Some(*media);
                 self.sess_tx
                     .send(SessionUpdateEvent::Media(self.model.clone(), image))
                     .ok();

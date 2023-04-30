@@ -13,6 +13,10 @@ use windows::{
     },
 };
 
+/// This is the main worker.
+/// It listens to the added/removed sessions.
+///
+/// Use [`create`](Self::create) to create a new instance.
 pub struct SessionManager {
     sessions: HashMap<String, SessionHandle>,
     next_session_id: usize,
@@ -28,20 +32,30 @@ pub struct SessionManager {
     current_changed_token: EventRegistrationToken,
 }
 
+/// Events emitted by a [`SessionManager`](crate::SessionManager).
 #[derive(Debug)]
 pub enum ManagerEvent {
+    /// Occurs when a new session was created.
     SessionCreated {
+        /// The _internal_ session-id of the created session.
         session_id: usize,
+        /// A handle to events emitted by the session.
         rx: mpsc::UnboundedReceiver<SessionUpdateEvent>,
+        /// The [source-app-user-model-id](https://learn.microsoft.com/uwp/api/windows.media.control.globalsystemmediatransportcontrolssession.sourceappusermodelid) of the session.
+        ///
+        /// This is the identifier for a session and assumed to be unique per session.
         source: String,
     },
+    /// Occurs when a previously added session was removed.
     SessionRemoved {
+        /// The _internal_ session-id of the removed session.
         session_id: usize,
     },
-    /// We don't use this event internally.
-    /// We compute the current session by the last event
-    /// that was received for a session.
+    /// Occurs when the current session has changed.
+    /// This is the session that the system believes is the one the user would most likely want to control.
     CurrentSessionChanged {
+        /// The _internal_ session-id of the new session.
+        /// If this is [`None`](Option::None), then there's no current session.
         session_id: Option<usize>,
     },
 }
@@ -53,7 +67,12 @@ pub enum ManagerCommand {
 }
 
 impl SessionManager {
-    pub async fn new() -> Result<mpsc::UnboundedReceiver<ManagerEvent>> {
+    /// Creates a new [`SessionManager`](crate::SessionManager) and spawns its worker-task.
+    ///
+    /// This mainly calls [`RequestAsync`](https://learn.microsoft.com/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager.requestasync) on the [`GlobalSystemMediaTransportControlsSessionManager`](https://learn.microsoft.com/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager).
+    ///
+    /// The manager stops after the returned receiver is dropped and an attempt was made to send an event.
+    pub async fn create() -> Result<mpsc::UnboundedReceiver<ManagerEvent>> {
         let this = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?.await?;
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();

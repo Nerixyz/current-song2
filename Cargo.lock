@@ -1376,6 +1376,7 @@ dependencies = [
  "bytes",
  "libc",
  "mio",
+ "num_cpus",
  "parking_lot",
  "pin-project-lite",
  "signal-hook-registry",
@@ -1631,10 +1632,10 @@ name = "win-gsmtc"
 version = "0.1.0"
 dependencies = [
  "serde",
- "serde_json",
  "tap",
  "tokio",
  "tracing",
+ "tracing-subscriber",
  "windows",
 ]
 
