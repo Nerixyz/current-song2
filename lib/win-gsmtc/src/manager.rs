@@ -53,7 +53,7 @@ pub enum ManagerCommand {
 }
 
 impl SessionManager {
-    pub async fn new() -> Result<mpsc::UnboundedReceiver<ManagerEvent>> {
+    pub async fn create() -> Result<mpsc::UnboundedReceiver<ManagerEvent>> {
         let this = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()?.await?;
 
         let (event_tx, event_rx) = mpsc::unbounded_channel();

@@ -29,7 +29,7 @@ pub async fn start_spawning(
     manager: Addr<Manager>,
     image_store: Arc<RwLock<ImageStore>>,
 ) -> AnyResult<()> {
-    let mut rx = SessionManager::new().await?;
+    let mut rx = SessionManager::create().await?;
     tokio::spawn(
         async move {
             while let Some(evt) = rx.recv().await {
