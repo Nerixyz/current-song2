@@ -143,12 +143,12 @@ Controls whether the module should be enabled or not.
 
 #### `custom_theme_path`
 
-Controls the path from which a CSS theme will be loaded, defaults to `theme.css`. This is indented, so that you can keep
+Controls the path from which a CSS theme will be loaded, defaults to `theme.css`. This is intended, so that you can keep
 multiple themes in the folder and switch between them.
 
 #### `custom_script_path`
 
-Controls the path from which a user script will be loaded, defaults to `user.js`. This is indented, so that you can keep
+Controls the path from which a user script will be loaded, defaults to `user.js`. This is intended, so that you can keep
 multiple scripts in the folder and switch between them.
 
 #### `port`
