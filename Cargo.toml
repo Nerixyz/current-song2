@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [workspace]
-members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
+members = [".", "lib/win-gsmtc", "lib/win-npsm", "lib/win-wrapper"]
 
 [features]
 # When enabled, the overlay will be bundled into the executable.
