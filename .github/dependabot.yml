@@ -8,6 +8,10 @@ updates:
       prefix: 'deps(npm)'
     labels:
       - 'javascript'
+    groups:
+      js:
+        patterns:
+          - '*'
   - package-ecosystem: 'cargo'
     directory: '/'
     schedule:
@@ -16,3 +20,7 @@ updates:
       prefix: 'deps(cargo)'
     labels:
       - 'rust'
+    groups:
+      rust:
+        patterns:
+          - '*'
