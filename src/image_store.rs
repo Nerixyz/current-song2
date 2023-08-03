@@ -12,7 +12,7 @@ impl Debug for Image {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Image")
             .field("content_type", &self.content_type)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
@@ -25,7 +25,7 @@ pub struct ImageStore {
 impl ImageStore {
     pub fn new() -> Self {
         Self {
-            images: Default::default(),
+            images: HashMap::default(),
             next_id: 0,
         }
     }

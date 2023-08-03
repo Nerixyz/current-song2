@@ -2,6 +2,11 @@
 name = "win-wrapper"
 version = "0.1.0"
 edition = "2021"
+description = "A wrapper around the various windows APIs"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Nerixyz/current-song2"
+categories = ["os::windows-apis"]
+keywords = ["windows", "wrapper"]
 
 [dependencies]
 windows = { version = "0.48", features = [
@@ -11,5 +16,5 @@ windows = { version = "0.48", features = [
     "Win32_Security",
     "Win32_UI_Shell",
     "Win32_System_Threading",
-    "Win32_System_ProcessStatus"
+    "Win32_System_ProcessStatus",
 ] }

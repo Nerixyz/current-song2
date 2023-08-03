@@ -100,18 +100,15 @@ impl GsmtcWorker {
     #[tracing::instrument(level = "trace")]
     async fn store_image(&mut self, image: Option<Image>) -> Option<ImageInfo> {
         let mut store = self.image_store.write().await;
-        let img = match image {
-            Some(img) => {
-                let epoch_id = store.store(self.image_id, img.content_type, img.data);
-                Some(ImageInfo::Internal(InternalImage {
-                    id: self.image_id,
-                    epoch_id,
-                }))
-            }
-            None => {
-                store.clear(self.image_id);
-                None
-            }
+        let img = if let Some(img) = image {
+            let epoch_id = store.store(self.image_id, img.content_type, img.data);
+            Some(ImageInfo::Internal(InternalImage {
+                id: self.image_id,
+                epoch_id,
+            }))
+        } else {
+            store.clear(self.image_id);
+            None
         };
         self.image = img.clone();
         img
@@ -149,14 +146,19 @@ fn convert_model(from: SessionModel, image: Option<ImageInfo>) -> ModuleState {
                 title: a.title,
                 track_count: a.track_count,
             }),
-            source: format!("gsmtc::{}", source),
+            source: format!("gsmtc::{source}"),
             image,
             timeline: timeline
                 .filter(|timeline| timeline.end > timeline.start && timeline.last_updated_at_ms > 0)
                 .map(|timeline| TimelineInfo {
-                    duration_ms: ((timeline.end - timeline.start) / 10_000) as u64,
-                    progress_ms: ((timeline.position - timeline.start) / 10_000) as u64,
-                    ts: timeline.last_updated_at_ms as u64,
+                    duration_ms: ((timeline.end - timeline.start) / 10_000)
+                        .try_into()
+                        .unwrap_or_default(),
+                    progress_ms: ((timeline.position - timeline.start) / 10_000)
+                        .try_into()
+                        .unwrap_or_default(),
+                    ts: timeline.last_updated_at_ms.try_into().unwrap_or_default(),
+                    #[allow(clippy::cast_possible_truncation)]
                     rate: playback.rate as f32,
                 }),
         }),

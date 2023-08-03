@@ -31,7 +31,7 @@ impl Manager {
     pub fn new(event_tx: watch::Sender<Event>) -> Self {
         Self {
             event_tx,
-            modules: Default::default(),
+            modules: HashMap::default(),
             current_module: None,
             next_id: 0,
         }
@@ -55,7 +55,7 @@ impl Manager {
             .iter()
             .filter_map(|(id, m)| match *m.state {
                 ModuleState::Playing(_) => Some((*id, m)),
-                _ => None,
+                ModuleState::Paused => None,
             })
             .collect();
 

@@ -3,6 +3,11 @@ name = "current-song-2"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+description = "Display the currently playing song/audio."
+keywords = ["overlay", "obs", "stream"]
+authors = ["Nerixyz"]
+repository = "https://github.com/Nerixyz/current-song2"
+categories = ["multimedia"]                               # TODO: find something more fitting
 
 [workspace]
 members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
