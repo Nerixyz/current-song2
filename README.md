@@ -38,14 +38,10 @@ graph TD;
 
 - Download the latest [`current-song2.exe` from the releases tab](https://github.com/Nerixyz/current-song2/releases)
   and place it in any (preferably empty) folder.
-- Run `current-song2.exe` by just double-clicking.
-- On the first run, it will ask you if you want to add the application to
-  autostart: ![autostart dialog](https://i.imgur.com/bxCVaMG.png)
-  - If you click **Yes**, then it will add the app to autostart and start CurrentSong2 regularly. You can remove it,
-    by running the app from the command line: `current-song2.exe --remove-autostart`.
-  - If you click **No**, then the app will start and remember your decision in `config.toml`.
-- In OBS, add a new **Browser Source** with the url set to `http://localhost:48457` (width and height should be your resolution, probably 1920x1080).
-- To get extended info from your browser, install the extension [for Chrome or Edge 📦](https://chrome.google.com/webstore/detail/currentsong/alanjgmjccmkkpmpejgdhaodfjlmcone) or [for Firefox 📦](https://addons.mozilla.org/firefox/addon/current-song-overlay/).
+- Run `current-song2.exe` by double-clicking. To check if the app is running, navigate to [http://localhost:48457](http://localhost:48457) in your browser. If nothing is playing, a blank page should show.
+- In OBS, add a new **Browser Source** with the URL set to `http://localhost:48457` (width and height should be your resolution, probably 1920x1080).
+
+To get extended info from your browser, install the extension [for Chrome or Edge 📦](https://chrome.google.com/webstore/detail/currentsong/alanjgmjccmkkpmpejgdhaodfjlmcone) or [for Firefox 📦](https://addons.mozilla.org/firefox/addon/current-song-overlay/).
 
 On the first run a `config.toml` file will be created. To configure the application further,
 see [Configuration](#configuration).
@@ -61,6 +57,8 @@ default setting). Search for `current-song2.exe` in the _Background Processes_ a
 
 #### Autostart
 
+CurrentSong2 can add itself to the autostart entries. To facilitate this, set the `no_autostart` option in `config.toml` to `true`.
+
 To remove the application from autostart, run `current-song2.exe --remove-autostart` from a terminal.
 
 Alternatively you can **disable** the autostart entry in the Task Manager (startup tab).
@@ -75,6 +73,8 @@ The configuration uses the [toml](https://toml.io) format.
 The default configuration looks like this:
 
 ```toml
+no_autostart = true
+
 [modules.gsmtc]
 enabled = true
 
@@ -83,7 +83,7 @@ mode = "Exclude"
 items = ["chrome.exe", "msedge.exe", "firefox.exe"]
 
 [modules.file]
-enabled = true # defaults to false
+enabled = false
 
 [server]
 port = 48457
