@@ -6,6 +6,7 @@ use tracing::{event, Level};
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct Config {
+    #[serde(default = "bool_true")]
     pub no_autostart: bool,
     pub modules: ModuleConfig,
     pub server: ServerConfig,
