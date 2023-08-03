@@ -55,7 +55,7 @@ pub fn win_main() {
             ..CONFIG.clone()
         };
         if let Err(e) = save_config(&updated_config) {
-            let error = HSTRING::from(format!("Cannot save config, you need to add 'no_autostart = true' to the config.toml.\nError: {}", e));
+            let error = HSTRING::from(format!("Cannot save config, you need to add 'no_autostart = true' to the config.toml.\nError: {e}"));
             MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                 .with_title(APPLICATION_NAME)
                 .show()
@@ -101,25 +101,26 @@ fn handle_multiple_instances() {
         "current-song2::main-executable::{}",
         CONFIG.server.port
     ));
-    if !single_instance::try_create_new_instance(&instance_id) {
-        if MessageBox::<YesNo>::information(w!(
-            "Another instance is already running. Kill the other instance?"
-        ))
-        .with_title(APPLICATION_NAME)
-        .show()
-        .unwrap_or(YesNo::No)
-            == YesNo::Yes
-        {
-            match single_instance::kill_other_instances_of_this_application() {
-                Ok(_) => (),
-                Err(e) => {
-                    let error =
-                        HSTRING::from(format!("Could not kill the other instance: {:?}", e));
-                    MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
-                        .with_title(APPLICATION_NAME)
-                        .show()
-                        .ok();
-                }
+    if single_instance::try_create_new_instance(&instance_id) {
+        return;
+    }
+
+    if MessageBox::<YesNo>::information(w!(
+        "Another instance is already running. Kill the other instance?"
+    ))
+    .with_title(APPLICATION_NAME)
+    .show()
+    .unwrap_or(YesNo::No)
+        == YesNo::Yes
+    {
+        match single_instance::kill_other_instances_of_this_application() {
+            Ok(_) => (),
+            Err(e) => {
+                let error = HSTRING::from(format!("Could not kill the other instance: {e:?}"));
+                MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
+                    .with_title(APPLICATION_NAME)
+                    .show()
+                    .ok();
             }
         }
     }

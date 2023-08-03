@@ -1,3 +1,5 @@
+#![allow(clippy::unused_async)] // required by the actix macros
+
 use crate::{
     actors::{client_ws::ClientWsSession, extension_ws::ExtensionWsSession, manager::Manager},
     manager,

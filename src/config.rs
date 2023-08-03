@@ -107,7 +107,7 @@ cfg_windows! {
         fn default() -> Self {
             Self {
                 enabled: true,
-                filter: Default::default(),
+                filter: GsmtcFilter::default(),
             }
         }
     }
