@@ -1,6 +1,6 @@
 # CurrentSong 2
 
-![example screenshot with default theme](https://i.imgur.com/qAs7xXh.png)
+![example screenshot with default theme](https://github.com/Nerixyz/current-song2/assets/19953266/9b2ac5cd-4135-4eea-8383-bc738c865da9)
 
 _For more examples, look at the [example themes](themes)!_
 

@@ -1,10 +1,12 @@
 export function animateOnChange(
   el: HTMLElement,
   updated: string,
+  resetAnimations: () => void,
   keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
   options?: number | KeyframeAnimationOptions,
 ) {
   if (el.textContent !== updated) {
+    resetAnimations();
     el.textContent = updated;
     el.animate(keyframes, options);
   }
