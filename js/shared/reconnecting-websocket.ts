@@ -7,7 +7,10 @@ export type OutgoingMessages<T = Record<string, never>> = T & { Pong: undefined 
 export class WsMessageEvent<M extends { [x: string]: unknown }, K extends keyof M> extends Event {
   public messageType: K;
 
-  constructor(messageType: K, public data: M[K]) {
+  constructor(
+    messageType: K,
+    public data: M[K],
+  ) {
     super(messageType as any);
     this.messageType = messageType;
   }

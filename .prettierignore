@@ -7,3 +7,4 @@ dist
 target
 pnpm-lock.yaml
 artifacts
+venv
