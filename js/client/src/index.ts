@@ -22,6 +22,46 @@ import {
   ReconnectingWebsocket,
 } from '../../shared/reconnecting-websocket';
 import { startUserScript } from './user-scripts';
+import { MarqueeEl, MarqueeOptions, wrapMarquee } from './text/marquee';
+
+function wrapMarqueeElements(
+  root: HTMLElement,
+  titleEl: HTMLElement,
+  subtitleEl: HTMLElement,
+): MarqueeEl {
+  const style = getComputedStyle(root);
+  const useIt = style.getPropertyValue('--use-marquee') === 'true';
+  if (!useIt) {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    return { pause() {}, reset() {}, start() {} };
+  }
+  const opt = (name: string, defaultValue: number) => {
+    const parsed = parseInt(style.getPropertyValue(name));
+    return Number.isNaN(parsed) ? defaultValue : parsed;
+  };
+  const opts: MarqueeOptions = {
+    speed: opt('--marquee-speed', 0.2),
+    pauseDuration: opt('--marquee-pause-duration', 1200),
+    repeatPauseDuration: opt('--marquee-repeat-pause-duration', 2000),
+  };
+  const title = wrapMarquee(titleEl, opts);
+  const subtitle = wrapMarquee(subtitleEl, opts);
+
+  return {
+    pause: () => {
+      title.pause();
+      subtitle.pause();
+    },
+    start: () => {
+      title.start();
+      subtitle.start();
+    },
+    reset: () => {
+      title.reset();
+      subtitle.reset();
+    },
+  };
+}
 
 (async function main() {
   const [container, imageContainer, imageEl, titleEl, subtitleEl, progressEl] = getElements<
@@ -34,6 +74,7 @@ import { startUserScript } from './user-scripts';
       HTMLDivElement,
     ]
   >('song-container', 'image-container', 'image', 'title', 'subtitle', 'progress');
+  const resetMarquee = wrapMarqueeElements(container, titleEl, subtitleEl);
 
   const progressManager = createProgress(progressEl);
 
@@ -63,9 +104,12 @@ import { startUserScript } from './user-scripts';
     container.classList.remove('vanish');
     const state = makeState(data);
     tree.update(state);
+    resetMarquee.start();
 
-    animateOnChange(titleEl, state.title, ...TextChangeAnimation);
-    if (state.subtitle) animateOnChange(subtitleEl, state.subtitle, ...TextChangeAnimation);
+    animateOnChange(titleEl, state.title, resetMarquee.reset, ...TextChangeAnimation);
+    if (state.subtitle) {
+      animateOnChange(subtitleEl, state.subtitle, resetMarquee.reset, ...TextChangeAnimation);
+    }
 
     if (state.imageUrl) {
       imageEl.src = state.imageUrl;
@@ -93,6 +137,7 @@ import { startUserScript } from './user-scripts';
     progressManager.pause();
 
     userScript.onPause();
+    resetMarquee.pause();
   });
   await ws.connect();
 })();
