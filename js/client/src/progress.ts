@@ -30,6 +30,7 @@ export function createProgress(element: HTMLDivElement): {
     run: timeline => {
       currentTl = timeline;
       element.classList.remove('hidden');
+      element.classList.remove('paused');
 
       if (!running) {
         running = true;
