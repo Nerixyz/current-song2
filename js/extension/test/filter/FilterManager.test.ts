@@ -56,8 +56,11 @@ describe('FilterManager', function () {
     const revokeFilterMode = jest.fn();
     const revokeIncludeFocusedTabs = jest.fn();
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let setFilters = (_filters?: FilterModel[]): void => void 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let setFilterMode = (_mode?: FilterMode): void => void 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let setIncludeFocusedTabs = (_v?: boolean): void => void 0;
     const listenFilters = jest.fn((cb: (filters?: FilterModel[]) => void): RevokeListener => {
       setFilters = cb;
