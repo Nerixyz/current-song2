@@ -1,0 +1,58 @@
+site_name: Current Song 2
+docs_dir: src
+theme:
+    name: material
+    palette:
+        # Palette toggle for light mode
+        - media: '(prefers-color-scheme: light)'
+          scheme: default
+          toggle:
+              icon: material/brightness-7
+              name: Switch to dark mode
+
+        # Palette toggle for dark mode
+        - media: '(prefers-color-scheme: dark)'
+          scheme: slate
+          toggle:
+              icon: material/brightness-4
+              name: Switch to light mode
+
+    features:
+        - navigation.instant
+        - navigation.top
+        - navigation.expand
+        - navigation.indexes
+        - content.code.annotate
+        - content.code.copy
+        - content.action.edit
+    icon:
+        repo: fontawesome/brands/github
+plugins:
+    - search
+repo_name: Nerixyz/current-song2
+repo_url: https://github.com/Nerixyz/current-song2
+edit_uri: edit/master/docs/
+markdown_extensions:
+    - admonition
+    - attr_list
+    - footnotes
+    - md_in_html
+    - pymdownx.highlight:
+          anchor_linenums: true
+    - pymdownx.snippets
+    - pymdownx.superfences
+    - pymdownx.details
+    - toc:
+          permalink: true
+
+nav:
+    - Home: index.md
+    - Configuration: Configuration.md
+    - Customization:
+          - Customization/index.md
+          - Themeing:
+                - Customization/Theming/index.md
+                - Examples: Customization/Theming/Examples.md
+          - User Scripts: Customization/User Scripts.md
+    - Building: Building.md
+    - Troubleshooting: Troubleshooting.md

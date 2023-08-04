@@ -7,13 +7,17 @@ export type OutgoingMessages<T = Record<string, never>> = T & { Pong: undefined 
 export class WsMessageEvent<M extends { [x: string]: unknown }, K extends keyof M> extends Event {
   public messageType: K;
 
-  constructor(messageType: K, public data: M[K]) {
+  constructor(
+    messageType: K,
+    public data: M[K],
+  ) {
     super(messageType as any);
     this.messageType = messageType;
   }
 }
 
 // Provide types for the events.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface ReconnectingWebsocket<EventMap extends MinEventMap, SendMap extends MinSendMap> extends EventTarget {
   addEventListener<K extends keyof EventMap>(
     type: K,
@@ -52,6 +56,7 @@ export interface ReconnectingWebsocket<EventMap extends MinEventMap, SendMap ext
  * sock.trySend('SendMessage', 'Connected');
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ReconnectingWebsocket<EventMap extends MinEventMap, SendMap extends MinSendMap> extends EventTarget {
   private ws?: WebSocket;
   private nextDelay = 1;

@@ -30,6 +30,7 @@
 body {
   background: #121212;
   margin: 0;
+  overflow: hidden;
 }
 
 #song-container {

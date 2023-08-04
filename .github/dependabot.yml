@@ -24,3 +24,13 @@ updates:
       rust:
         patterns:
           - '*'
+  - package-ecosystem: 'pip'
+    directory: '/docs'
+    schedule:
+      interval: 'daily'
+    commit-message:
+      prefix: 'deps(pip)'
+    groups:
+      pip:
+        patterns:
+          - '*'

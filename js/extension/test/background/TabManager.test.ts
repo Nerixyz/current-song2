@@ -6,7 +6,7 @@ import { dynamicStorage } from '../mock/filter-storage';
 import { FilterMode } from '../../src/options';
 import { waitNMicrotasks } from '../pseudo-async';
 import { IBrowserInterface } from '../../src/background/BrowserInterface';
-import { BrowserTab, BrowserWindow, TabActivateInfo, TabId, WindowId } from '../../src/types/tab.types';
+import { BrowserTab, BrowserWindow, TabId } from '../../src/types/tab.types';
 
 const make2Wind4TabBrowser = () =>
   mockBrowser([
