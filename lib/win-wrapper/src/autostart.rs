@@ -1,9 +1,8 @@
 use std::{env, iter, ops::Deref, os::windows::ffi::OsStrExt};
 use windows::{
-    core::PCWSTR,
-    w,
+    core::{w, PCWSTR},
     Win32::{
-        Foundation::{ERROR_MORE_DATA, ERROR_SUCCESS, WIN32_ERROR},
+        Foundation::ERROR_MORE_DATA,
         System::Registry::{
             RegCloseKey, RegCreateKeyExW, RegGetValueW, RegSetValueExW, HKEY, HKEY_CURRENT_USER,
             KEY_CREATE_SUB_KEY, KEY_SET_VALUE, REG_SZ, RRF_RT_REG_SZ,
@@ -16,11 +15,8 @@ use windows::Win32::System::Registry::{RegDeleteValueW, RegOpenKeyExW, REG_OPTIO
 
 struct ManagedHkey(HKEY);
 impl ManagedHkey {
-    fn try_new(ret: WIN32_ERROR, key: HKEY) -> Result<Self, WIN32_ERROR> {
-        match ret {
-            ERROR_SUCCESS => Ok(Self(key)),
-            x => Err(x),
-        }
+    const fn new(key: HKEY) -> Self {
+        Self(key)
     }
 }
 
@@ -35,28 +31,26 @@ impl Deref for ManagedHkey {
 impl Drop for ManagedHkey {
     fn drop(&mut self) {
         unsafe {
-            RegCloseKey(self.0);
+            RegCloseKey(self.0).ok();
         }
     }
 }
 
-pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> Result<(), WIN32_ERROR> {
+pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> windows::core::Result<()> {
     unsafe {
         let mut hkey = HKEY(0);
-        let hkey = ManagedHkey::try_new(
-            RegCreateKeyExW(
-                HKEY_CURRENT_USER,
-                windows::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-                0,
-                None,
-                REG_OPTION_RESERVED,
-                KEY_CREATE_SUB_KEY | KEY_SET_VALUE,
-                None,
-                &mut hkey,
-                None,
-            ),
-            hkey,
+        RegCreateKeyExW(
+            HKEY_CURRENT_USER,
+            w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
+            0,
+            None,
+            REG_OPTION_RESERVED,
+            KEY_CREATE_SUB_KEY | KEY_SET_VALUE,
+            None,
+            &mut hkey,
+            None,
         )?;
+        let hkey = ManagedHkey::new(hkey);
 
         let path = env::current_exe()
             .unwrap()
@@ -65,7 +59,7 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> Result<(), 
             .chain(iter::once(0))
             .collect::<Vec<u16>>();
 
-        match RegSetValueExW(
+        RegSetValueExW(
             *hkey,
             application_name.into(),
             0,
@@ -74,44 +68,41 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> Result<(), 
                 path.as_ptr() as *const u8,
                 path.len() * 2,
             )),
-        ) {
-            ERROR_SUCCESS => Ok(()),
-            x => Err(x),
-        }
+        )
     }
 }
 
 pub fn check_autostart(application_name: impl Into<PCWSTR>) -> bool {
     unsafe {
-        matches!(
-            RegGetValueW(
-                HKEY_CURRENT_USER,
-                windows::core::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-                application_name.into(),
-                RRF_RT_REG_SZ,
-                None,
-                None,
-                None
-            ),
-            ERROR_SUCCESS | ERROR_MORE_DATA
-        )
+        match RegGetValueW(
+            HKEY_CURRENT_USER,
+            windows::core::w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
+            application_name.into(),
+            RRF_RT_REG_SZ,
+            None,
+            None,
+            None,
+        ) {
+            Ok(_) => true,
+            Err(e) if e.code() == ERROR_MORE_DATA.to_hresult() => true,
+            _ => false,
+        }
     }
 }
 
-pub fn remove_autostart(application_name: impl Into<PCWSTR>) {
+pub fn remove_autostart(application_name: impl Into<PCWSTR>) -> windows::core::Result<()> {
     unsafe {
         let mut hkey = HKEY(0);
-        if RegOpenKeyExW(
+        RegOpenKeyExW(
             HKEY_CURRENT_USER,
             w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
             0,
             KEY_SET_VALUE,
             &mut hkey,
-        ) != ERROR_SUCCESS
-        {
-            return;
-        }
-        RegDeleteValueW(hkey, application_name.into());
-        RegCloseKey(hkey);
+        )?;
+        let hkey = ManagedHkey::new(hkey);
+        RegDeleteValueW(hkey.0, application_name.into())?;
+
+        Ok(())
     }
 }

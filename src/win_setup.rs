@@ -8,10 +8,7 @@ use win_wrapper::{
     message_box::{MessageBox, Okay, YesNo},
     single_instance,
 };
-use windows::{
-    core::{HSTRING, PCWSTR},
-    w,
-};
+use windows::core::{w, HSTRING, PCWSTR};
 
 #[cfg(debug_assertions)]
 const APPLICATION_NAME: PCWSTR = w!("CurrentSong2Dev");
@@ -29,11 +26,21 @@ pub fn win_main() {
         elevated_main();
     }
     if has_arg("--remove-autostart") {
-        remove_autostart(APPLICATION_NAME);
-        MessageBox::<Okay>::information(w!("Removed from autostart, exiting."))
-            .with_title(APPLICATION_NAME)
-            .show()
-            .ok();
+        match remove_autostart(APPLICATION_NAME) {
+            Ok(_) => MessageBox::<Okay>::information(w!("Removed from autostart, exiting."))
+                .with_title(APPLICATION_NAME)
+                .show(),
+            Err(e) => {
+                // this must be kept alive for the message box
+                // TODO: messagebox should make sure this is the case
+                let text =
+                    HSTRING::from(format!("Failed to remove autostart entry ({e}), exiting."));
+                MessageBox::<Okay>::warning(PCWSTR(text.as_ptr()))
+                    .with_title(APPLICATION_NAME)
+                    .show()
+            }
+        }
+        .ok();
         std::process::exit(0);
     }
 
@@ -65,9 +72,9 @@ pub fn win_main() {
     }
 
     match add_self_to_autostart(APPLICATION_NAME) {
-        Err(ERROR_ACCESS_DENIED) => {
+        Err(e) if e.code() == ERROR_ACCESS_DENIED.to_hresult() => {
             if let Err(e) = elevate_self() {
-                let error = HSTRING::from(format!("Cannot elevate process: {}", e.0));
+                let error = HSTRING::from(format!("Cannot elevate process: {e}"));
                 MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                     .with_title(APPLICATION_NAME)
                     .show()
@@ -76,9 +83,9 @@ pub fn win_main() {
         }
         Err(e) => {
             let error = HSTRING::from(format!(
-                "Cannot add {} to autostart: WindowsErrorCode({})",
+                "Cannot add {} to autostart: {}",
                 unsafe { APPLICATION_NAME.display() },
-                e.0
+                e
             ));
             MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                 .with_title(APPLICATION_NAME)
@@ -129,9 +136,8 @@ fn handle_multiple_instances() {
 fn elevated_main() -> ! {
     if let Err(e) = add_self_to_autostart(APPLICATION_NAME) {
         let error = HSTRING::from(format!(
-            "Cannot add {} to autostart (even in elevated mode): WindowsErrorCode({})",
-            unsafe { APPLICATION_NAME.display() },
-            e.0
+            "Cannot add {} to autostart (even in elevated mode): {e}",
+            unsafe { APPLICATION_NAME.display() }
         ));
         MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
             .with_title(APPLICATION_NAME)
