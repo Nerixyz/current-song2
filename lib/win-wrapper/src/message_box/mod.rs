@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use windows::{
     core::PCWSTR,
     Win32::{
-        Foundation::{GetLastError, WIN32_ERROR},
+        Foundation::{GetLastError, E_UNEXPECTED},
         UI::WindowsAndMessaging::{
             MessageBoxW, MB_ICONASTERISK, MB_ICONERROR, MB_ICONEXCLAMATION, MB_ICONHAND,
             MB_ICONINFORMATION, MB_ICONQUESTION, MB_ICONSTOP, MB_ICONWARNING, MESSAGEBOX_RESULT,
@@ -107,7 +107,7 @@ impl<T: MessageBoxOption> MessageBox<T> {
         self
     }
 
-    pub fn show(self) -> Result<T, WIN32_ERROR> {
+    pub fn show(self) -> windows::core::Result<T> {
         let return_code = unsafe {
             if let Some(title) = self.title {
                 MessageBoxW(None, self.text, title, T::flags() | self.icon.style())
@@ -116,7 +116,12 @@ impl<T: MessageBoxOption> MessageBox<T> {
             }
         };
         match return_code {
-            MESSAGEBOX_RESULT(0) => Err(unsafe { GetLastError() }),
+            MESSAGEBOX_RESULT(0) => Err(unsafe {
+                match GetLastError() {
+                    Err(e) => e,
+                    Ok(_) => E_UNEXPECTED.into(),
+                }
+            }),
             x => Ok(T::from(x)),
         }
     }

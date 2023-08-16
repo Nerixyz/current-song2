@@ -3,7 +3,7 @@ use std::{env, mem};
 use windows::{
     core::{Error, Result, HRESULT, HSTRING},
     Win32::{
-        Foundation::{CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, ERROR_NOT_FOUND, MAX_PATH},
+        Foundation::{CloseHandle, ERROR_ALREADY_EXISTS, ERROR_NOT_FOUND, MAX_PATH},
         System::{
             ProcessStatus::{EnumProcesses, GetModuleFileNameExW},
             Threading::{
@@ -48,10 +48,8 @@ pub fn kill_other_instances_of_this_application() -> Result<()> {
     unsafe {
         let handle = OpenProcess(PROCESS_TERMINATE, false, pid)?;
 
-        if !TerminateProcess(handle, u32::MAX).as_bool() {
-            return Err(GetLastError().into());
-        }
-        CloseHandle(handle);
+        TerminateProcess(handle, u32::MAX)?;
+        let _ = CloseHandle(handle);
     }
 
     Ok(())
@@ -61,15 +59,11 @@ fn get_all_processes() -> Result<(Vec<u32>, u32)> {
     let mut buf = vec![0u32; 1024];
     let mut returned_bytes = 0;
     unsafe {
-        if !EnumProcesses(
+        EnumProcesses(
             buf.as_mut_ptr(),
             (mem::size_of::<u32>() * buf.len()) as u32,
             &mut returned_bytes,
-        )
-        .as_bool()
-        {
-            return Err(GetLastError().into());
-        }
+        )?;
     }
     Ok((buf, returned_bytes / (mem::size_of::<u32>() as u32)))
 }
@@ -81,7 +75,7 @@ fn cmp_path(pid: u32, path: &ManagedPwstr, path_buf: &mut ManagedPwstr) -> bool 
             Err(_) => return false,
         };
         let chars = GetModuleFileNameExW(proc, None, path_buf.as_mut_slice());
-        CloseHandle(proc);
+        let _ = CloseHandle(proc);
         if chars == 0 {
             false
         } else {

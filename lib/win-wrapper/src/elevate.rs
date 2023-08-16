@@ -3,7 +3,7 @@ use std::env;
 use windows::{
     core::PCWSTR,
     Win32::{
-        Foundation::{CloseHandle, GetLastError, WIN32_ERROR},
+        Foundation::CloseHandle,
         System::Threading::WaitForSingleObject,
         UI::{
             Shell::{
@@ -14,7 +14,7 @@ use windows::{
     },
 };
 
-pub fn elevate_self() -> Result<(), WIN32_ERROR> {
+pub fn elevate_self() -> windows::core::Result<()> {
     unsafe {
         let verb: ManagedPwstr = "runas".into();
         let file: ManagedPwstr = env::current_exe().unwrap().as_os_str().into();
@@ -29,11 +29,9 @@ pub fn elevate_self() -> Result<(), WIN32_ERROR> {
             fMask: SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC,
             ..Default::default()
         };
-        if !ShellExecuteExW(&mut info).as_bool() {
-            return Err(GetLastError());
-        }
+        ShellExecuteExW(&mut info)?;
         WaitForSingleObject(info.hProcess, u32::MAX);
-        CloseHandle(info.hProcess);
+        let _ = CloseHandle(info.hProcess);
 
         Ok(())
     }
