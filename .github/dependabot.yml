@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: npm
     directory: '/js'
     schedule:
-      interval: daily
+      interval: weekly
     commit-message:
       prefix: 'deps(npm)'
     labels:
@@ -15,7 +15,7 @@ updates:
   - package-ecosystem: cargo
     directory: '/'
     schedule:
-      interval: daily
+      interval: weekly
     commit-message:
       prefix: 'deps(cargo)'
     labels:
@@ -27,7 +27,7 @@ updates:
   - package-ecosystem: pip
     directory: '/docs'
     schedule:
-      interval: daily
+      interval: weekly
     commit-message:
       prefix: 'deps(pip)'
     groups:
