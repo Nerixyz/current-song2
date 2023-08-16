@@ -1,33 +1,33 @@
 version: 2
 updates:
-  - package-ecosystem: 'npm'
+  - package-ecosystem: npm
     directory: '/js'
     schedule:
-      interval: 'daily'
+      interval: weekly
     commit-message:
       prefix: 'deps(npm)'
     labels:
-      - 'javascript'
+      - javascript
     groups:
       js:
         patterns:
           - '*'
-  - package-ecosystem: 'cargo'
+  - package-ecosystem: cargo
     directory: '/'
     schedule:
-      interval: 'daily'
+      interval: weekly
     commit-message:
       prefix: 'deps(cargo)'
     labels:
-      - 'rust'
+      - rust
     groups:
       rust:
         patterns:
           - '*'
-  - package-ecosystem: 'pip'
+  - package-ecosystem: pip
     directory: '/docs'
     schedule:
-      interval: 'daily'
+      interval: weekly
     commit-message:
       prefix: 'deps(pip)'
     groups:
