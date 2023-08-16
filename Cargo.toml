@@ -56,7 +56,7 @@ tracing-appender = "0.2"
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
-windows = "0.48"
+windows = "0.51"
 
 [build-dependencies]
 actix-web-static-files = "4.0"
