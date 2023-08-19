@@ -55,4 +55,5 @@ nav:
                 - Examples: Customization/Theming/Examples.md
           - User Scripts: Customization/User Scripts.md
     - Building: Building.md
+    - Display API: DisplayApi.md
     - Troubleshooting: Troubleshooting.md
