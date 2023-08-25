@@ -23,6 +23,7 @@ import {
 } from '../../shared/reconnecting-websocket';
 import { startUserScript } from './user-scripts';
 import { MarqueeEl, MarqueeOptions, wrapMarquee } from './text/marquee';
+import { setupOptions } from './options';
 
 function wrapMarqueeElements(
   root: HTMLElement,
@@ -94,6 +95,7 @@ function wrapMarqueeElements(
     ],
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
+  setupOptions();
 
   const userScript = startUserScript();
 
