@@ -33,6 +33,22 @@ When creating your theme, it's best to use your browser to view the overlay. Sim
 </body>
 ```
 
+### Attributes
+
+Current Song 2 reflects query and hash parameters in the DOM through attributes on the `<html>` element. These can be used through [attribute selectors](https://developer.mozilla.org/docs/Web/CSS/Attribute_selectors) in CSS.
+All query parameters are prefixed with `data-query-` and all hash parameters are prefixed with `data-hash-`:
+
+```html title="http://localhost:48457/?align=left&color=red#animate=yes&shadow=none"
+<html data-query-align="left" data-query-color="red" data-hash-animate="yes" data-hash-shadow="none">
+    <head>
+        <!-- ... -->
+    </head>
+    <body>
+        <!-- ... -->
+    </body>
+</html>
+```
+
 ## CSS Classes
 
 The overlay will conditionally set a few CSS classes on elements by default.
