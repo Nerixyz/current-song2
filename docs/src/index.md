@@ -28,7 +28,7 @@ Currently, only Windows is fully supported. If you'd like full support for other
 
 2. Run `current-song2.exe` by double-clicking. This will start the backing server in the background. The server will only listen on your local computer. _To check if the app is running, navigate to [http://localhost:48457](http://localhost:48457){:target="\_blank"} in your browser. If nothing is playing, a blank page should show._
 
-3. In OBS, add a new **Browser Source** with the URL set to `http://localhost:48457`. The default theme will have a maximum width of `500px` and height of `85px`. ![Screenshot of browser source](assets/browser-source.png)
+3. In OBS, add a new **Browser Source** with the URL set to `http://localhost:48457`. The default theme will have a maximum width of `500px` and height of `85px`. ![Screenshot of browser source](assets/browser-source.png) You can change the position (and thereby the transition direction) of the overlay by passing `?pos=<position>` - for example: [`http://localhost:48457/?pos=br`](http://localhost:48457/?pos=br){:target="\_blank"} will position the overlay in the bottom right corner. See more in [Theming](Customization/Theming/index.md#position).
 
 ### Stopping the Server
 
