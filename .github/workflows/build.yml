@@ -133,3 +133,20 @@ jobs:
           generateReleaseNotes: true
           bodyFile: body.txt
           prerelease: ${{ env.ext_release == '0' }}
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
+      - working-directory: docs
+        run: |
+          pip install -r requirements.txt
+          mkdocs build --verbose
