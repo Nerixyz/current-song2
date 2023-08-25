@@ -49,6 +49,16 @@ All query parameters are prefixed with `data-query-` and all hash parameters are
 </html>
 ```
 
+#### Built-In
+
+##### Position
+
+You can control the position of the song container from the URL without the need to create a custom theme.
+The following parameters are recognized: `?position=`, `?pos=`, `#position=`, `#pos=` (e.g. [`http://localhost:48457/?pos=r`](http://localhost:48457/?pos=r)).
+As the value, you can either use single letters (`b`, `t`, `l`, `r`), full words (`bottom`, `top`, `left`, `right`), or a combination (joined with `-`).
+
+To place the overlay on the bottom right, the following values will work: `br`, `rb`, `bottom-right`, `bottom-r`, `r-b` (and more combinations).
+
 ## CSS Classes
 
 The overlay will conditionally set a few CSS classes on elements by default.

@@ -1,3 +1,5 @@
+@import url(./position.css);
+
 :root {
   --theme-color: #c7cedb;
   --text-color: #000;
