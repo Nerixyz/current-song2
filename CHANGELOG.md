@@ -22,6 +22,7 @@ When releasing a new version:
 ### Fixed
 
 - Missing user-scripts would break the overlay in dev mode (`pnpm dev`).
+- The marquee effect would not work in Chromium < 103.
 
 ## [v0.1.0-alpha.9] - 2023-08-04
 
