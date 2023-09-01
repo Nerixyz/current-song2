@@ -14,6 +14,8 @@ When releasing a new version:
 
 ## [Unreleased]
 
+## [v0.1.0-alpha.10] - 2023-09-01
+
 ### Added
 
 - The overlay can be positioned through URL parameters. For example `localhost:48457/?pos=br` to position the overlay in the bottom right corner ([documentation](https://currentsong.nerixyz.de/Customization/Theming/#position)).
