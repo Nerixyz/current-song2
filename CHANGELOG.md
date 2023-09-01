@@ -39,5 +39,6 @@ When releasing a new version:
 
 - Auto-start by default is now disabled.
 
-[unreleased]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.9...HEAD
+[unreleased]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.10...HEAD
+[v0.1.0-alpha.10]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.9...v0.1.0-alpha.10
 [v0.1.0-alpha.9]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.8...v0.1.0-alpha.9
