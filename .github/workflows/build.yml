@@ -130,6 +130,7 @@ jobs:
         with:
           artifacts: 'artifacts/**/*'
           token: ${{ secrets.GITHUB_TOKEN }}
-          generateReleaseNotes: true
+          generateReleaseNotes: false
+          allowUpdates: true
           bodyFile: body.txt
           prerelease: ${{ env.ext_release == '0' }}
