@@ -31,13 +31,13 @@ function wrapMarqueeElements(
   subtitleEl: HTMLElement,
 ): MarqueeEl {
   const style = getComputedStyle(root);
-  const useIt = style.getPropertyValue('--use-marquee') === 'true';
+  const useIt = style.getPropertyValue('--use-marquee').trim() === 'true';
   if (!useIt) {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     return { pause() {}, reset() {}, start() {} };
   }
   const opt = (name: string, defaultValue: number) => {
-    const parsed = parseInt(style.getPropertyValue(name));
+    const parsed = parseFloat(style.getPropertyValue(name).trim());
     return Number.isNaN(parsed) ? defaultValue : parsed;
   };
   const opts: MarqueeOptions = {
