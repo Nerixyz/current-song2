@@ -1,3 +1,5 @@
+#![cfg(windows)]
+
 pub mod autostart;
 pub mod elevate;
 pub mod message_box;
