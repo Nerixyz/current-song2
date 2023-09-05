@@ -10,6 +10,7 @@ mod logging;
 mod model;
 mod repositories;
 mod static_files;
+#[cfg(windows)]
 mod win_setup;
 mod workers;
 #[macro_use]
