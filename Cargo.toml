@@ -10,7 +10,7 @@ repository = "https://github.com/Nerixyz/current-song2"
 categories = ["multimedia"]                               # TODO: find something more fitting
 
 [workspace]
-members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
+members = [".", "lib/win-gsmtc", "lib/win-wrapper", "lib/spotify-dbus"]
 
 [features]
 # When enabled, the overlay will be bundled into the executable.

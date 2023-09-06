@@ -1,0 +1,25 @@
+[package]
+name = "spotify-dbus"
+version = "0.1.0"
+edition = "2021"
+description = "A wrapper around Spotify's DBus interface"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Nerixyz/current-song2"
+keywords = ["unix", "spotify", "dbus"]
+categories = ["multimedia"]
+readme = "README.md"
+
+[dependencies]
+chrono = "0.4"
+derive_more = "0.99.17"
+futures = "0.3"
+serde = { version = "1", features = ["derive"] }
+tap = "1"
+thiserror = "1"
+tokio = { version = "1.32", features = ["sync", "rt"] }
+tracing = "0.1"
+zbus = { version = "3.14", default-features = false, features = ["tokio"] }
+
+[dev-dependencies]
+tokio = { version = "1.32", features = ["sync", "macros", "rt-multi-thread"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
