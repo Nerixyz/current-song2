@@ -711,6 +711,7 @@ dependencies = [
  "lazy_static",
  "serde",
  "serde_json",
+ "spotify-dbus",
  "static-files",
  "tap",
  "thiserror",

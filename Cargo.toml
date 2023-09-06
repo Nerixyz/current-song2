@@ -58,5 +58,8 @@ win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
 windows = "0.51"
 
+[target.'cfg(unix)'.dependencies]
+spotify-dbus = { path = "lib/spotify-dbus" }
+
 [build-dependencies]
 actix-web-static-files = "4.0"

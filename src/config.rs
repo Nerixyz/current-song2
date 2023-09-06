@@ -1,4 +1,4 @@
-use crate::cfg_windows;
+use crate::{cfg_unix, cfg_windows};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, fs, path::PathBuf};
 use tracing::{event, Level};
@@ -65,6 +65,10 @@ pub struct ModuleConfig {
     #[cfg(windows)]
     #[cfg_attr(windows, serde(default))]
     pub gsmtc: GsmtcConfig,
+
+    #[cfg(unix)]
+    #[cfg_attr(unix, serde(default))]
+    pub dbus: DbusConfig,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -137,6 +141,25 @@ cfg_windows! {
                 GsmtcFilter::Disabled => true,
                 GsmtcFilter::Include(include) => include.contains(source_model_id),
                 GsmtcFilter::Exclude(exclude) => !exclude.contains(source_model_id),
+            }
+        }
+    }
+}
+
+cfg_unix! {
+    #[derive(Deserialize, Serialize, Debug, Clone)]
+    #[serde(default)]
+    pub struct DbusConfig {
+        #[serde(default = "bool_true")]
+        pub enabled: bool,
+        pub destinations: Vec<String>,
+    }
+
+    impl Default for DbusConfig {
+        fn default() -> Self {
+            Self {
+                enabled: true,
+                destinations: vec!["org.mpris.MediaPlayer2.spotify".to_owned()],
             }
         }
     }
