@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::interface::*;
 use crate::player::State;
 use chrono::Utc;
@@ -16,8 +14,6 @@ pub enum Error {
     GetConnection(zbus::Error),
     #[error("Failed to setup the proxy")]
     SetupProxy(zbus::Error),
-    #[error("Failed to listen to property-change events")]
-    SetupStream(zbus::Error),
 }
 
 macro_rules! send_or_break {
@@ -36,7 +32,7 @@ macro_rules! get_meta {
     };
 }
 
-pub async fn listen<D>(dest: D) -> Result<mpsc::Receiver<Arc<State>>, Error>
+pub async fn listen<D>(dest: D) -> Result<mpsc::Receiver<State>, Error>
 where
     D: TryInto<zbus::names::BusName<'static>>,
     D::Error: Into<zbus::Error>,
@@ -61,43 +57,38 @@ where
         let mut state = State::default();
 
         loop {
-            tokio::select! {
+            tokio::select! { biased;
                 Some(status) = status_changed.next() => {
                     match status.get().await {
                         Ok(s) => {
                             state.status = s;
-                            send_or_break!(tx, Arc::new(state.clone()))
+                            send_or_break!(tx, state.clone())
                         },
                         Err(e) => warn!(error = %e, "Failed to get status"),
                     };
                 },
                 Some(_) = meta_changed.next() => {
                     update_meta(&proxy, &mut state).await;
-                    send_or_break!(tx, Arc::new(state.clone()));
+                    send_or_break!(tx, state.clone());
                 },
                 Some(rate) = rate_changed.next() => {
                     match rate.get().await {
                         Ok(r) => {
                             state.playback_rate = r;
-                            send_or_break!(tx, Arc::new(state.clone()))
+                            send_or_break!(tx, state.clone())
                         },
                         Err(e) => warn!(error = %e, "Failed to get rate"),
                     };
                 },
                 Some(_) = seeked.next() => {
-                    match proxy.position().await {
-                        Ok(p) => {
-                            state.timeline.position = p;
-                            state.timeline.ts = Utc::now();
-                            send_or_break!(tx, Arc::new(state.clone()));
-                        },
-                        Err(e) => warn!(error = %e, "Failed to get rate"),
-                    };
+                    if update_position(&proxy, &mut state).await {
+                        send_or_break!(tx, state.clone());
+                    }
                 },
                 Some(owner) = owner_changed.next() => {
                     if owner.filter(|x| x.is_empty()).is_none() {
                         state.status = PlaybackStatus::Stopped;
-                        send_or_break!(tx, Arc::new(state.clone()));
+                        send_or_break!(tx, state.clone());
                     }
                 },
                 else => break
@@ -141,13 +132,19 @@ async fn update_meta(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) {
     };
     state.cover_art = get_meta!(meta, "mpris:artUrl", String);
 
-    let Ok(position) = proxy
-        .position()
-        .await
-        .tap_err(|e| warn!(error = %e, "Failed to get position"))
-    else {
-        return;
-    };
-    state.timeline.position = position;
-    state.timeline.ts = Utc::now();
+    update_position(proxy, state).await;
+}
+
+async fn update_position(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) -> bool {
+    match proxy.position().await {
+        Ok(p) => {
+            state.timeline.position = p;
+            state.timeline.ts = Utc::now();
+            true
+        }
+        Err(e) => {
+            warn!(error = %e, "Failed to get rate");
+            false
+        }
+    }
 }
