@@ -69,7 +69,7 @@ trait SpotifyPlayer {
     #[dbus_proxy(property(emits_changed_signal = "true"))]
     fn metadata(&self) -> fdo::Result<HashMap<zvariant::Str<'static>, zvariant::Value>>;
 
-    #[dbus_proxy(property)]
+    #[dbus_proxy(property(emits_changed_signal = "false"))]
     fn position(&self) -> fdo::Result<i64>;
     #[dbus_proxy(property)]
     fn minimum_rate(&self) -> fdo::Result<i64>;
