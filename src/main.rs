@@ -55,6 +55,15 @@ async fn init_windows_actors(manager: Addr<Manager>, image_store: Arc<RwLock<Ima
     }
 }
 
+#[cfg(unix)]
+async fn init_unix_actors(manager: Addr<Manager>) {
+    if CONFIG.modules.dbus.enabled {
+        workers::dbus::start_spawning(manager, &CONFIG.modules.dbus.destinations)
+            .await
+            .unwrap();
+    }
+}
+
 #[actix_web::main]
 async fn async_main() -> std::io::Result<()> {
     let (event_rx, manager) = init_channels();
@@ -63,6 +72,9 @@ async fn async_main() -> std::io::Result<()> {
 
     #[cfg(windows)]
     init_windows_actors(manager.clone(), image_store.clone()).await;
+
+    #[cfg(unix)]
+    init_unix_actors(manager.clone()).await;
 
     let image_store: web::Data<_> = image_store.into();
     let manager = web::Data::new(manager);

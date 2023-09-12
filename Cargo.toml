@@ -10,7 +10,7 @@ repository = "https://github.com/Nerixyz/current-song2"
 categories = ["multimedia"]                               # TODO: find something more fitting
 
 [workspace]
-members = [".", "lib/win-gsmtc", "lib/win-wrapper"]
+members = [".", "lib/win-gsmtc", "lib/win-wrapper", "lib/mpris-dbus"]
 
 [features]
 # When enabled, the overlay will be bundled into the executable.
@@ -57,6 +57,9 @@ tracing-appender = "0.2"
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
 windows = "0.51"
+
+[target.'cfg(unix)'.dependencies]
+mpris-dbus = { path = "lib/mpris-dbus" }
 
 [build-dependencies]
 actix-web-static-files = "4.0"
