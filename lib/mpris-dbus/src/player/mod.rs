@@ -2,6 +2,10 @@ use chrono::{DateTime, Utc};
 
 use crate::interface::PlaybackStatus;
 
+mod listener;
+
+pub use listener::{listen, Error as ListenError};
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct State {
     pub timeline: Timeline,

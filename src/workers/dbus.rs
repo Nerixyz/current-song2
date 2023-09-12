@@ -36,7 +36,7 @@ pub async fn start_spawning(manager: Addr<Manager>, sources: &[String]) -> AnyRe
                     paused: false,
                     source,
                 };
-                let Ok(rx) = mpris_dbus::tracks::listen(worker.source.clone())
+                let Ok(rx) = player::listen(worker.source.clone())
                     .await
                     .tap_err(|e| warn!(error = %e, "Failed to listen"))
                 else {

@@ -1,4 +1,4 @@
-use mpris_dbus::tracks::*;
+use mpris_dbus::player;
 
 #[tokio::main]
 async fn main() {
@@ -6,7 +6,9 @@ async fn main() {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    let mut listener = listen("org.mpris.MediaPlayer2.spotify").await.unwrap();
+    let mut listener = player::listen("org.mpris.MediaPlayer2.spotify")
+        .await
+        .unwrap();
     println!("Waiting for events...");
     while let Some(state) = listener.recv().await {
         println!("{state:#?}");
