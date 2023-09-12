@@ -104,11 +104,12 @@ async fn update_meta(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) {
     };
 
     get_meta(&meta, "mpris:length", &mut state.timeline.duration, Some);
-    get_meta(&meta, "xseam:title", &mut state.title, Some);
-    get_meta(&meta, "xseam:album", &mut state.album, Some);
+    get_meta(&meta, "xesam:title", &mut state.title, Some);
+    get_meta(&meta, "xesam:album", &mut state.album, Some);
+    get_meta(&meta, "xesam:trackNumber", &mut state.track_number, Some);
     get_meta(
         &meta,
-        "xseam:artist",
+        "xesam:artist",
         &mut state.artist,
         |artist: zvariant::Array| {
             artist

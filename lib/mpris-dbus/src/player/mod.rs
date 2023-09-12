@@ -10,6 +10,7 @@ pub use listener::{listen, Error as ListenError};
 pub struct State {
     pub title: Option<String>,
     pub artist: String,
+    pub track_number: Option<i32>,
     pub album: Option<String>,
     pub cover_art: Option<String>,
 

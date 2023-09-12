@@ -87,7 +87,7 @@ fn convert_model(from: player::State, source: &str) -> ModuleState {
     return ModuleState::Playing(PlayInfo {
         title: from.title.unwrap_or_default(),
         artist: from.artist,
-        track_number: None,
+        track_number: from.track_number.map(|n| n as u32),
         image: from.cover_art.map(ImageInfo::External),
         timeline: Some(TimelineInfo {
             ts: from
