@@ -7,6 +7,7 @@ use tracing::{event, Level};
 #[serde(default)]
 pub struct Config {
     #[serde(default = "bool_true")]
+    #[cfg(windows)]
     pub no_autostart: bool,
     pub modules: ModuleConfig,
     pub server: ServerConfig,
