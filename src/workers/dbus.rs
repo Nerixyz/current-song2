@@ -4,7 +4,7 @@ use crate::{
 };
 use actix::Addr;
 use anyhow::Result as AnyResult;
-use spotify_dbus::{interface::PlaybackStatus, player};
+use mpris_dbus::{interface::PlaybackStatus, player};
 use tap::TapFallible;
 use tokio::sync::mpsc;
 use tracing::{span, warn, Instrument, Level};
@@ -36,7 +36,7 @@ pub async fn start_spawning(manager: Addr<Manager>, sources: &[String]) -> AnyRe
                     paused: false,
                     source,
                 };
-                let Ok(rx) = spotify_dbus::tracks::listen(worker.source.clone())
+                let Ok(rx) = mpris_dbus::tracks::listen(worker.source.clone())
                     .await
                     .tap_err(|e| warn!(error = %e, "Failed to listen"))
                 else {

@@ -1,8 +1,8 @@
 [package]
-name = "spotify-dbus"
+name = "mpris-dbus"
 version = "0.1.0"
 edition = "2021"
-description = "A wrapper around Spotify's DBus interface"
+description = "A wrapper around the org.mpris.MediaPlayer2.Player DBus interface"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Nerixyz/current-song2"
 keywords = ["unix", "spotify", "dbus"]

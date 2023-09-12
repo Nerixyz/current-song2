@@ -709,9 +709,9 @@ dependencies = [
  "anyhow",
  "futures",
  "lazy_static",
+ "mpris-dbus",
  "serde",
  "serde_json",
- "spotify-dbus",
  "static-files",
  "tap",
  "thiserror",
@@ -1310,6 +1310,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "mpris-dbus"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "derive_more",
+ "futures",
+ "serde",
+ "tap",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "zbus",
+]
+
+[[package]]
 name = "nix"
 version = "0.26.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1794,22 +1810,6 @@ checksum = "2538b18701741680e0322a2302176d3253a35388e2e62f172f64f4f16605f877"
 dependencies = [
  "libc",
  "windows-sys 0.48.0",
-]
-
-[[package]]
-name = "spotify-dbus"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "derive_more",
- "futures",
- "serde",
- "tap",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "zbus",
 ]
 
 [[package]]

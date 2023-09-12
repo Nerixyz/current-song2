@@ -1,4 +1,4 @@
-use spotify_dbus::tracks::*;
+use mpris_dbus::tracks::*;
 
 #[tokio::main]
 async fn main() {
