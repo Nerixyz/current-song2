@@ -103,9 +103,9 @@ async fn update_meta(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) {
         return;
     };
 
-    get_meta_ident(&meta, "mpris:length", &mut state.timeline.duration);
-    get_meta_ident(&meta, "xseam:title", &mut state.title);
-    get_meta_ident(&meta, "xseam:album", &mut state.album);
+    get_meta(&meta, "mpris:length", &mut state.timeline.duration, Some);
+    get_meta(&meta, "xseam:title", &mut state.title, Some);
+    get_meta(&meta, "xseam:album", &mut state.album, Some);
     get_meta(
         &meta,
         "xseam:artist",
@@ -158,14 +158,4 @@ fn get_meta<'a, T, U>(
         Some(v) => *target = map(v),
         None => *target = U::default(),
     }
-}
-
-fn get_meta_ident<'a, T>(
-    meta: &'a HashMap<zvariant::Str<'_>, zvariant::Value<'a>>,
-    key: &'static str,
-    target: &mut T,
-) where
-    T: TryFrom<&'a zvariant::Value<'a>> + Default,
-{
-    get_meta(meta, key, target, |x| x)
 }

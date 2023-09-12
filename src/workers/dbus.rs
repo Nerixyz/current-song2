@@ -85,7 +85,7 @@ fn convert_model(from: player::State, source: &str) -> ModuleState {
         return ModuleState::Paused;
     }
     return ModuleState::Playing(PlayInfo {
-        title: from.title,
+        title: from.title.unwrap_or_default(),
         artist: from.artist,
         track_number: None,
         image: from.cover_art.map(ImageInfo::External),
@@ -96,14 +96,14 @@ fn convert_model(from: player::State, source: &str) -> ModuleState {
                 .timestamp_millis()
                 .try_into()
                 .unwrap_or_default(),
-            duration_ms: from.timeline.duration / 1000,
+            duration_ms: from.timeline.duration.unwrap_or(0) / 1000,
             progress_ms: (from.timeline.position / 1000)
                 .try_into()
                 .unwrap_or_default(),
             rate: from.playback_rate as f32,
         }),
-        album: Some(AlbumInfo {
-            title: from.album,
+        album: from.album.map(|title| AlbumInfo {
+            title,
             track_count: 0,
         }),
         source: format!("dbus::{source}"),
