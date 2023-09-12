@@ -1,13 +1,11 @@
 use std::collections::HashMap;
 
-use crate::interface::*;
-use crate::player::State;
+use crate::{interface::*, player::State};
 use chrono::Utc;
 use futures::StreamExt;
 use tap::TapFallible;
 use tokio::sync::mpsc;
-use tracing::info;
-use tracing::warn;
+use tracing::{info, warn};
 use zbus::{zvariant, Connection};
 
 #[derive(Debug, Clone, PartialEq, thiserror::Error)]
