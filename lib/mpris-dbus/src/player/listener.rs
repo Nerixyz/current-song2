@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::interface::*;
 use crate::player::State;
 use chrono::Utc;
@@ -21,14 +23,6 @@ macro_rules! send_or_break {
         if let Err(_) = $tx.send($it).await {
             break;
         }
-    };
-}
-
-macro_rules! get_meta {
-    ($meta:ident, $key:literal, $typ:ty) => {
-        $meta
-            .get(&zvariant::Str::from_static($key))
-            .and_then(|v| <$typ>::try_from(v).ok())
     };
 }
 
@@ -109,28 +103,27 @@ async fn update_meta(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) {
         return;
     };
 
-    if let Some(length) = get_meta!(meta, "mpris:length", u64) {
-        state.timeline.duration = length;
-    }
-    if let Some(title) = get_meta!(meta, "xesam:title", String) {
-        state.title = title;
-    }
-    if let Some(artist) = get_meta!(meta, "xesam:artist", zvariant::Array) {
-        state.artist = artist
-            .iter()
-            .filter_map(|v| zvariant::Str::try_from(v).ok())
-            .fold(String::new(), |acc, v| {
-                if acc.is_empty() {
-                    v.to_string()
-                } else {
-                    format!("{acc}, {v}")
-                }
-            });
-    }
-    if let Some(album) = get_meta!(meta, "xesam:album", String) {
-        state.album = album;
-    };
-    state.cover_art = get_meta!(meta, "mpris:artUrl", String);
+    get_meta_ident(&meta, "mpris:length", &mut state.timeline.duration);
+    get_meta_ident(&meta, "xseam:title", &mut state.title);
+    get_meta_ident(&meta, "xseam:album", &mut state.album);
+    get_meta(
+        &meta,
+        "xseam:artist",
+        &mut state.artist,
+        |artist: zvariant::Array| {
+            artist
+                .iter()
+                .filter_map(|v| zvariant::Str::try_from(v).ok())
+                .fold(String::new(), |acc, v| {
+                    if acc.is_empty() {
+                        v.to_string()
+                    } else {
+                        format!("{acc}, {v}")
+                    }
+                })
+        },
+    );
+    get_meta(&meta, "mpris:artUrl", &mut state.cover_art, Some);
 
     update_position(proxy, state).await;
 }
@@ -147,4 +140,32 @@ async fn update_position(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) -> b
             false
         }
     }
+}
+
+fn get_meta<'a, T, U>(
+    meta: &'a HashMap<zvariant::Str<'_>, zvariant::Value<'a>>,
+    key: &'static str,
+    target: &mut U,
+    map: impl FnOnce(T) -> U,
+) where
+    T: TryFrom<&'a zvariant::Value<'a>>,
+    U: Default,
+{
+    let value = meta
+        .get(&zvariant::Str::from_static(key))
+        .and_then(|v| T::try_from(v).ok());
+    match value {
+        Some(v) => *target = map(v),
+        None => *target = U::default(),
+    }
+}
+
+fn get_meta_ident<'a, T>(
+    meta: &'a HashMap<zvariant::Str<'_>, zvariant::Value<'a>>,
+    key: &'static str,
+    target: &mut T,
+) where
+    T: TryFrom<&'a zvariant::Value<'a>> + Default,
+{
+    get_meta(meta, key, target, |x| x)
 }
