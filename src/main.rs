@@ -41,30 +41,33 @@ fn init_channels() -> (watch::Receiver<manager::Event>, Addr<Manager>) {
     (event_rx, manager)
 }
 
-fn init_common_actors(modules: &ModuleConfig, event_rx: &watch::Receiver<Arc<ModuleState>>) {
+fn init_common_actors(
+    modules: &'static ModuleConfig,
+    event_rx: &watch::Receiver<Arc<ModuleState>>,
+) {
     if modules.file.enabled {
         let event_rx = event_rx.clone();
         tokio::spawn(async move {
-            output_to_file(&modules.file.path, &modules.file.format, event_rx).await
+            output_to_file(&modules.file.path, &modules.file.format, event_rx).await;
         });
     }
 }
 
 #[cfg(windows)]
 async fn init_windows_actors(
-    modules: &ModuleConfig,
+    modules: &'static ModuleConfig,
     manager: Addr<Manager>,
     image_store: Arc<RwLock<ImageStore>>,
 ) {
     if modules.gsmtc.enabled {
-        workers::gsmtc::start_spawning(manager, image_store, modules.gsmtc.filter.clone())
+        workers::gsmtc::start_spawning(manager, image_store)
             .await
             .unwrap();
     }
 }
 
 #[cfg(unix)]
-async fn init_unix_actors(modules: &ModuleConfig, manager: Addr<Manager>) {
+async fn init_unix_actors(modules: &'static ModuleConfig, manager: Addr<Manager>) {
     if modules.dbus.enabled {
         workers::dbus::start_spawning(manager, &modules.dbus.destinations)
             .await

@@ -1,7 +1,12 @@
 use crate::{cfg_unix, cfg_windows};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, fs, path::PathBuf, sync::Arc};
-use tracing::{event, Level};
+use std::{
+    collections::HashSet,
+    fs,
+    path::{Path, PathBuf},
+    sync::OnceLock,
+};
+use tracing::warn;
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
@@ -106,14 +111,14 @@ cfg_windows! {
     pub struct GsmtcConfig {
         #[serde(default = "bool_true")]
         pub enabled: bool,
-        pub filter: Arc<GsmtcFilter>,
+        pub filter: GsmtcFilter,
     }
 
     impl Default for GsmtcConfig {
         fn default() -> Self {
             Self {
                 enabled: true,
-                filter: GsmtcFilter::default().into(),
+                filter: GsmtcFilter::default(),
             }
         }
     }
@@ -166,31 +171,93 @@ cfg_unix! {
     }
 }
 
-lazy_static::lazy_static! {
-    static ref CONFIG_PATH: PathBuf = PathBuf::from("config.toml");
-}
+static CURRENT_CONFIG_PATH: OnceLock<PathBuf> = OnceLock::new();
+
 lazy_static::lazy_static! {
     pub static ref CONFIG: Config = {
         match read_config() {
-            Ok(config) => config,
-            Err(e) => {
-                event!(Level::WARN, error = %e, "Couldn't read config, creating a new one.");
+            Ok((path, config)) => {
+                CURRENT_CONFIG_PATH.get_or_init(|| path);
+                config
+            },
+            Err(None) => {
+                warn!("Didn't find any config at any location, creating default one at default location");
                 let conf = Config::default();
-                if CONFIG_PATH.exists() {
-                    std::fs::rename(&*CONFIG_PATH, "config.toml.old").ok();
+
+                let path = default_config_paths()[0].clone(); // can't move out of array
+                save_config(&conf, &path).ok();
+                CURRENT_CONFIG_PATH.get_or_init(|| path);
+
+                conf
+            }
+            Err(Some(loc)) => {
+                warn!("Config at {} was invalid - replacing with default config", loc.display());
+                if loc.exists() {
+                    fs::rename(&loc, loc.with_file_name("config.toml.old")).ok();
                 }
-                save_config(&conf).ok();
+                let conf = Config::default();
+
+                save_config(&conf, &loc).ok();
+                CURRENT_CONFIG_PATH.get_or_init(|| loc);
+
                 conf
             }
         }
     };
 }
 
-fn read_config() -> anyhow::Result<Config> {
-    let file = fs::read_to_string(&*CONFIG_PATH)?;
-    Ok(toml::from_str(&file)?)
+pub fn current_config_path() -> &'static Path {
+    CURRENT_CONFIG_PATH.get_or_init(|| default_config_paths()[0].clone())
 }
 
-pub fn save_config(config: &Config) -> anyhow::Result<()> {
-    Ok(std::fs::write(&*CONFIG_PATH, toml::to_string(config)?)?)
+#[cfg(windows)]
+fn default_config_paths() -> [PathBuf; 2] {
+    [PathBuf::from("config.toml"), {
+        let mut appdata = PathBuf::from(
+            std::env::var_os("APPDATA").unwrap_or_else(|| "~\\AppData\\Roaming".into()),
+        );
+        appdata.push("CurrentSong2/config.toml");
+        appdata
+    }]
+}
+
+#[cfg(unix)]
+fn default_config_paths() -> [PathBuf; 1] {
+    [{
+        let mut cfg_home =
+            PathBuf::from(std::env::var_os("XDG_CONFIG_HOME").unwrap_or_else(|| {
+                let mut cfg_home = std::env::var_os("HOME").unwrap_or_else(|| "~".into());
+                cfg_home.push("/.config");
+                cfg_home
+            }));
+        cfg_home.push("CurrentSong2/config.toml");
+        cfg_home
+    }]
+}
+
+fn read_config() -> Result<(PathBuf, Config), Option<PathBuf>> {
+    let locations = default_config_paths();
+    let mut first_loc = None;
+
+    for loc in &locations {
+        let Ok(file) = fs::read_to_string(loc) else {
+            continue;
+        };
+        match toml::from_str(&file) {
+            Ok(c) => return Ok((loc.clone(), c)),
+            Err(e) => {
+                warn!(error = %e, "Found config at {} but couldn't read it", loc.display());
+                if first_loc.is_none() {
+                    first_loc = Some(loc);
+                }
+            }
+        }
+    }
+    warn!("Couldn't find a single config");
+
+    Err(first_loc.cloned())
+}
+
+pub fn save_config(config: &Config, path: &Path) -> anyhow::Result<()> {
+    Ok(std::fs::write(path, toml::to_string(config)?)?)
 }

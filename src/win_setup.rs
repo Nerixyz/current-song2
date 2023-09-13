@@ -1,5 +1,5 @@
 use crate::{
-    config::{save_config, Config},
+    config::{self, save_config, Config},
     CONFIG,
 };
 use win_wrapper::{
@@ -61,7 +61,7 @@ pub fn win_main() {
             no_autostart: true,
             ..CONFIG.clone()
         };
-        if let Err(e) = save_config(&updated_config) {
+        if let Err(e) = save_config(&updated_config, config::current_config_path()) {
             let error = HSTRING::from(format!("Cannot save config, you need to add 'no_autostart = true' to the config.toml.\nError: {e}"));
             MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
                 .with_title(APPLICATION_NAME)
