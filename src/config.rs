@@ -1,6 +1,6 @@
 use crate::{cfg_unix, cfg_windows};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, fs, path::PathBuf};
+use std::{collections::HashSet, fs, path::PathBuf, sync::Arc};
 use tracing::{event, Level};
 
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
@@ -106,14 +106,14 @@ cfg_windows! {
     pub struct GsmtcConfig {
         #[serde(default = "bool_true")]
         pub enabled: bool,
-        pub filter: GsmtcFilter,
+        pub filter: Arc<GsmtcFilter>,
     }
 
     impl Default for GsmtcConfig {
         fn default() -> Self {
             Self {
                 enabled: true,
-                filter: GsmtcFilter::default(),
+                filter: GsmtcFilter::default().into(),
             }
         }
     }

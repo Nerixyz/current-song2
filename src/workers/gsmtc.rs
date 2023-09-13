@@ -1,6 +1,6 @@
 use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
-    config::CONFIG,
+    config::GsmtcFilter,
     image_store::ImageStore,
     model::{AlbumInfo, ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
@@ -28,13 +28,14 @@ struct GsmtcWorker {
 pub async fn start_spawning(
     manager: Addr<Manager>,
     image_store: Arc<RwLock<ImageStore>>,
+    filter: Arc<GsmtcFilter>,
 ) -> AnyResult<()> {
     let mut rx = SessionManager::create().await?;
     tokio::spawn(
         async move {
             while let Some(evt) = rx.recv().await {
                 if let ManagerEvent::SessionCreated { rx, source, .. } = evt {
-                    if !CONFIG.modules.gsmtc.filter.pass_filter(&source) {
+                    if !filter.pass_filter(&source) {
                         event!(Level::DEBUG, "Ignoring {} as it's filtered", source);
                         continue;
                     }

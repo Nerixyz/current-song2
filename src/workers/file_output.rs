@@ -2,7 +2,7 @@ use crate::{
     manager,
     model::{PlayInfo, TimelineInfo},
     utilities::format_string::{FormatDescription, InterpolationProvider},
-    ModuleState, CONFIG,
+    ModuleState,
 };
 use std::{borrow::Cow, fmt, fmt::Write, path::Path, time::Duration};
 use tap::TapFallible;
@@ -71,17 +71,19 @@ impl InterpolationProvider for Interpolation {
     }
 }
 
-pub async fn output_to_file<P>(file_path: P, mut rx: watch::Receiver<manager::Event>)
-where
+pub async fn output_to_file<P>(
+    file_path: P,
+    format: impl Into<Cow<'static, str>>,
+    mut rx: watch::Receiver<manager::Event>,
+) where
     P: AsRef<Path>,
 {
     let path = file_path.as_ref();
     debug!(path = ?path, "Enabled output to file");
 
-    let format_descr =
-        FormatDescription::<Interpolation>::try_from(Cow::from(&CONFIG.modules.file.format))
-            .tap_err(|e| warn!(erorr = %e, "Invalid format"))
-            .unwrap_or_else(|_| FormatDescription::raw("invalid format"));
+    let format_descr = FormatDescription::<Interpolation>::try_from(format.into())
+        .tap_err(|e| warn!(erorr = %e, "Invalid format"))
+        .unwrap_or_else(|_| FormatDescription::raw("invalid format"));
 
     while rx.changed().await.is_ok() {
         let formatted = format_event(&rx.borrow(), &format_descr);
