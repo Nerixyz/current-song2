@@ -5,8 +5,7 @@
 The documentation is located at [currentsong.nerixyz.de](https://currentsong.nerixyz.de).
 
 This project is a rewrite of the [**CurrentSong Overlay**](https://github.com/Nerixyz/current-song-overlay). The core is
-written in Rust now. That doesn't change much, but now the project supports
-Windows' [`GlobalSystemMediaTransportControls`](https://docs.microsoft.com/uwp/api/windows.media.control).
+written in Rust now. Both Windows and Unix platforms are supported. On Windows, [`GlobalSystemMediaTransportControls`](https://docs.microsoft.com/uwp/api/windows.media.control) is used and on Unix, D-Bus is used.
 
 The goal of the project is to create a **simple yet powerful** overlay that displays the currently playing song. There
 are a few unique features separating this project:
@@ -26,14 +25,20 @@ are a few unique features separating this project:
 
 ```mermaid
 graph TD;
-    gsmtc[Windows GSMTC]
+    gsmtc[GSMTC<br><i>Windows</i>]
+    dbus[MPRIS D-Bus<br><i>Unix</i>]
     ext[Browser Extension]
     cso2[CurrentSong2]
     ext-->cso2
-    Spotify-->gsmtc
-    Browser-- no playback progress -->gsmtc
+    Browser-->dbus
+    Spotify-->dbus
+    VLC-->dbus
+    MPV-->dbus
+    Browser-- limited <br> playback progress -->gsmtc
     Browser-- playback progress -->ext
+    Spotify-->gsmtc
     gsmtc-->cso2
+    dbus-->cso2
     cso2-->Overlay
 ```
 
