@@ -259,5 +259,18 @@ fn read_config() -> Result<(PathBuf, Config), Option<PathBuf>> {
 }
 
 pub fn save_config(config: &Config, path: &Path) -> anyhow::Result<()> {
+    // create the parent directory if it doesn't exist first
+    if let Some(dir) = path.parent() {
+        if !dir.exists() || !dir.is_dir() {
+            if let Err(e) = std::fs::create_dir_all(dir) {
+                warn!(
+                    error = %e,
+                    "Failed to create directory containing the config ({})",
+                    dir.display()
+                );
+            }
+        }
+    }
+
     Ok(std::fs::write(path, toml::to_string(config)?)?)
 }
