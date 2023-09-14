@@ -14,6 +14,10 @@ When releasing a new version:
 
 ## [Unreleased]
 
+## Added
+
+- Added support for players implementing the MPRIS D-Bus interface on Unix.
+
 ## Changed
 
 - Adjusted the config location search. This is compatible with the previous behavior.
