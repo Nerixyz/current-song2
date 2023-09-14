@@ -17,7 +17,7 @@ mod workers;
 mod macros;
 mod utilities;
 
-use config::CONFIG;
+use config::{ModuleConfig, CONFIG};
 use std::sync::Arc;
 
 use crate::{
@@ -38,17 +38,28 @@ fn init_channels() -> (watch::Receiver<manager::Event>, Addr<Manager>) {
 
     let manager = Manager::new(event_tx).start();
 
-    if CONFIG.modules.file.enabled {
-        let event_rx = event_rx.clone();
-        tokio::spawn(async move { output_to_file(&CONFIG.modules.file.path, event_rx).await });
-    }
-
     (event_rx, manager)
 }
 
+fn init_common_actors(
+    modules: &'static ModuleConfig,
+    event_rx: &watch::Receiver<Arc<ModuleState>>,
+) {
+    if modules.file.enabled {
+        let event_rx = event_rx.clone();
+        tokio::spawn(async move {
+            output_to_file(&modules.file.path, &modules.file.format, event_rx).await;
+        });
+    }
+}
+
 #[cfg(windows)]
-async fn init_windows_actors(manager: Addr<Manager>, image_store: Arc<RwLock<ImageStore>>) {
-    if CONFIG.modules.gsmtc.enabled {
+async fn init_windows_actors(
+    modules: &'static ModuleConfig,
+    manager: Addr<Manager>,
+    image_store: Arc<RwLock<ImageStore>>,
+) {
+    if modules.gsmtc.enabled {
         workers::gsmtc::start_spawning(manager, image_store)
             .await
             .unwrap();
@@ -56,9 +67,9 @@ async fn init_windows_actors(manager: Addr<Manager>, image_store: Arc<RwLock<Ima
 }
 
 #[cfg(unix)]
-async fn init_unix_actors(manager: Addr<Manager>) {
-    if CONFIG.modules.dbus.enabled {
-        workers::dbus::start_spawning(manager, &CONFIG.modules.dbus.destinations)
+async fn init_unix_actors(modules: &'static ModuleConfig, manager: Addr<Manager>) {
+    if modules.dbus.enabled {
+        workers::dbus::start_spawning(manager, &modules.dbus.destinations)
             .await
             .unwrap();
     }
@@ -70,11 +81,13 @@ async fn async_main() -> std::io::Result<()> {
 
     let image_store = Arc::new(RwLock::new(ImageStore::new()));
 
+    init_common_actors(&CONFIG.modules, &event_rx);
+
     #[cfg(windows)]
-    init_windows_actors(manager.clone(), image_store.clone()).await;
+    init_windows_actors(&CONFIG.modules, manager.clone(), image_store.clone()).await;
 
     #[cfg(unix)]
-    init_unix_actors(manager.clone()).await;
+    init_unix_actors(&CONFIG.modules, manager.clone()).await;
 
     let image_store: web::Data<_> = image_store.into();
     let manager = web::Data::new(manager);
