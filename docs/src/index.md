@@ -7,8 +7,7 @@
 
 Welcome to Current Song 2, a customizable song overlay.
 It's a rewrite of the [**CurrentSong Overlay**](https://github.com/Nerixyz/current-song-overlay). The core is
-written in Rust now. That doesn't change much, but now the project supports
-Windows' [`GlobalSystemMediaTransportControls`](https://docs.microsoft.com/uwp/api/windows.media.control) which allows it to capture the currently playing song of many applications on the device.
+written in Rust now. Both Windows and Unix platforms are supported. On Windows, [`GlobalSystemMediaTransportControls`](https://docs.microsoft.com/uwp/api/windows.media.control) is used and on Unix, D-Bus is used.
 
 The goal of the project is to create a **simple yet powerful** overlay that displays the currently playing song. There
 are a few unique features separating this project:
@@ -21,7 +20,7 @@ are a few unique features separating this project:
 
 ## Getting Started
 
-Currently, only Windows is fully supported. If you'd like full support for other platforms, please [open an issue](https://github.com/Nerixyz/current-song2/issues/new).
+Currently, only Windows is _fully_ supported. If you'd like _full_ support for other platforms, please [open an issue](https://github.com/Nerixyz/current-song2/issues/new). See [#363](https://github.com/Nerixyz/current-song2/issues/363) for Linux support.
 
 1. Download the latest [`current-song2.exe` from the releases tab](https://github.com/Nerixyz/current-song2/releases)
    and place it in any (preferably empty) folder.
