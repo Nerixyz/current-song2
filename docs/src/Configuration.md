@@ -32,6 +32,8 @@ custom_theme_path = "theme.css"
 
 ## Location
 
+### Windows :fontawesome-brands-windows:
+
 The server executable always searches for the configuration file next to itself:
 
 ```text
@@ -40,6 +42,12 @@ The server executable always searches for the configuration file next to itself:
    ├─ current-song2.exe
    ╰─ config.toml
 ```
+
+If this configuration isn't found, `%APPDATA%/CurrentSong2/config.toml` is checked.
+
+### Unix :fontawesome-brands-linux:
+
+The configuration on Unix systems must be located in `$XDG_CONFIG_HOME/CurrentSong2/config.toml` ([`XDG_CONFIG_HOME`](https://wiki.archlinux.org/title/XDG_Base_Directory) defaults to `$HOME/.config`).
 
 ## `no_autostart` :fontawesome-brands-windows:
 
