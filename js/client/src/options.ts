@@ -49,8 +49,8 @@ export function setupOptions() {
   addEventListener('hashchange', () => applyOptions(document.documentElement));
 }
 
-type VPos = 'top' | 'bottom';
-type HPos = 'right' | 'left';
+type VPos = 'top' | 'bottom' | 'center';
+type HPos = 'right' | 'left' | 'center';
 type Pos = { v: VPos | null; h: HPos | null };
 
 function parsePositionOption(query: URLSearchParams, hash: URLSearchParams): Pos {
@@ -76,6 +76,17 @@ function parsePositionOption(query: URLSearchParams, hash: URLSearchParams): Pos
       case 'bottom':
       case 'b':
         pos.v = 'bottom';
+        break;
+      case 'center':
+      case 'c':
+        pos.v = 'center';
+        pos.h = 'center';
+        break;
+      case 'vcenter':
+        pos.v = 'center';
+        break;
+      case 'hcenter':
+        pos.h = 'center';
         break;
     }
   };

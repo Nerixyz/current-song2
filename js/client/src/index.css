@@ -49,6 +49,7 @@ body {
   transition-property: opacity, transform;
   transform-origin: left;
   box-shadow: var(--container-shadow);
+  transform: translate(var(--translate-x, 0), var(--translate-y, 0));
 }
 
 #song-container.with-image {
@@ -112,10 +113,10 @@ h2 {
 
 @keyframes scale-in {
   from {
-    transform: scale(0);
+    transform: translate(var(--translate-x, 0), var(--translate-y, 0)) scale(0);
   }
   to {
-    transform: scale(var(--full-scale, 1));
+    transform: translate(var(--translate-x, 0), var(--translate-y, 0)) scale(var(--full-scale, 1));
   }
 }
 
@@ -131,8 +132,8 @@ img.spotify {
   transform: scale(1.28) translate(0%, 11%);
 }
 
-.vanish {
-  transform: scale(0) translateX(50%);
+#song-container.vanish {
+  transform: translate(var(--translate-x, 0), var(--translate-y, 0)) scale(0) translateX(50%);
   opacity: 0;
 }
 

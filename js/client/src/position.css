@@ -5,9 +5,19 @@ html[data-cs-hpos='right'] #song-container {
 html[data-cs-hpos='left'] #song-container {
   left: 0;
 }
+html[data-cs-hpos='center'] #song-container {
+  left: 50%;
+  --translate-x: -50%;
+  transform-origin: center;
+}
 html[data-cs-vpos='top'] #song-container {
   top: 0;
 }
 html[data-cs-vpos='bottom'] #song-container {
   bottom: 0;
+}
+html[data-cs-vpos='center'] #song-container {
+  top: 50%;
+  --translate-y: -50%;
+  transform-origin: center;
 }
