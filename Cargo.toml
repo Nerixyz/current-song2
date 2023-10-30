@@ -47,7 +47,7 @@ tap = "1.0"
 thiserror = "1.0"
 
 tracing = "0.1"
-tracing-log = "0.1"
+tracing-log = "0.2"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-actix-web = "0.7"
 tracing-actix = "0.4"
