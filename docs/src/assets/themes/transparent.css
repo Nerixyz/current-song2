@@ -6,6 +6,7 @@
     background: transparent;
     transition: none;
     overflow: visible;
+    box-shadow: none;
 }
 
 #song-info :is(h1, h2) {

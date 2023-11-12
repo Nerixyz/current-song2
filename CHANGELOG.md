@@ -23,6 +23,10 @@ When releasing a new version:
 
 - Adjusted the config location search. This is compatible with the previous behavior.
 
+## Fixed
+
+- Removed shadow in [transparent example](https://currentsong.nerixyz.de/Customization/Theming/Examples/#transparent-background).
+
 ## [v0.1.0-alpha.10] - 2023-09-01
 
 ### Added
