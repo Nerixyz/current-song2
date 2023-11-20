@@ -56,7 +56,7 @@ tracing-appender = "0.2"
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
-windows = "0.51"
+windows = "0.52"
 
 [target.'cfg(unix)'.dependencies]
 mpris-dbus = { path = "lib/mpris-dbus" }
