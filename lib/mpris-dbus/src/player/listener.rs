@@ -44,7 +44,7 @@ where
         let mut meta_changed = proxy.receive_metadata_changed().await;
         let mut rate_changed = proxy.receive_rate_changed().await;
         let mut seeked = proxy.receive_seeked().await.expect("TODO");
-        let mut owner_changed = proxy.receive_owner_changed().await.expect("TODO");
+        let mut owner_changed = proxy.inner().receive_owner_changed().await.expect("TODO");
 
         let mut state = State::default();
 
