@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use zbus::{dbus_proxy, fdo, zvariant};
+use zbus::{fdo, proxy, zvariant};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, zvariant::Type, Deserialize, Serialize)]
 #[zvariant(signature = "s")]
@@ -21,7 +21,7 @@ pub enum LoopStatus {
     Playlist,
 }
 
-#[dbus_proxy(
+#[proxy(
     interface = "org.mpris.MediaPlayer2.Player",
     default_path = "/org/mpris/MediaPlayer2",
     gen_blocking = false
@@ -39,53 +39,53 @@ trait SpotifyPlayer {
     fn open_uri(&self, uri: zvariant::Str<'_>) -> fdo::Result<()>;
 
     // Signals
-    #[dbus_proxy(signal)]
+    #[zbus(signal)]
     fn seeked(&self, position: i64) -> fdo::Result<()>;
 
     // Properties
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn playback_status(&self) -> fdo::Result<PlaybackStatus>;
 
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn loop_status(&self) -> fdo::Result<LoopStatus>;
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn set_loop_status(&self, status: LoopStatus) -> fdo::Result<()>;
 
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn rate(&self) -> fdo::Result<f64>;
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn set_rate(&self, rate: f64) -> fdo::Result<()>;
 
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn shuffle(&self) -> fdo::Result<bool>;
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn set_shuffle(&self, enabled: bool) -> fdo::Result<()>;
 
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn volume(&self) -> fdo::Result<f64>;
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn set_volume(&self, volume: f64) -> fdo::Result<()>;
 
-    #[dbus_proxy(property(emits_changed_signal = "true"))]
+    #[zbus(property(emits_changed_signal = "true"))]
     fn metadata(&self) -> fdo::Result<HashMap<zvariant::Str<'static>, zvariant::Value>>;
 
-    #[dbus_proxy(property(emits_changed_signal = "false"))]
+    #[zbus(property(emits_changed_signal = "false"))]
     fn position(&self) -> fdo::Result<i64>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn minimum_rate(&self) -> fdo::Result<i64>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn maximum_rate(&self) -> fdo::Result<f64>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn can_go_next(&self) -> fdo::Result<bool>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn can_go_previous(&self) -> fdo::Result<bool>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn can_play(&self) -> fdo::Result<bool>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn can_pause(&self) -> fdo::Result<bool>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn can_seek(&self) -> fdo::Result<bool>;
-    #[dbus_proxy(property)]
+    #[zbus(property)]
     fn can_control(&self) -> fdo::Result<bool>;
 }
 
