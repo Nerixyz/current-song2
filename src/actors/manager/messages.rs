@@ -1,14 +1,16 @@
 use crate::model::{ModuleState, PlayInfo};
 use actix::Message;
 
+type Unit = ();
+
 #[derive(Message)]
-#[rtype("usize")]
+#[rtype(usize)]
 pub struct CreateModule {
     pub priority: u8,
 }
 
 #[derive(Message)]
-#[rtype("()")]
+#[rtype(Unit)]
 pub struct UpdateModule {
     pub id: usize,
     pub state: ModuleState,
@@ -31,7 +33,7 @@ impl UpdateModule {
 }
 
 #[derive(Message)]
-#[rtype("()")]
+#[rtype(Unit)]
 pub struct RemoveModule {
     pub id: usize,
 }

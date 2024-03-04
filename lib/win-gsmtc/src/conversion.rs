@@ -5,7 +5,6 @@ use crate::{
     },
     util::ResultExt,
 };
-use std::convert::{TryFrom, TryInto};
 use windows::{
     core::HRESULT,
     Media::{
