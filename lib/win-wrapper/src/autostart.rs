@@ -31,7 +31,7 @@ impl Deref for ManagedHkey {
 impl Drop for ManagedHkey {
     fn drop(&mut self) {
         unsafe {
-            RegCloseKey(self.0).ok();
+            let _ = RegCloseKey(self.0);
         }
     }
 }
@@ -49,7 +49,8 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> windows::co
             None,
             &mut hkey,
             None,
-        )?;
+        )
+        .ok()?;
         let hkey = ManagedHkey::new(hkey);
 
         let path = env::current_exe()
@@ -69,6 +70,7 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> windows::co
                 path.len() * 2,
             )),
         )
+        .ok()
     }
 }
 
@@ -82,7 +84,9 @@ pub fn check_autostart(application_name: impl Into<PCWSTR>) -> bool {
             None,
             None,
             None,
-        ) {
+        )
+        .ok()
+        {
             Ok(_) => true,
             Err(e) if e.code() == ERROR_MORE_DATA.to_hresult() => true,
             _ => false,
@@ -99,9 +103,10 @@ pub fn remove_autostart(application_name: impl Into<PCWSTR>) -> windows::core::R
             0,
             KEY_SET_VALUE,
             &mut hkey,
-        )?;
+        )
+        .ok()?;
         let hkey = ManagedHkey::new(hkey);
-        RegDeleteValueW(hkey.0, application_name.into())?;
+        RegDeleteValueW(hkey.0, application_name.into()).ok()?;
 
         Ok(())
     }

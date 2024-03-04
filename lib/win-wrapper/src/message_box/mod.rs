@@ -117,7 +117,7 @@ impl<T: MessageBoxOption> MessageBox<T> {
         };
         match return_code {
             MESSAGEBOX_RESULT(0) => Err(unsafe {
-                match GetLastError() {
+                match GetLastError().ok() {
                     Err(e) => e,
                     Ok(_) => E_UNEXPECTED.into(),
                 }
