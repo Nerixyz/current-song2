@@ -2,10 +2,7 @@ use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
     util::{request_media_properties, ResultExt},
 };
-use std::{
-    convert::TryInto,
-    sync::{Arc, Weak},
-};
+use std::sync::{Arc, Weak};
 use tokio::sync::mpsc;
 use tracing::{debug, event, warn, Level};
 use windows::{
