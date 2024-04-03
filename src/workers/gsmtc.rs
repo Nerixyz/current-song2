@@ -151,10 +151,16 @@ fn convert_model(from: SessionModel, image: Option<ImageInfo>) -> ModuleState {
             timeline: timeline
                 .filter(|timeline| timeline.end > timeline.start && timeline.last_updated_at_ms > 0)
                 .map(|timeline| TimelineInfo {
-                    duration_ms: ((timeline.end - timeline.start) / 10_000)
+                    duration_ms: timeline
+                        .end
+                        .saturating_sub(timeline.start)
+                        .as_millis()
                         .try_into()
                         .unwrap_or_default(),
-                    progress_ms: ((timeline.position - timeline.start) / 10_000)
+                    progress_ms: timeline
+                        .position
+                        .saturating_sub(timeline.start)
+                        .as_millis()
                         .try_into()
                         .unwrap_or_default(),
                     ts: timeline.last_updated_at_ms.try_into().unwrap_or_default(),
