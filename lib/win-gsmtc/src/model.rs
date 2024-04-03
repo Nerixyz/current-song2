@@ -1,5 +1,7 @@
-use std::fmt::{Debug, Formatter};
-use std::time::Duration;
+use std::{
+    fmt::{Debug, Formatter},
+    time::Duration,
+};
 
 /// Represents a playback session from another app providing info about that session.
 ///
