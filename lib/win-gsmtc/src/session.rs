@@ -185,7 +185,12 @@ fn timeline_actually_the_same(first: &Option<TimelineModel>, second: &TimelineMo
                     && first.end == second.end
                     && rough_eq(
                         second.last_updated_at_ms - first.last_updated_at_ms,
-                        (second.position - first.position) / 10_000,
+                        second
+                            .position
+                            .saturating_sub(first.position)
+                            .as_millis()
+                            .try_into()
+                            .unwrap_or_default(),
                     ))
         })
         .unwrap_or_default()

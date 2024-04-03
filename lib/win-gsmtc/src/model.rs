@@ -1,4 +1,7 @@
-use std::fmt::{Debug, Formatter};
+use std::{
+    fmt::{Debug, Formatter},
+    time::Duration,
+};
 
 /// Represents a playback session from another app providing info about that session.
 ///
@@ -66,11 +69,11 @@ pub struct PlaybackModel {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TimelineModel {
     /// The starting timestamp of the current media item.
-    pub start: i64,
+    pub start: Duration,
     /// The end timestamp of the current media item.
-    pub end: i64,
+    pub end: Duration,
     /// The playback position, current as of [`last_updated_at_ms`](TimelineModel::last_updated_at_ms).
-    pub position: i64,
+    pub position: Duration,
     /// The UTC time at which the timeline properties were last updated.
     pub last_updated_at_ms: i64,
     // TODO: add {Max,Min}SeekTime

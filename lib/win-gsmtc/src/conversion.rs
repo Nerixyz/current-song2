@@ -52,9 +52,9 @@ impl TryFrom<GlobalSystemMediaTransportControlsSessionTimelineProperties> for Ti
         value: GlobalSystemMediaTransportControlsSessionTimelineProperties,
     ) -> Result<Self, Self::Error> {
         Ok(Self {
-            start: value.StartTime()?.Duration,
-            end: value.EndTime()?.Duration,
-            position: value.Position()?.Duration,
+            start: value.StartTime()?.into(),
+            end: value.EndTime()?.into(),
+            position: value.Position()?.into(),
             last_updated_at_ms: filetime_to_unix_ms(value.LastUpdatedTime()?.UniversalTime),
         })
     }
