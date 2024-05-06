@@ -18,7 +18,7 @@ tap = "1"
 thiserror = "1"
 tokio = { version = "1.37", features = ["sync", "rt", "macros"] }
 tracing = "0.1"
-zbus = { version = "4.0", default-features = false, features = ["tokio"] }
+zbus = { version = "4.2", default-features = false, features = ["tokio"] }
 
 [dev-dependencies]
 tokio = { version = "1.37", features = ["sync", "macros", "rt-multi-thread"] }
