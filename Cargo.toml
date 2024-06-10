@@ -30,7 +30,7 @@ tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 
 actix = "0.13"
-actix-web = { version = "4.6", features = ["compress-brotli"] }
+actix-web = { version = "4.7", features = ["compress-brotli"] }
 actix-files = "0.6"
 actix-web-actors = "4.3"
 actix-cors = "0.7"
@@ -56,7 +56,7 @@ tracing-appender = "0.2"
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
-windows = "0.56"
+windows = "0.57"
 
 [target.'cfg(unix)'.dependencies]
 mpris-dbus = { path = "lib/mpris-dbus" }
