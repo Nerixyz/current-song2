@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "actix"
-version = "0.13.3"
+version = "0.13.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb72882332b6d6282f428b77ba0358cb2687e61a6f6df6a6d3871e8a177c2d4f"
+checksum = "de7fa236829ba0841304542f7614c42b80fca007455315c45c785ccfa873a85b"
 dependencies = [
  "actix-macros",
  "actix-rt",
@@ -61,9 +61,9 @@ dependencies = [
 
 [[package]]
 name = "actix-files"
-version = "0.6.5"
+version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf0bdd6ff79de7c9a021f5d9ea79ce23e108d8bfc9b49b5b4a2cf6fad5a35212"
+checksum = "0773d59061dedb49a8aed04c67291b9d8cf2fe0b60130a381aab53c6dd86e9be"
 dependencies = [
  "actix-http",
  "actix-service",
@@ -196,9 +196,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web"
-version = "4.6.0"
+version = "4.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1cf67dadb19d7c95e5a299e2dda24193b89d5d4f33a3b9800888ede9e19aa32"
+checksum = "5d6316df3fa569627c98b12557a8b6ff0674e5be4bb9b5e4ae2550ddb4964ed6"
 dependencies = [
  "actix-codec",
  "actix-http",
@@ -255,9 +255,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web-codegen"
-version = "4.2.2"
+version = "4.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb1f50ebbb30eca122b188319a4398b3f7bb4a8cdf50ecfb73bfc6a3c3ce54f5"
+checksum = "f591380e2e68490b5dfaf1dd1aa0ebe78d84ba7067078512b4ea6e4492d622b8"
 dependencies = [
  "actix-router",
  "proc-macro2",
@@ -2018,14 +2018,14 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.13"
+version = "0.8.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4e43f8cc456c9704c851ae29c67e17ef65d2c30017c17a9765b89c382dc8bba"
+checksum = "6f49eb2ab21d2f26bd6db7bf383edc527a7ebaee412d17af4d40fdccd442f335"
 dependencies = [
  "serde",
  "serde_spanned",
  "toml_datetime",
- "toml_edit 0.22.13",
+ "toml_edit 0.22.14",
 ]
 
 [[package]]
@@ -2050,9 +2050,9 @@ dependencies = [
 
 [[package]]
 name = "toml_edit"
-version = "0.22.13"
+version = "0.22.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c127785850e8c20836d49732ae6abfa47616e60bf9d9f57c43c250361a9db96c"
+checksum = "f21c7aaf97f1bd9ca9d4f9e73b0a6c74bd5afef56f2bc931943a6e1c37e04e38"
 dependencies = [
  "indexmap",
  "serde",
@@ -2087,9 +2087,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-actix-web"
-version = "0.7.10"
+version = "0.7.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa069bd1503dd526ee793bb3fce408895136c95fc86d2edb2acf1c646d7f0684"
+checksum = "4ee9e39a66d9b615644893ffc1704d2a89b5b315b7fd0228ad3182ca9a306b19"
 dependencies = [
  "actix-web",
  "mutually_exclusive_features",
@@ -2348,11 +2348,11 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "windows"
-version = "0.56.0"
+version = "0.57.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1de69df01bdf1ead2f4ac895dc77c9351aefff65b2f3db429a343f9cbf05e132"
+checksum = "12342cb4d8e3b046f3d80effd474a7a02447231330ef77d71daa6fbc40681143"
 dependencies = [
- "windows-core 0.56.0",
+ "windows-core 0.57.0",
  "windows-targets 0.52.5",
 ]
 
@@ -2367,9 +2367,9 @@ dependencies = [
 
 [[package]]
 name = "windows-core"
-version = "0.56.0"
+version = "0.57.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4698e52ed2d08f8658ab0c39512a7c00ee5fe2688c65f8c0a4f06750d729f2a6"
+checksum = "d2ed2439a290666cd67ecce2b0ffaad89c2a56b976b736e6ece670297897832d"
 dependencies = [
  "windows-implement",
  "windows-interface",
@@ -2379,9 +2379,9 @@ dependencies = [
 
 [[package]]
 name = "windows-implement"
-version = "0.56.0"
+version = "0.57.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6fc35f58ecd95a9b71c4f2329b911016e6bec66b3f2e6a4aad86bd2e99e2f9b"
+checksum = "9107ddc059d5b6fbfbffdfa7a7fe3e22a226def0b2608f72e9d552763d3e1ad7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2390,9 +2390,9 @@ dependencies = [
 
 [[package]]
 name = "windows-interface"
-version = "0.56.0"
+version = "0.57.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08990546bf4edef8f431fa6326e032865f27138718c587dc21bc0265bbcb57cc"
+checksum = "29bee4b38ea3cde66011baa44dba677c432a78593e202392d1e9070cf2a7fca7"
 dependencies = [
  "proc-macro2",
  "quote",
