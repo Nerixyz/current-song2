@@ -20,27 +20,35 @@ pub struct Config {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ServerConfig {
-    #[serde(default = "default_port")]
-    pub port: u16,
+    #[serde(default, flatten)]
+    pub bind: BindConfig,
     #[serde(default = "default_custom_theme_path")]
     pub custom_theme_path: String,
     #[serde(default = "default_custom_script_path")]
     pub custom_script_path: String,
 }
 
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum BindConfig {
+    Single { port: u16 },
+    Multiple { bind: Vec<std::net::SocketAddr> },
+}
+
+impl Default for BindConfig {
+    fn default() -> Self {
+        Self::Single { port: 48457 }
+    }
+}
+
 impl Default for ServerConfig {
     fn default() -> Self {
         Self {
-            port: default_port(),
+            bind: BindConfig::default(),
             custom_theme_path: default_custom_theme_path(),
             custom_script_path: default_custom_script_path(),
         }
     }
-}
-
-#[inline]
-fn default_port() -> u16 {
-    48457
 }
 
 #[inline]

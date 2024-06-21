@@ -92,7 +92,7 @@ async fn async_main() -> std::io::Result<()> {
     let image_store: web::Data<_> = image_store.into();
     let manager = web::Data::new(manager);
     let event_rx = web::Data::new(event_rx);
-    HttpServer::new(move || {
+    let srv = HttpServer::new(move || {
         App::new()
             .app_data(event_rx.clone())
             .app_data(image_store.clone())
@@ -102,8 +102,18 @@ async fn async_main() -> std::io::Result<()> {
             .service(static_files::theme_css)
             .service(static_files::user_js)
             .service(static_files::service())
-    })
-    .bind(format!("127.0.0.1:{}", CONFIG.server.port))?
+    });
+
+    match &CONFIG.server.bind {
+        config::BindConfig::Single { port } => {
+            tracing::info!("Binding on 127.0.0.1:{port}");
+            srv.bind((std::net::Ipv4Addr::LOCALHOST, *port))
+        }
+        config::BindConfig::Multiple { bind } => {
+            tracing::info!("Binding on {bind:?}");
+            srv.bind(&bind[..])
+        }
+    }?
     .run()
     .await
 }
