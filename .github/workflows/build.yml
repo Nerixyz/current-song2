@@ -2,10 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
     tags: ['*']
   pull_request:
-    branches: [master]
+    branches: [master, main]
 
 env:
   CARGO_TERM_COLOR: always
@@ -20,21 +20,21 @@ jobs:
     name: 'Build on ${{matrix.os}}'
     runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # ╭─────────────────────────────╮
       # │ Build extension and overlay │
       # ╰─────────────────────────────╯
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: lts
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         id: pnpm-install
         with:
-          version: 7
+          version: latest
           run_install: false
 
       - name: Get pnpm store directory
@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -70,21 +70,11 @@ jobs:
       # ╭──────────────────╮
       # │ Build executable │
       # ╰──────────────────╯
-      - uses: actions-rs/toolchain@v1
-        id: rust_chain
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ steps.rust_chain.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.lock') }}-build
+      - uses: Swatinem/rust-cache@v2
 
       - name: Build
         run: cargo build --release --locked
@@ -92,19 +82,19 @@ jobs:
       # ╭───────────────────╮
       # │ Upload articfacts │
       # ╰───────────────────╯
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: current-song2.exe
           path: target/release/current-song2.exe
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: extension.${{ env.ext_type }}
           path: js/extension/artifacts/*.${{ env.ext_type }}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: client.zip
@@ -115,8 +105,8 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && contains(github.ref, 'refs/tags/v'))
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           path: artifacts
 
