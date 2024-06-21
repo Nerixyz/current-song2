@@ -2,9 +2,9 @@ name: win-gsmtc
 
 on:
   push:
-    branches: [master]
+    branches: [master, main]
   pull_request:
-    branches: [master]
+    branches: [master, main]
 
 env:
   CARGO_TERM_COLOR: always
@@ -14,11 +14,10 @@ jobs:
     name: Build, Lint, and Test
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
 
       - uses: Swatinem/rust-cache@v2
