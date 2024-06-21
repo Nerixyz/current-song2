@@ -16,6 +16,8 @@ When releasing a new version:
 
 ## [Unreleased]
 
+## [v0.1.0-alpha.11] - 2024-06-21
+
 ### Added
 
 - Added support for players implementing the MPRIS D-Bus interface on Unix.
@@ -57,5 +59,6 @@ When releasing a new version:
 - Auto-start by default is now disabled.
 
 [unreleased]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.10...HEAD
+[v0.1.0-alpha.11]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.10...v0.1.0-alpha.11
 [v0.1.0-alpha.10]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.9...v0.1.0-alpha.10
 [v0.1.0-alpha.9]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.8...v0.1.0-alpha.9
