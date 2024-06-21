@@ -101,13 +101,21 @@ pub fn win_main() {
     };
 }
 
+fn fmt_instance_id() -> String {
+    let mut base = "current-song2::main-executable::".to_owned();
+    let _ = match &CONFIG.server.bind {
+        config::BindConfig::Single { port } => std::fmt::write(&mut base, format_args!("{port}")),
+        config::BindConfig::Multiple { bind } => {
+            std::fmt::write(&mut base, format_args!("{bind:?}"))
+        }
+    };
+    base
+}
+
 fn handle_multiple_instances() {
     // consider using something random?
     // not dependant on the version!
-    let instance_id = HSTRING::from(format!(
-        "current-song2::main-executable::{}",
-        CONFIG.server.port
-    ));
+    let instance_id = HSTRING::from(fmt_instance_id());
     if single_instance::try_create_new_instance(&instance_id) {
         return;
     }

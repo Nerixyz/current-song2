@@ -20,6 +20,7 @@ When releasing a new version:
 
 - Added support for players implementing the MPRIS D-Bus interface on Unix.
 - Added center positioning (`pos=c`, `pos=vcenter`, `pos=hcenter`, [documentation](https://currentsong.nerixyz.de/Customization/Theming/#position)).
+- Added [`server.bind`](https://currentsong.nerixyz.de/Configuration/#bind) to specify multiple addresses the application should bind to/listen on.
 
 ## Changed
 

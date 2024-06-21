@@ -26,7 +26,7 @@ destinations = ["org.mpris.MediaPlayer2.spotify"]
 enabled = false
 
 [server]
-port = 48457
+port = 48457 # use 'bind' to specify IP addresses
 custom_theme_path = "theme.css"
 ```
 
@@ -139,10 +139,26 @@ multiple scripts in the folder and switch between them.
 ### `port`
 
 Controls the local port on which the server is listening, defaults to `48457`.
+The server will only listen on `127.0.0.1` - use [bind](#bind) to specify one or more IP addresses to bind to.
+
+This is mutually exclusive to [bind](#bind).
 
 <!-- prettier-ignore -->
 !!! note
     If you change the port, make sure to change it in the extension as well.
+
+### `bind`
+
+Specifies the IP addresses and ports the application binds to as a list/array:
+
+```toml
+[server]
+# listen on all interfaces on port 48457
+# and on the ipv6 address fd64:7a68:ce44:: on port 8080
+bind = ["0.0.0.0:48457", "[fd64:7a68:ce44::]:8080"]
+```
+
+This is mutually exclusive to [port](#port).
 
 ## File Output
 
