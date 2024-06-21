@@ -25,6 +25,7 @@ When releasing a new version:
 ## Changed
 
 - Adjusted the config location search. This is compatible with the previous behavior.
+- If an invalid config is encountered on Windows, the user is now shown a dialog with the error and the options "Cancel", "Try Again" (re-read the config), and "Continue" (replace the config with the default one).
 
 ## Fixed
 

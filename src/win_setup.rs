@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::{
     config::{self, save_config, Config},
     CONFIG,
@@ -5,7 +7,7 @@ use crate::{
 use win_wrapper::{
     autostart::{add_self_to_autostart, check_autostart, remove_autostart, ERROR_ACCESS_DENIED},
     elevate::elevate_self,
-    message_box::{MessageBox, Okay, YesNo},
+    message_box::{CancelTryAgainContinue, MessageBox, Okay, YesNo},
     single_instance,
 };
 use windows::core::{w, HSTRING, PCWSTR};
@@ -99,6 +101,22 @@ pub fn win_main() {
                 .ok();
         }
     };
+}
+
+pub fn should_replace_invalid_config(loc: &Path, err: &impl std::fmt::Display) -> bool {
+    let error = windows::core::HSTRING::from(format!(
+        "Config at {0} was invalid:\n{err}\n\nWhen continuing, {0} will be replaced with the default config.\n",
+        loc.display(),
+    ));
+    match MessageBox::<CancelTryAgainContinue>::error(PCWSTR(error.as_ptr()))
+        .with_title(APPLICATION_NAME)
+        .show()
+        .ok()
+    {
+        Some(CancelTryAgainContinue::Cancel) => std::process::exit(1),
+        Some(CancelTryAgainContinue::TryAgain) => false,
+        None | Some(CancelTryAgainContinue::Continue) => true,
+    }
 }
 
 fn fmt_instance_id() -> String {

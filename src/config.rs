@@ -183,32 +183,39 @@ static CURRENT_CONFIG_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 lazy_static::lazy_static! {
     pub static ref CONFIG: Config = {
-        match read_config() {
-            Ok((path, config)) => {
-                CURRENT_CONFIG_PATH.get_or_init(|| path);
-                config
-            },
-            Err(None) => {
-                warn!("Didn't find any config at any location, creating default one at default location");
-                let conf = Config::default();
+        loop {
+            match read_config() {
+                Ok((path, config)) => {
+                    CURRENT_CONFIG_PATH.get_or_init(|| path);
+                    break config
+                },
+                Err(None) => {
+                    warn!("Didn't find any config at any location, creating default one at default location");
+                    let conf = Config::default();
 
-                let path = default_config_paths()[0].clone(); // can't move out of array
-                save_config(&conf, &path).ok();
-                CURRENT_CONFIG_PATH.get_or_init(|| path);
+                    let path = default_config_paths()[0].clone(); // can't move out of array
+                    save_config(&conf, &path).ok();
+                    CURRENT_CONFIG_PATH.get_or_init(|| path);
 
-                conf
-            }
-            Err(Some(loc)) => {
-                warn!("Config at {} was invalid - replacing with default config", loc.display());
-                if loc.exists() {
-                    fs::rename(&loc, loc.with_file_name("config.toml.old")).ok();
+                    break conf
                 }
-                let conf = Config::default();
+                Err(Some((loc, err))) => {
+                    #[cfg(windows)]
+                    if !crate::win_setup::should_replace_invalid_config(&loc, &err) {
+                        continue; // try again
+                    }
 
-                save_config(&conf, &loc).ok();
-                CURRENT_CONFIG_PATH.get_or_init(|| loc);
+                    warn!("Config at {} was invalid - replacing with default config", loc.display());
+                    if loc.exists() {
+                        fs::rename(&loc, loc.with_file_name("config.toml.old")).ok();
+                    }
+                    let conf = Config::default();
 
-                conf
+                    save_config(&conf, &loc).ok();
+                    CURRENT_CONFIG_PATH.get_or_init(|| loc);
+
+                    break conf
+                }
             }
         }
     };
@@ -243,9 +250,10 @@ fn default_config_paths() -> [PathBuf; 1] {
     }]
 }
 
-fn read_config() -> Result<(PathBuf, Config), Option<PathBuf>> {
+#[allow(clippy::result_large_err)]
+fn read_config() -> Result<(PathBuf, Config), Option<(PathBuf, toml::de::Error)>> {
     let locations = default_config_paths();
-    let mut first_loc = None;
+    let mut first_err = None;
 
     for loc in &locations {
         let Ok(file) = fs::read_to_string(loc) else {
@@ -255,15 +263,15 @@ fn read_config() -> Result<(PathBuf, Config), Option<PathBuf>> {
             Ok(c) => return Ok((loc.clone(), c)),
             Err(e) => {
                 warn!(error = %e, "Found config at {} but couldn't read it", loc.display());
-                if first_loc.is_none() {
-                    first_loc = Some(loc);
+                if first_err.is_none() {
+                    first_err = Some((loc.clone(), e));
                 }
             }
         }
     }
     warn!("Couldn't find a single config");
 
-    Err(first_loc.cloned())
+    Err(first_err)
 }
 
 pub fn save_config(config: &Config, path: &Path) -> anyhow::Result<()> {
