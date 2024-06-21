@@ -16,18 +16,18 @@ When releasing a new version:
 
 ## [Unreleased]
 
-## Added
+### Added
 
 - Added support for players implementing the MPRIS D-Bus interface on Unix.
 - Added center positioning (`pos=c`, `pos=vcenter`, `pos=hcenter`, [documentation](https://currentsong.nerixyz.de/Customization/Theming/#position)).
 - Added [`server.bind`](https://currentsong.nerixyz.de/Configuration/#bind) to specify multiple addresses the application should bind to/listen on.
 
-## Changed
+### Changed
 
 - Adjusted the config location search. This is compatible with the previous behavior.
 - If an invalid config is encountered on Windows, the user is now shown a dialog with the error and the options "Cancel", "Try Again" (re-read the config), and "Continue" (replace the config with the default one).
 
-## Fixed
+### Fixed
 
 - Removed shadow in [transparent example](https://currentsong.nerixyz.de/Customization/Theming/Examples/#transparent-background).
 
