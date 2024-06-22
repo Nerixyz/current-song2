@@ -6,6 +6,7 @@ export enum Option {
   Filters = 'filters',
   IncludeFocusedTabs = 'include-focused-tabs',
   ApiPort = 'api-port',
+  ApiHost = 'api-host',
 }
 
 export enum FilterMode {

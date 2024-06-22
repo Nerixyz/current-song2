@@ -16,6 +16,10 @@ When releasing a new version:
 
 ## [Unreleased]
 
+### Fixed
+
+- Custom hosts now work correctly with the overlay client and extension.
+
 ## [v0.1.0-alpha.11] - 2024-06-21
 
 ### Added
