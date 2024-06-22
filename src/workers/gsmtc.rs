@@ -110,7 +110,7 @@ impl GsmtcWorker {
             store.clear(self.image_id);
             None
         };
-        self.image = img.clone();
+        self.image.clone_from(&img);
         img
     }
 

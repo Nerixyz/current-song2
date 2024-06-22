@@ -29,7 +29,7 @@ pub fn win_main() {
     }
     if has_arg("--remove-autostart") {
         match remove_autostart(APPLICATION_NAME) {
-            Ok(_) => MessageBox::<Okay>::information(w!("Removed from autostart, exiting."))
+            Ok(()) => MessageBox::<Okay>::information(w!("Removed from autostart, exiting."))
                 .with_title(APPLICATION_NAME)
                 .show(),
             Err(e) => {
@@ -94,7 +94,7 @@ pub fn win_main() {
                 .show()
                 .ok();
         }
-        Ok(_) => {
+        Ok(()) => {
             MessageBox::<Okay>::information(w!("Added to autostart.\nStarting in normal mode."))
                 .with_title(APPLICATION_NAME)
                 .show()
@@ -147,7 +147,7 @@ fn handle_multiple_instances() {
         == YesNo::Yes
     {
         match single_instance::kill_other_instances_of_this_application() {
-            Ok(_) => (),
+            Ok(()) => (),
             Err(e) => {
                 let error = HSTRING::from(format!("Could not kill the other instance: {e:?}"));
                 MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
