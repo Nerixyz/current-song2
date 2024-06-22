@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches: [master, main]
-    tags: ['*']
+    tags: ['v*']
   pull_request:
     branches: [master, main]
 
@@ -103,16 +103,26 @@ jobs:
   create-release:
     needs: [build]
     runs-on: ubuntu-latest
-    if: (github.event_name == 'push' && contains(github.ref, 'refs/tags/v'))
+    if: (github.event_name == 'push' && (contains(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'))
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
 
+      - name: Get changelog (release)
+        if: contains(github.ref, 'refs/tags/v')
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/' > body.txt
+
+      - name: Get changelog (nightly)
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g' > body.txt
+
       - name: Hash Files
         run: |
-          echo "### Hashes" > body.txt
+          echo "### Hashes" >> body.txt
           echo "| File | Hash |" >> body.txt
           echo "|---|---|" >> body.txt
           for file in $(find artifacts); 
@@ -123,7 +133,9 @@ jobs:
           done
         shell: bash
 
-      - uses: ncipollo/release-action@v1
+      - name: Regular release
+        uses: ncipollo/release-action@v1
+        if: contains(github.ref, 'refs/tags/v')
         with:
           artifacts: 'artifacts/**/*'
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -131,3 +143,23 @@ jobs:
           allowUpdates: true
           bodyFile: body.txt
           prerelease: ${{ env.ext_release == '0' }}
+
+      - name: Nightly release
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        with:
+          artifacts: 'artifacts/**/*'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          generateReleaseNotes: false
+          replacesArtifacts: true
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          bodyFile: body.txt
+          prerelease: true
+          name: Nightly Release
+          tag: nightly-build
+
+      - name: Update nightly-build tag
+        run: |
+          git tag -f nightly-build
+          git push -f origin nightly-build
