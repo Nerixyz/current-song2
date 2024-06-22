@@ -4,18 +4,22 @@ use crate::{
     config::{self, save_config, Config},
     CONFIG,
 };
+use win_msgbox::{CancelTryAgainContinue, MessageBox, Okay, YesNo};
 use win_wrapper::{
     autostart::{add_self_to_autostart, check_autostart, remove_autostart, ERROR_ACCESS_DENIED},
     elevate::elevate_self,
-    message_box::{CancelTryAgainContinue, MessageBox, Okay, YesNo},
     single_instance,
 };
 use windows::core::{w, HSTRING, PCWSTR};
 
 #[cfg(debug_assertions)]
-const APPLICATION_NAME: PCWSTR = w!("CurrentSong2Dev");
+const APPLICATION_NAME: &str = "CurrentSong2Dev";
+#[cfg(debug_assertions)]
+const APPLICATION_NAME_W: PCWSTR = w!("CurrentSong2Dev");
 #[cfg(not(debug_assertions))]
-const APPLICATION_NAME: PCWSTR = w!("CurrentSong2");
+const APPLICATION_NAME: &str = "CurrentSong2";
+#[cfg(not(debug_assertions))]
+const APPLICATION_NAME_W: PCWSTR = w!("CurrentSong2");
 
 fn has_arg(arg: &str) -> bool {
     std::env::args().any(|a| a == arg)
@@ -28,88 +32,62 @@ pub fn win_main() {
         elevated_main();
     }
     if has_arg("--remove-autostart") {
-        match remove_autostart(APPLICATION_NAME) {
-            Ok(()) => MessageBox::<Okay>::information(w!("Removed from autostart, exiting."))
-                .with_title(APPLICATION_NAME)
-                .show(),
-            Err(e) => {
-                // this must be kept alive for the message box
-                // TODO: messagebox should make sure this is the case
-                let text =
-                    HSTRING::from(format!("Failed to remove autostart entry ({e}), exiting."));
-                MessageBox::<Okay>::warning(PCWSTR(text.as_ptr()))
-                    .with_title(APPLICATION_NAME)
-                    .show()
-            }
+        match remove_autostart(APPLICATION_NAME_W) {
+            Ok(()) => confirm_information("Removed from autostart, exiting."),
+            Err(e) => confirm_warning(&format!("Failed to remove autostart entry ({e}), exiting.")),
         }
-        .ok();
+
         std::process::exit(0);
     }
 
     handle_multiple_instances();
 
-    if CONFIG.no_autostart || check_autostart(APPLICATION_NAME) {
+    if CONFIG.no_autostart || check_autostart(APPLICATION_NAME_W) {
         return;
     }
-    if MessageBox::question(w!(
-        "Add application to autostart?\nYou can remove the entry with --remove-autostart"
-    ))
-    .with_title(APPLICATION_NAME)
+
+    let should_add = MessageBox::question(
+        "Add application to autostart?\nYou can remove the entry with --remove-autostart",
+    )
+    .title(APPLICATION_NAME)
     .show()
     .unwrap_or(YesNo::No)
-        == YesNo::No
-    {
+        == YesNo::No;
+
+    if should_add {
         let updated_config = Config {
             no_autostart: true,
             ..CONFIG.clone()
         };
         if let Err(e) = save_config(&updated_config, config::current_config_path()) {
-            let error = HSTRING::from(format!("Cannot save config, you need to add 'no_autostart = true' to the config.toml.\nError: {e}"));
-            MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
-                .with_title(APPLICATION_NAME)
-                .show()
-                .ok();
+            let error = format!("Cannot save config, you need to add 'no_autostart = true' to the config.toml.\nError: {e}");
+            confirm_error(&error);
         }
         return;
     }
 
-    match add_self_to_autostart(APPLICATION_NAME) {
+    match add_self_to_autostart(APPLICATION_NAME_W) {
         Err(e) if e.code() == ERROR_ACCESS_DENIED.to_hresult() => {
             if let Err(e) = elevate_self() {
-                let error = HSTRING::from(format!("Cannot elevate process: {e}"));
-                MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
-                    .with_title(APPLICATION_NAME)
-                    .show()
-                    .ok();
+                confirm_error(&format!("Cannot elevate process: {e}"));
             }
         }
         Err(e) => {
-            let error = HSTRING::from(format!(
-                "Cannot add {} to autostart: {}",
-                unsafe { APPLICATION_NAME.display() },
-                e
-            ));
-            MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
-                .with_title(APPLICATION_NAME)
-                .show()
-                .ok();
+            confirm_error(&format!("Cannot add {APPLICATION_NAME} to autostart: {e}"));
         }
         Ok(()) => {
-            MessageBox::<Okay>::information(w!("Added to autostart.\nStarting in normal mode."))
-                .with_title(APPLICATION_NAME)
-                .show()
-                .ok();
+            confirm_information("Added to autostart.\nStarting in normal mode.");
         }
     };
 }
 
 pub fn should_replace_invalid_config(loc: &Path, err: &impl std::fmt::Display) -> bool {
-    let error = windows::core::HSTRING::from(format!(
+    let error = format!(
         "Config at {0} was invalid:\n{err}\n\nWhen continuing, {0} will be replaced with the default config.\n",
         loc.display(),
-    ));
-    match MessageBox::<CancelTryAgainContinue>::error(PCWSTR(error.as_ptr()))
-        .with_title(APPLICATION_NAME)
+    );
+    match MessageBox::error(&error)
+        .title(APPLICATION_NAME)
         .show()
         .ok()
     {
@@ -138,44 +116,49 @@ fn handle_multiple_instances() {
         return;
     }
 
-    if MessageBox::<YesNo>::information(w!(
-        "Another instance is already running. Kill the other instance?"
-    ))
-    .with_title(APPLICATION_NAME)
-    .show()
-    .unwrap_or(YesNo::No)
+    if MessageBox::information("Another instance is already running. Kill the other instance?")
+        .title(APPLICATION_NAME)
+        .show()
+        .unwrap_or(YesNo::No)
         == YesNo::Yes
     {
         match single_instance::kill_other_instances_of_this_application() {
             Ok(()) => (),
             Err(e) => {
-                let error = HSTRING::from(format!("Could not kill the other instance: {e:?}"));
-                MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
-                    .with_title(APPLICATION_NAME)
-                    .show()
-                    .ok();
+                confirm_error(&format!("Could not kill the other instance: {e:?}"));
             }
         }
     }
 }
 
 fn elevated_main() -> ! {
-    if let Err(e) = add_self_to_autostart(APPLICATION_NAME) {
-        let error = HSTRING::from(format!(
-            "Cannot add {} to autostart (even in elevated mode): {e}",
-            unsafe { APPLICATION_NAME.display() }
-        ));
-        MessageBox::<Okay>::error(PCWSTR(error.as_ptr()))
-            .with_title(APPLICATION_NAME)
-            .show()
-            .ok();
+    if let Err(e) = add_self_to_autostart(APPLICATION_NAME_W) {
+        let error =
+            format!("Cannot add {APPLICATION_NAME} to autostart (even in elevated mode): {e}",);
+        confirm_error(&error);
     } else {
-        MessageBox::<Okay>::information(w!(
-            "Added to autostart.\nRunning application in user-mode."
-        ))
-        .with_title(APPLICATION_NAME)
-        .show()
-        .ok();
+        confirm_information("Added to autostart.\nRunning application in user-mode.");
     }
     std::process::exit(0)
+}
+
+fn confirm_information(msg: &str) {
+    MessageBox::<Okay>::information(msg)
+        .title(APPLICATION_NAME)
+        .show()
+        .ok();
+}
+
+fn confirm_error(msg: &str) {
+    MessageBox::<Okay>::error(msg)
+        .title(APPLICATION_NAME)
+        .show()
+        .ok();
+}
+
+fn confirm_warning(msg: &str) {
+    MessageBox::<Okay>::warning(msg)
+        .title(APPLICATION_NAME)
+        .show()
+        .ok();
 }
