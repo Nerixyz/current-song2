@@ -94,14 +94,6 @@ jobs:
           name: extension.${{ env.ext_type }}
           path: js/extension/artifacts/*.${{ env.ext_type }}
 
-      - name: Get changelog (release)
-        run: |
-          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/'
-
-      - name: Get changelog (nightly)
-        run: |
-          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g'
-
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
         with:
@@ -117,6 +109,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Get changelog (release)
+        if: contains(github.ref, 'refs/tags/v')
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/' > body.txt
+
+      - name: Get changelog (nightly)
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g' > body.txt
 
       - name: Hash Files
         run: |
