@@ -16,8 +16,6 @@ When releasing a new version:
 
 ## [Unreleased]
 
-Testing
-
 ## [v0.1.0-alpha.13] - 2024-06-22
 
 ### Fixed
