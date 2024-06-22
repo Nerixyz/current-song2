@@ -110,6 +110,8 @@ jobs:
         with:
           path: artifacts
 
+      - run: ls -la artifacts
+
       - name: Get changelog (release)
         if: contains(github.ref, 'refs/tags/v')
         run: |
@@ -137,10 +139,11 @@ jobs:
         uses: ncipollo/release-action@v1
         if: contains(github.ref, 'refs/tags/v')
         with:
-          artifacts: 'artifacts/**/*'
+          artifacts: 'artifacts/*'
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: false
           allowUpdates: true
+          draft: true
           bodyFile: body.txt
           prerelease: ${{ env.ext_release == '0' }}
 
@@ -148,12 +151,11 @@ jobs:
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
         with:
-          artifacts: 'artifacts/**/*'
+          artifacts: 'artifacts/*'
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: false
           replacesArtifacts: true
           allowUpdates: true
-          artifactErrorsFailBuild: true
           bodyFile: body.txt
           prerelease: true
           name: Nightly Release
