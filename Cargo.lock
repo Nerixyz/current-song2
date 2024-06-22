@@ -735,6 +735,7 @@ dependencies = [
  "tracing-log",
  "tracing-subscriber",
  "win-gsmtc",
+ "win-msgbox",
  "win-wrapper",
  "windows",
 ]
@@ -2256,6 +2257,15 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "windows",
+]
+
+[[package]]
+name = "win-msgbox"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "75fa92b8b7a828ac44d3f5ef0f3b5f6dab2fc362ba7b0f972492eb2c51e62581"
+dependencies = [
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
