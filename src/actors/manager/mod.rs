@@ -70,7 +70,7 @@ impl Manager {
         } else {
             // sort descending
             active.sort_by(|(_, a), (_, b)| b.priority.cmp(&a.priority));
-            let (id, module) = active.get(0).unwrap(); // we checked if the vec was empty
+            let (id, module) = active.first().unwrap(); // we checked if the vec was empty
 
             // if the current module didn't change and the updated module was not the current one
             // -> this would result in no change -> no update

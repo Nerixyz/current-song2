@@ -4,6 +4,7 @@ use actix_web::get;
 use std::io;
 
 #[cfg(feature = "single-executable")]
+#[allow(clippy::wildcard_imports, clippy::unreadable_literal)]
 mod static_web_files {
     include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 }
