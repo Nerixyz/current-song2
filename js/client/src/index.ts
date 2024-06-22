@@ -100,7 +100,12 @@ function wrapMarqueeElements(
   const userScript = startUserScript();
 
   const ws = new ReconnectingWebsocket<IncomingMessages<EventMap>, OutgoingMessages>(
-    formatLocalUrl('/api/ws/client', 48457, 'ws'),
+    formatLocalUrl({
+      path: '/api/ws/client',
+      port: Number(location.port) || 48457,
+      protocol: 'ws',
+      host: location.hostname,
+    }),
   );
   ws.addEventListener('Playing', ({ data }) => {
     container.classList.remove('vanish');
