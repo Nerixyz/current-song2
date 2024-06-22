@@ -94,12 +94,13 @@ jobs:
           name: extension.${{ env.ext_type }}
           path: js/extension/artifacts/*.${{ env.ext_type }}
 
-      - name: Hash Files
+      - name: Get changelog (release)
         run: |
-          cat CHANGELOG.md | perl -0777nle "print for /$CHANGELOG_RE/g"
-        shell: bash
-        env:
-          CHANGELOG_RE: ${{ contains(github.ref, 'refs/tags/v') && '\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)' || '\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)' }}
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g'
+
+      - name: Get changelog (nightly)
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g'
 
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
@@ -117,9 +118,18 @@ jobs:
         with:
           path: artifacts
 
+      - name: Get changelog (release)
+        if: contains(github.ref, 'refs/tags/v')
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g' > body.txt
+
+      - name: Get changelog (nightly)
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        run: |
+          cat CHANGELOG.md | perl -0777nle 'print for /\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)/g' > body.txt
+
       - name: Hash Files
         run: |
-          cat CHANGELOG.md | perl -0777nle "print for /$CHANGELOG_RE/g" > body.txt
           echo "### Hashes" >> body.txt
           echo "| File | Hash |" >> body.txt
           echo "|---|---|" >> body.txt
@@ -130,8 +140,6 @@ jobs:
             fi;
           done
         shell: bash
-        env:
-          CHANGELOG_RE: ${{ contains(github.ref, 'refs/tags/v') && '\n## \[v[^\n]++\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)' || '\n## \[Unreleased\]\s+((?:\s+|(?:[^#]|#{3,})[^\n]*\s+)*)' }}
 
       - name: Regular release
         uses: ncipollo/release-action@v1
