@@ -16,6 +16,12 @@ When releasing a new version:
 
 ## [Unreleased]
 
+## [v0.1.0-alpha.13] - 2024-06-22
+
+### Fixed
+
+- Custom hosts now resolve links correctly.
+
 ## [v0.1.0-alpha.12] - 2024-06-22
 
 ### Fixed
@@ -65,6 +71,7 @@ When releasing a new version:
 - Auto-start by default is now disabled.
 
 [unreleased]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.10...HEAD
+[v0.1.0-alpha.13]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.12...v0.1.0-alpha.13
 [v0.1.0-alpha.12]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.11...v0.1.0-alpha.12
 [v0.1.0-alpha.11]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.10...v0.1.0-alpha.11
 [v0.1.0-alpha.10]: https://github.com/Nerixyz/current-song2/compare/v0.1.0-alpha.9...v0.1.0-alpha.10
