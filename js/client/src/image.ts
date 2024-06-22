@@ -8,6 +8,10 @@ export function getImageUrl(info: PlayInfo): string | undefined {
     if (!info.image.startsWith('https://')) return undefined;
     return info.image;
   } else {
-    return formatLocalUrl(`/api/img/${info.image.id}/${info.image.epochId}`);
+    return formatLocalUrl({
+      path: `/api/img/${info.image.id}/${info.image.epochId}`,
+      port: Number(location.port),
+      host: location.hostname,
+    });
   }
 }

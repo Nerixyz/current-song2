@@ -3,5 +3,6 @@
   "compilerOptions": {
     "useDefineForClassFields": false,
     "experimentalDecorators": true
-  }
+  },
+  "include": ["src", "test"]
 }
