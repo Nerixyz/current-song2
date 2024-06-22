@@ -33,7 +33,6 @@ function wrapMarqueeElements(
   const style = getComputedStyle(root);
   const useIt = style.getPropertyValue('--use-marquee').trim() === 'true';
   if (!useIt) {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     return { pause() {}, reset() {}, start() {} };
   }
   const opt = (name: string, defaultValue: number) => {
