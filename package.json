@@ -10,12 +10,12 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.5.0",
-    "@types/node": "^20.14.8",
-    "@typescript-eslint/eslint-plugin": "^8.0.0-alpha.30",
-    "@typescript-eslint/parser": "^8.0.0-alpha.30",
-    "eslint": "^9.5.0",
-    "globals": "^15.6.0",
+    "@eslint/js": "^9.6.0",
+    "@types/node": "^20.14.9",
+    "@typescript-eslint/eslint-plugin": "^8.0.0-alpha.37",
+    "@typescript-eslint/parser": "^8.0.0-alpha.37",
+    "eslint": "^9.6.0",
+    "globals": "^15.7.0",
     "prettier": "^3.3.2",
     "typescript": "^5.5.2"
   }
