@@ -1,6 +1,6 @@
 use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
-    util::{request_media_properties, ResultExt},
+    util::{request_media_properties_sync, ResultExt},
 };
 use std::sync::{Arc, Weak};
 use tokio::sync::mpsc;
@@ -142,13 +142,13 @@ impl SessionWorker {
             SessionCommand::MediaPropertiesChanged => {
                 let loop_tx = self.loop_tx.clone();
                 let session = AgileReference::new(&self.session)?;
-                tokio::spawn(async move {
-                    match request_media_properties(loop_tx, session).await {
+                tokio::spawn(tokio::task::spawn_blocking(
+                    move || match request_media_properties_sync(loop_tx, session) {
                         Ok(None) => debug!("Empty media properties"),
                         Err(e) => event!(Level::WARN, error = %e, "Could not get media properties"),
                         _ => (),
-                    }
-                });
+                    },
+                ));
             }
             SessionCommand::TimelinePropertiesChanged => {
                 let model = self.session.GetTimelineProperties()?.try_into()?;

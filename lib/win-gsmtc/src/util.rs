@@ -2,7 +2,7 @@ use crate::{session::SessionCommand, Image};
 use std::sync::Weak;
 use tap::TapFallible;
 use tokio::sync::mpsc;
-use tracing::{debug, error, warn};
+use tracing::{debug, warn};
 use windows::{
     core::{AgileReference, Result},
     Media::Control::{
@@ -10,7 +10,6 @@ use windows::{
         GlobalSystemMediaTransportControlsSessionMediaProperties,
     },
     Storage::Streams::{DataReader, IRandomAccessStreamWithContentType},
-    Win32::Foundation::E_ABORT,
 };
 
 macro_rules! bail_opt {
@@ -36,18 +35,15 @@ impl<T> ResultExt<T> for Result<T> {
     }
 }
 
-pub(crate) async fn request_media_properties(
+pub(crate) fn request_media_properties_sync(
     loop_tx: Weak<mpsc::UnboundedSender<SessionCommand>>,
     session: AgileReference<GlobalSystemMediaTransportControlsSession>,
 ) -> Result<Option<()>> {
     debug!("Getting media properties");
     let session = session.resolve()?;
-    let media_properties = session.TryGetMediaPropertiesAsync()?.await?;
+    let media_properties = session.TryGetMediaPropertiesAsync()?.get()?;
     let get_properties = media_properties.clone();
-    let image = tokio::task::spawn_blocking(move || try_get_thumbnail_sync(&get_properties))
-        .await
-        .tap_err(|e| error!(error = %e,"Couldn't read stream"))
-        .map_err(|_| windows::core::Error::from(E_ABORT))?
+    let image = try_get_thumbnail(&get_properties)
         .tap_err(|e| warn!(error = ?e, "Couldn't get image"))
         .ok()
         .flatten();
@@ -63,7 +59,7 @@ pub(crate) async fn request_media_properties(
     Ok(Some(()))
 }
 
-fn try_get_thumbnail_sync(
+fn try_get_thumbnail(
     media_properties: &GlobalSystemMediaTransportControlsSessionMediaProperties,
 ) -> Result<Option<Image>> {
     let thumb = bail_opt!(media_properties.Thumbnail().opt());
