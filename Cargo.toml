@@ -56,7 +56,7 @@ tracing-appender = "0.2"
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
-windows = "0.57"
+windows = "0.58"
 win-msgbox = "0.2"
 
 [target.'cfg(unix)'.dependencies]
