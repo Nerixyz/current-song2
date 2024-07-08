@@ -9,7 +9,7 @@ categories = ["os::windows-apis"]
 keywords = ["windows", "wrapper"]
 
 [dependencies]
-windows = { version = "0.57", features = [
+windows = { version = "0.58", features = [
     "Win32_Foundation",
     "Win32_UI_WindowsAndMessaging",
     "Win32_System_Registry",

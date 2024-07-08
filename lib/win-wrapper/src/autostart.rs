@@ -38,7 +38,7 @@ impl Drop for ManagedHkey {
 
 pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> windows::core::Result<()> {
     unsafe {
-        let mut hkey = HKEY(0);
+        let mut hkey = HKEY(std::ptr::null_mut());
         RegCreateKeyExW(
             HKEY_CURRENT_USER,
             w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
@@ -96,7 +96,7 @@ pub fn check_autostart(application_name: impl Into<PCWSTR>) -> bool {
 
 pub fn remove_autostart(application_name: impl Into<PCWSTR>) -> windows::core::Result<()> {
     unsafe {
-        let mut hkey = HKEY(0);
+        let mut hkey = HKEY(std::ptr::null_mut());
         RegOpenKeyExW(
             HKEY_CURRENT_USER,
             w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
