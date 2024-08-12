@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "beaverjs": "^0.3.1",
-    "lit": "^3.1.4"
+    "lit": "^3.2.0"
   },
   "devDependencies": {
     "@parcel/config-webextension": "^2.8.0",
