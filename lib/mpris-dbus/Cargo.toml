@@ -11,7 +11,7 @@ readme = "README.md"
 
 [dependencies]
 chrono = "0.4"
-derive_more = "0.99.18"
+derive_more = "1.0.0"
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 tap = "1"
