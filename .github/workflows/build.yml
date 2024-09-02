@@ -28,7 +28,9 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          # https://github.com/parcel-bundler/parcel/issues/9926
+          # node-version: latest
+          node-version: 22.6
 
       - uses: pnpm/action-setup@v4
         name: Install pnpm
