@@ -26,7 +26,7 @@ pub enum LoopStatus {
     default_path = "/org/mpris/MediaPlayer2",
     gen_blocking = false
 )]
-trait SpotifyPlayer {
+pub trait SpotifyPlayer {
     // Methods
     fn next(&self) -> fdo::Result<()>;
     fn previous(&self) -> fdo::Result<()>;
