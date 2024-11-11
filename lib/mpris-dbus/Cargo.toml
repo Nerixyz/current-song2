@@ -14,7 +14,7 @@ chrono = "0.4"
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 tap = "1"
-thiserror = "1"
+thiserror = "2"
 tokio = { version = "1.41", features = ["sync", "rt", "macros"] }
 tracing = "0.1"
 zbus = { version = "5.1", default-features = false, features = ["tokio"] }
