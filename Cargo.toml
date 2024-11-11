@@ -44,7 +44,7 @@ toml = "0.8"
 anyhow = "1.0"
 lazy_static = "1.5"
 tap = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 
 tracing = "0.1"
 tracing-log = "0.2"
