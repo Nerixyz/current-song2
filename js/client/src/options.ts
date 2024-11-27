@@ -44,9 +44,18 @@ function applyOptions(el: HTMLElement) {
   }
 }
 
-export function setupOptions() {
+export interface ScriptOptions {
+  useRawSongInfo: boolean;
+}
+
+export function setupOptions(): ScriptOptions {
   applyOptions(document.documentElement);
   addEventListener('hashchange', () => applyOptions(document.documentElement));
+
+  const query = searchParams(location.search);
+  return {
+    useRawSongInfo: query.has('use-raw-data'),
+  };
 }
 
 type VPos = 'top' | 'bottom' | 'center';

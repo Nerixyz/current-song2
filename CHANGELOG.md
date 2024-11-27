@@ -16,6 +16,10 @@ When releasing a new version:
 
 ## [Unreleased]
 
+### Added
+
+- Added the `use-raw-data` query parameter for the overlay. If it's present in the URL, no cleanup will be performed on the client (example: `http://localhost:48457/?use-raw-data`).
+
 ## [v0.1.0-alpha.13] - 2024-06-22
 
 ### Fixed

@@ -94,7 +94,7 @@ function wrapMarqueeElements(
     ],
     [subtitleEl, { hidden: not(hasSubtitle) }],
   );
-  setupOptions();
+  const scriptOptions = setupOptions();
 
   const userScript = startUserScript();
 
@@ -108,7 +108,7 @@ function wrapMarqueeElements(
   );
   ws.addEventListener('Playing', ({ data }) => {
     container.classList.remove('vanish');
-    const state = makeState(data);
+    const state = makeState(data, scriptOptions);
     tree.update(state);
     resetMarquee.start();
 
