@@ -13,8 +13,8 @@ export function extractTitleAndSub(info: PlayInfo): TitleData {
   }
 
   let title = info.title;
+  // remove website name - usually websites have their title as "<page> - <website>" (e.g. "Video - YouTube")
   if (info.source.startsWith('gsmtc') && info.source.match(/chrome|firefox|opera|brave|edge/i)) {
-    console.log('xd');
     const dashIdx = title.lastIndexOf('-');
     if (dashIdx !== -1) {
       title = title.substring(0, dashIdx).trim();

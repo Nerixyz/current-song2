@@ -1,6 +1,7 @@
 import { cleanupTitleAndSub, extractTitleAndSub } from './text';
 import { getImageUrl } from './image';
 import { PlayInfo } from '../../shared/types';
+import { ScriptOptions } from './options';
 
 export interface State {
   info: PlayInfo;
@@ -9,9 +10,13 @@ export interface State {
   imageUrl: string | undefined;
 }
 
-export function makeState(info: PlayInfo): State {
-  const extracted = extractTitleAndSub(info);
-  const { title, subtitle } = cleanupTitleAndSub(extracted);
+export function makeState(info: PlayInfo, options: ScriptOptions): State {
+  let extracted = extractTitleAndSub(info);
+  if (!options.useRawSongInfo) {
+    extracted = cleanupTitleAndSub(extracted);
+  }
+  const { title, subtitle } = extracted;
+
   const imageUrl = getImageUrl(info);
   return {
     info,
