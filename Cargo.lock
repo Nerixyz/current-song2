@@ -358,9 +358,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.93"
+version = "1.0.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c95c10ba0b00a02636238b814946408b1322d5ac4760326e6fb8ec956d85775"
+checksum = "c1fd03a028ef38ba2276dce7e33fcd6369c158a1bca17946c4b1b701891c1ff7"
 
 [[package]]
 name = "async-broadcast"
@@ -620,7 +620,7 @@ dependencies = [
  "serde_json",
  "static-files",
  "tap",
- "thiserror 2.0.3",
+ "thiserror 2.0.6",
  "tokio",
  "tokio-stream",
  "toml",
@@ -1171,7 +1171,7 @@ dependencies = [
  "futures",
  "serde",
  "tap",
- "thiserror 2.0.3",
+ "thiserror 2.0.6",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -1696,11 +1696,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "2.0.3"
+version = "2.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c006c85c7651b3cf2ada4584faa36773bd07bac24acfb39f3c431b36d7e667aa"
+checksum = "8fec2a1820ebd077e2b90c4df007bebf344cd394098a13c563957d0afc83ea47"
 dependencies = [
- "thiserror-impl 2.0.3",
+ "thiserror-impl 2.0.6",
 ]
 
 [[package]]
@@ -1716,9 +1716,9 @@ dependencies = [
 
 [[package]]
 name = "thiserror-impl"
-version = "2.0.3"
+version = "2.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f077553d607adc1caf65430528a576c757a71ed73944b66ebb58ef2bbd243568"
+checksum = "d65750cab40f4ff1929fb1ba509e9914eb756131cef4210da8d5d700d26f6312"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1783,9 +1783,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.41.1"
+version = "1.42.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22cfb5bee7a6a52939ca9224d6ac897bb669134078daa8735560897f69de4d33"
+checksum = "5cec9b21b0450273377fc97bd4c33a8acffc8c996c987a7c5b319a0083707551"
 dependencies = [
  "backtrace",
  "bytes",
@@ -1813,9 +1813,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-stream"
-version = "0.1.16"
+version = "0.1.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f4e6ce100d0eb49a2734f8c0812bcd324cf357d21810932c5df6b96ef2b86f1"
+checksum = "eca58d7bba4a75707817a2c44174253f9236b2d5fbd055602e9d5c07c139a047"
 dependencies = [
  "futures-core",
  "pin-project-lite",
