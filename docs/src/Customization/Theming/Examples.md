@@ -2,7 +2,7 @@
 
 ## Repositioning
 
--   **Right**
+- **Right**
 
     ```css title="theme.css"
     #song-container {
@@ -11,7 +11,7 @@
     }
     ```
 
--   **Bottom left**
+- **Bottom left**
 
     ```css title="theme.css"
     #song-container {
@@ -19,7 +19,7 @@
     }
     ```
 
--   **Bottom right**
+- **Bottom right**
 
     ```css title="theme.css"
     #song-container {

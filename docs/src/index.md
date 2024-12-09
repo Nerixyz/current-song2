@@ -12,11 +12,11 @@ written in Rust now. Both Windows and Unix platforms are supported. On Windows, 
 The goal of the project is to create a **simple yet powerful** overlay that displays the currently playing song. There
 are a few unique features separating this project:
 
--   **Near zero latency** ⏱ Current Song 2 doesn't poll applications or APIs for updates.
--   **Displaying Progress** 💯 Progress is displayed where available.
--   **Display Album Art** 🖼
--   **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`) and JavaScript (`user.js`), see [Customization](Customization/index.md). Modules and the server can be configured in
-    a `config.toml` file, see [Configuration](Configuration.md).
+- **Near zero latency** ⏱ Current Song 2 doesn't poll applications or APIs for updates.
+- **Displaying Progress** 💯 Progress is displayed where available.
+- **Display Album Art** 🖼
+- **Customizable** 🔧 The overlay is customizable through CSS (`theme.css`) and JavaScript (`user.js`), see [Customization](Customization/index.md). Modules and the server can be configured in
+  a `config.toml` file, see [Configuration](Configuration.md).
 
 ## Getting Started
 

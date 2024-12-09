@@ -53,9 +53,9 @@ The configuration on Unix systems must be located in `$XDG_CONFIG_HOME/CurrentSo
 
 This flag controls if the application will try to add itself to autostart.
 
--   If it's `true`, then it won't add itself to autostart. _This doesn't mean it will be removed! See [Autostart](index.md#Autostart)._
--   If it's `false` (default), then it **will** check the autostart and possibly add itself there. You can still disable
-    the entry on the _Task Manager_'s _Autostart_ tab since this is independent of the actual registry entry.
+- If it's `true`, then it won't add itself to autostart. _This doesn't mean it will be removed! See [Autostart](index.md#Autostart)._
+- If it's `false` (default), then it **will** check the autostart and possibly add itself there. You can still disable
+  the entry on the _Task Manager_'s _Autostart_ tab since this is independent of the actual registry entry.
 
 ## GSMTC (Global System Media Transport Controls) :fontawesome-brands-windows:
 
@@ -67,15 +67,15 @@ or only limited metadata (specifically browsers; that's why they're excluded by 
 You can control which applications will be included in the search for metadata through `modules.gsmtc.filter`. There are
 three modes: `Disabled`,`Include`, and `Exclude`:
 
--   `Disabled` will disable all filters, and let everything pass the filters:
+- `Disabled` will disable all filters, and let everything pass the filters:
 
     ```toml
     [modules.gsmtc.filter]
     mode = "Disabled"
     ```
 
--   `Include` will only include applications listed in `items`. For example, only
-    include Spotify:
+- `Include` will only include applications listed in `items`. For example, only
+  include Spotify:
 
     ```toml
     [modules.gsmtc.filter]
@@ -85,8 +85,8 @@ three modes: `Disabled`,`Include`, and `Exclude`:
 
     1. Notice the capital 'S', the filter is case-sensitive.
 
--   `Exclude` will include everything, except applications listed in `items`. For
-    example, don't include firefox:
+- `Exclude` will include everything, except applications listed in `items`. For
+  example, don't include firefox:
 
     ```toml
     [modules.gsmtc.filter]
@@ -109,12 +109,12 @@ The D-Bus module and collect metadata from any player implementing the [Media Pl
 
 The following [metadata](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata) is collected (when available):
 
--   [`mpris:length`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#mpris:length)
--   [`xesam:title`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:title)
--   [`xesam:album`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:album)
--   [`xesam:trackNumber`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:tracknumber)
--   [`xesam:artist`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:artist) (joined by `, `)
--   [`mpris:artUrl`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#mpris:arturl)
+- [`mpris:length`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#mpris:length)
+- [`xesam:title`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:title)
+- [`xesam:album`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:album)
+- [`xesam:trackNumber`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:tracknumber)
+- [`xesam:artist`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:artist) (joined by `, `)
+- [`mpris:artUrl`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#mpris:arturl)
 
 ### `destinations`
 

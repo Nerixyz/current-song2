@@ -8,3 +8,9 @@ target
 pnpm-lock.yaml
 artifacts
 venv
+.env
+.venv
+env/
+ENV/
+env.bak/
+venv.bak/
