@@ -15,10 +15,10 @@ futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 tap = "1"
 thiserror = "2"
-tokio = { version = "1.42", features = ["sync", "rt", "macros"] }
+tokio = { version = "1.43", features = ["sync", "rt", "macros"] }
 tracing = "0.1"
-zbus = { version = "5.2", default-features = false, features = ["tokio"] }
+zbus = { version = "5.3", default-features = false, features = ["tokio"] }
 
 [dev-dependencies]
-tokio = { version = "1.42", features = ["sync", "macros", "rt-multi-thread"] }
+tokio = { version = "1.43", features = ["sync", "macros", "rt-multi-thread"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
