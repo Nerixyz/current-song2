@@ -1,13 +1,14 @@
 use crate::{
     session::{SessionCommand, SessionHandle, SessionUpdateEvent},
     util::ResultExt,
+    EventRegistrationToken,
 };
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::mpsc;
 use tracing::{event, Level};
 use windows::{
     core::Result,
-    Foundation::{EventRegistrationToken, TypedEventHandler},
+    Foundation::TypedEventHandler,
     Media::Control::{
         GlobalSystemMediaTransportControlsSession, GlobalSystemMediaTransportControlsSessionManager,
     },

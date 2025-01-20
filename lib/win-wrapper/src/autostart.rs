@@ -42,7 +42,7 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> windows::co
         RegCreateKeyExW(
             HKEY_CURRENT_USER,
             w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-            0,
+            None,
             None,
             REG_OPTION_RESERVED,
             KEY_CREATE_SUB_KEY | KEY_SET_VALUE,
@@ -63,7 +63,7 @@ pub fn add_self_to_autostart(application_name: impl Into<PCWSTR>) -> windows::co
         RegSetValueExW(
             *hkey,
             application_name.into(),
-            0,
+            None,
             REG_SZ,
             Some(std::slice::from_raw_parts(
                 path.as_ptr() as *const u8,
@@ -100,7 +100,7 @@ pub fn remove_autostart(application_name: impl Into<PCWSTR>) -> windows::core::R
         RegOpenKeyExW(
             HKEY_CURRENT_USER,
             w!("Software\\Microsoft\\Windows\\CurrentVersion\\Run"),
-            0,
+            None,
             KEY_SET_VALUE,
             &mut hkey,
         )

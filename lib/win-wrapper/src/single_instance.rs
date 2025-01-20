@@ -74,7 +74,7 @@ fn cmp_path(pid: u32, path: &ManagedPwstr, path_buf: &mut ManagedPwstr) -> bool 
             Ok(h) => h,
             Err(_) => return false,
         };
-        let chars = GetModuleFileNameExW(proc, None, path_buf.as_mut_slice());
+        let chars = GetModuleFileNameExW(Some(proc), None, path_buf.as_mut_slice());
         let _ = CloseHandle(proc);
         if chars == 0 {
             false
