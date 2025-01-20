@@ -1,13 +1,14 @@
 use crate::{
     model::{Image, MediaModel, PlaybackStatus, SessionModel, TimelineModel},
     util::{request_media_properties_sync, ResultExt},
+    EventRegistrationToken,
 };
 use std::sync::{Arc, Weak};
 use tokio::sync::mpsc;
 use tracing::{debug, event, warn, Level};
 use windows::{
     core::{AgileReference, Result},
-    Foundation::{EventRegistrationToken, TypedEventHandler},
+    Foundation::TypedEventHandler,
     Media::Control::GlobalSystemMediaTransportControlsSession,
 };
 

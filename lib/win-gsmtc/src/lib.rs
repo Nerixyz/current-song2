@@ -52,3 +52,5 @@ mod util;
 pub use manager::{ManagerEvent, SessionManager};
 pub use model::*;
 pub use session::SessionUpdateEvent;
+
+pub(crate) type EventRegistrationToken = i64;
