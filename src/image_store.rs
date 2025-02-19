@@ -1,6 +1,8 @@
 use std::{
     collections::HashMap,
     fmt::{Debug, Formatter},
+    ops::Deref,
+    sync::{Arc, RwLock},
 };
 
 pub struct Image {
@@ -61,7 +63,47 @@ impl ImageStore {
             img.1 = None;
         }
     }
+
     pub fn remove(&mut self, slot: usize) {
         self.images.remove(&slot);
+    }
+}
+
+pub struct SlotRef {
+    slot: usize,
+    store: std::sync::Weak<RwLock<ImageStore>>,
+}
+
+impl std::fmt::Debug for SlotRef {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("SlotRef").field(&self.slot).finish()
+    }
+}
+
+impl SlotRef {
+    pub fn new(store: &Arc<RwLock<ImageStore>>) -> Self {
+        let slot = store.write().unwrap().create_id();
+        Self {
+            slot,
+            store: Arc::downgrade(store),
+        }
+    }
+}
+
+impl Deref for SlotRef {
+    type Target = usize;
+
+    fn deref(&self) -> &Self::Target {
+        &self.slot
+    }
+}
+
+impl Drop for SlotRef {
+    fn drop(&mut self) {
+        if let Some(store) = self.store.upgrade() {
+            if let Ok(mut store) = store.write() {
+                store.remove(self.slot);
+            }
+        }
     }
 }

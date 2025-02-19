@@ -3,7 +3,7 @@ use std::{ffi::OsStr, path::Path, sync::Arc};
 use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
     config::CONFIG,
-    image_store::ImageStore,
+    image_store::{ImageStore, SlotRef},
     model::{AlbumInfo, ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
 use actix::Addr;
@@ -23,7 +23,7 @@ struct DBusWorker {
     paused: bool,
     source: zbus_names::BusName<'static>,
     image_store: Arc<RwLock<ImageStore>>,
-    image_id: usize,
+    image_id: SlotRef,
 }
 
 pub async fn start_spawning(
@@ -55,7 +55,7 @@ pub async fn start_spawning(
                 continue;
             };
             let image_store = image_store.clone();
-            let image_id = image_store.write().unwrap().create_id();
+            let image_id = SlotRef::new(&image_store);
             let source = name.clone();
             tokio::spawn(
                 async move {
@@ -122,7 +122,7 @@ impl DBusWorker {
             None => None,
         };
         if image.is_none() {
-            self.image_store.write().unwrap().clear(self.image_id);
+            self.image_store.write().unwrap().clear(*self.image_id);
         }
 
         return ModuleState::Playing(PlayInfo {
@@ -186,9 +186,9 @@ impl DBusWorker {
                 self.image_store
                     .write()
                     .unwrap()
-                    .store(self.image_id, content_type, bytes);
+                    .store(*self.image_id, content_type, bytes);
             Some(ImageInfo::Internal(InternalImage {
-                id: self.image_id,
+                id: *self.image_id,
                 epoch_id,
             }))
         } else {

@@ -1,7 +1,7 @@
 use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
     config::CONFIG,
-    image_store::ImageStore,
+    image_store::{ImageStore, SlotRef},
     model::{AlbumInfo, ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
 use ::gsmtc::{ManagerEvent, SessionManager, SessionUpdateEvent};
@@ -19,7 +19,7 @@ struct GsmtcWorker {
     image_store: Arc<RwLock<ImageStore>>,
 
     module_id: usize,
-    image_id: usize,
+    image_id: SlotRef,
 
     image: Option<ImageInfo>,
     paused: bool,
@@ -45,10 +45,10 @@ pub async fn start_spawning(
                             "Creating GSMTC worker: module-id: {}",
                             module_id
                         );
-                        let mut store = image_store.write().unwrap();
+                        let image_id = SlotRef::new(&image_store);
                         tokio::spawn(
                             GsmtcWorker {
-                                image_id: store.create_id(),
+                                image_id,
                                 module_id,
                                 image_store: image_store.clone(),
                                 manager: manager.clone(),
@@ -89,21 +89,19 @@ impl GsmtcWorker {
             .send(RemoveModule { id: self.module_id })
             .await
             .ok();
-
-        self.image_store.write().unwrap().remove(self.image_id);
     }
 
     #[tracing::instrument(level = "trace")]
     async fn store_image(&mut self, image: Option<Image>) -> Option<ImageInfo> {
         let mut store = self.image_store.write().unwrap();
         let img = if let Some(img) = image {
-            let epoch_id = store.store(self.image_id, img.content_type, img.data);
+            let epoch_id = store.store(*self.image_id, img.content_type, img.data);
             Some(ImageInfo::Internal(InternalImage {
-                id: self.image_id,
+                id: *self.image_id,
                 epoch_id,
             }))
         } else {
-            store.clear(self.image_id);
+            store.clear(*self.image_id);
             None
         };
         self.image.clone_from(&img);
