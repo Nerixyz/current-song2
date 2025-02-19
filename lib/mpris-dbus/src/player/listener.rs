@@ -100,7 +100,21 @@ async fn update_meta(proxy: &MediaPlayerProxy<'_>, state: &mut State) {
         return;
     };
 
-    get_meta(&meta, "mpris:length", &mut state.timeline.duration, Some);
+    get_meta(
+        &meta,
+        "mpris:length",
+        &mut state.timeline.duration,
+        |d: zvariant::Value| match d {
+            zvariant::Value::I16(v) => u64::try_from(v).ok(),
+            zvariant::Value::U16(v) => u64::try_from(v).ok(),
+            zvariant::Value::I32(v) => u64::try_from(v).ok(),
+            zvariant::Value::U32(v) => u64::try_from(v).ok(),
+            zvariant::Value::I64(v) => u64::try_from(v).ok(),
+            zvariant::Value::U64(v) => Some(v),
+            zvariant::Value::F64(v) => Some(v as u64),
+            _ => None,
+        },
+    );
     get_meta(&meta, "xesam:title", &mut state.title, Some);
     get_meta(&meta, "xesam:album", &mut state.album, Some);
     get_meta(&meta, "xesam:trackNumber", &mut state.track_number, Some);
