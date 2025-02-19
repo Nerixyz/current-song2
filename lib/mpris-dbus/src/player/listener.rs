@@ -79,8 +79,7 @@ where
                 },
                 Some(owner) = owner_changed.next() => {
                     if owner.filter(|x| x.is_empty()).is_none() {
-                        state.status = PlaybackStatus::Stopped;
-                        send_or_break!(tx, state.clone());
+                        break;
                     }
                 },
                 else => break
