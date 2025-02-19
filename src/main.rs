@@ -73,7 +73,7 @@ async fn init_unix_actors(
     image_store: Arc<RwLock<ImageStore>>,
 ) {
     if modules.dbus.enabled {
-        workers::dbus::start_spawning(manager, image_store, &modules.dbus.destinations)
+        workers::dbus::start_spawning(manager, image_store)
             .await
             .unwrap();
     }

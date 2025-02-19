@@ -2,15 +2,17 @@ use std::{ffi::OsStr, path::Path, sync::Arc};
 
 use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
+    config::CONFIG,
     image_store::ImageStore,
     model::{AlbumInfo, ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
 use actix::Addr;
 use anyhow::Result as AnyResult;
+use futures::StreamExt;
 use mpris_dbus::{interface::PlaybackStatus, player};
 use tap::TapFallible;
 use tokio::sync::{mpsc, RwLock};
-use tracing::{span, warn, Instrument, Level};
+use tracing::{debug, info, span, warn, Instrument, Level};
 use url::Url;
 
 #[derive(Debug)]
@@ -18,7 +20,7 @@ struct DBusWorker {
     manager: Addr<Manager>,
     module_id: usize,
     paused: bool,
-    source: String,
+    source: zbus_names::BusName<'static>,
     image_store: Arc<RwLock<ImageStore>>,
     image_id: usize,
 }
@@ -26,41 +28,57 @@ struct DBusWorker {
 pub async fn start_spawning(
     manager: Addr<Manager>,
     image_store: Arc<RwLock<ImageStore>>,
-    sources: &[String],
 ) -> AnyResult<()> {
-    for name in sources {
-        let source = name.clone();
-        let manager = manager.clone();
-        let Ok(module_id) = manager
-            .send(CreateModule { priority: 0 })
-            .await
-            .tap_err(|e| warn!(error = %e, "Failed to create module"))
-        else {
-            continue;
-        };
-        let image_store = image_store.clone();
-        let image_id = image_store.write().await.create_id();
-        tokio::spawn(
-            async move {
-                let worker = DBusWorker {
-                    manager,
-                    module_id,
-                    paused: false,
-                    source,
-                    image_store,
-                    image_id,
-                };
-                let Ok(rx) = player::listen(worker.source.clone())
-                    .await
-                    .tap_err(|e| warn!(error = %e, "Failed to listen"))
-                else {
-                    return;
-                };
-                worker.feed_manager(rx).await;
+    let discoverer = mpris_dbus::discovery::Listener::new().await?;
+    let mut name_stream = discoverer.listen().await?;
+    tokio::spawn(async move {
+        while let Some(name) = name_stream.next().await {
+            if !CONFIG
+                .modules
+                .dbus
+                .destinations
+                .iter()
+                .any(|s| fast_glob::glob_match(s.as_bytes(), name.as_bytes()))
+            {
+                debug!("Ignoring {}", name);
+                continue;
             }
-            .instrument(span!(Level::INFO, "DBusWorker", source = name)),
-        );
-    }
+            info!("Listening to dbus service {}", name);
+
+            let manager = manager.clone();
+            let Ok(module_id) = manager
+                .send(CreateModule { priority: 0 })
+                .await
+                .tap_err(|e| warn!(error = %e, "Failed to create module"))
+            else {
+                continue;
+            };
+            let image_store = image_store.clone();
+            let image_id = image_store.write().await.create_id();
+            let source = name.clone();
+            tokio::spawn(
+                async move {
+                    let worker = DBusWorker {
+                        manager,
+                        module_id,
+                        paused: false,
+                        source,
+                        image_store,
+                        image_id,
+                    };
+                    let Ok(rx) = player::listen(worker.source.clone())
+                        .await
+                        .tap_err(|e| warn!(error = %e, "Failed to listen"))
+                    else {
+                        return;
+                    };
+                    worker.feed_manager(rx).await;
+                }
+                .instrument(span!(Level::INFO, "DBusWorker", source = %name)),
+            );
+        }
+    });
+
     Ok(())
 }
 

@@ -173,7 +173,7 @@ cfg_unix! {
         fn default() -> Self {
             Self {
                 enabled: true,
-                destinations: vec!["org.mpris.MediaPlayer2.spotify".to_owned()],
+                destinations: vec!["org.mpris.MediaPlayer2.*".to_owned()],
             }
         }
     }
