@@ -67,9 +67,13 @@ async fn init_windows_actors(
 }
 
 #[cfg(unix)]
-async fn init_unix_actors(modules: &'static ModuleConfig, manager: Addr<Manager>) {
+async fn init_unix_actors(
+    modules: &'static ModuleConfig,
+    manager: Addr<Manager>,
+    image_store: Arc<RwLock<ImageStore>>,
+) {
     if modules.dbus.enabled {
-        workers::dbus::start_spawning(manager, &modules.dbus.destinations)
+        workers::dbus::start_spawning(manager, image_store, &modules.dbus.destinations)
             .await
             .unwrap();
     }
@@ -87,7 +91,7 @@ async fn async_main() -> std::io::Result<()> {
     init_windows_actors(&CONFIG.modules, manager.clone(), image_store.clone()).await;
 
     #[cfg(unix)]
-    init_unix_actors(&CONFIG.modules, manager.clone()).await;
+    init_unix_actors(&CONFIG.modules, manager.clone(), image_store.clone()).await;
 
     let image_store: web::Data<_> = image_store.into();
     let manager = web::Data::new(manager);
