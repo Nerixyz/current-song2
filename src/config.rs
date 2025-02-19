@@ -1,7 +1,6 @@
 use crate::{cfg_unix, cfg_windows};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashSet,
     fs,
     path::{Path, PathBuf},
     sync::OnceLock,
@@ -114,6 +113,8 @@ impl Default for FileOutputConfig {
 }
 
 cfg_windows! {
+    use std::collections::HashSet;
+
     #[derive(Deserialize, Serialize, Debug, Clone)]
     #[serde(default)]
     pub struct GsmtcConfig {
@@ -173,7 +174,7 @@ cfg_unix! {
         fn default() -> Self {
             Self {
                 enabled: true,
-                destinations: vec!["org.mpris.MediaPlayer2.spotify".to_owned()],
+                destinations: vec!["org.mpris.MediaPlayer2.*".to_owned()],
             }
         }
     }
@@ -204,6 +205,8 @@ lazy_static::lazy_static! {
                     if !crate::win_setup::should_replace_invalid_config(&loc, &err) {
                         continue; // try again
                     }
+                    #[cfg(not(windows))]
+                    let _ = err;
 
                     warn!("Config at {} was invalid - replacing with default config", loc.display());
                     if loc.exists() {
@@ -221,6 +224,7 @@ lazy_static::lazy_static! {
     };
 }
 
+#[cfg(windows)]
 pub fn current_config_path() -> &'static Path {
     CURRENT_CONFIG_PATH.get_or_init(|| default_config_paths()[0].clone())
 }

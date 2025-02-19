@@ -30,7 +30,7 @@ where
     D::Error: Into<zbus::Error>,
 {
     let connection = Connection::session().await.map_err(Error::GetConnection)?;
-    let proxy = SpotifyPlayerProxy::builder(&connection)
+    let proxy = MediaPlayerProxy::builder(&connection)
         .destination(dest)
         .map_err(Error::SetupProxy)?
         .build()
@@ -79,8 +79,7 @@ where
                 },
                 Some(owner) = owner_changed.next() => {
                     if owner.filter(|x| x.is_empty()).is_none() {
-                        state.status = PlaybackStatus::Stopped;
-                        send_or_break!(tx, state.clone());
+                        break;
                     }
                 },
                 else => break
@@ -92,7 +91,7 @@ where
     Ok(rx)
 }
 
-async fn update_meta(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) {
+async fn update_meta(proxy: &MediaPlayerProxy<'_>, state: &mut State) {
     let Ok(meta) = proxy
         .metadata()
         .await
@@ -127,7 +126,7 @@ async fn update_meta(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) {
     update_position(proxy, state).await;
 }
 
-async fn update_position(proxy: &SpotifyPlayerProxy<'_>, state: &mut State) -> bool {
+async fn update_position(proxy: &MediaPlayerProxy<'_>, state: &mut State) -> bool {
     match proxy.position().await {
         Ok(p) => {
             state.timeline.position = p;

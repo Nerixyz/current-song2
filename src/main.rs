@@ -30,7 +30,8 @@ use crate::{
 };
 use actix::{Actor, Addr};
 use actix_web::{web, App, HttpServer};
-use tokio::sync::{watch, RwLock};
+use std::sync::RwLock;
+use tokio::sync::watch;
 use tracing_actix_web::TracingLogger;
 
 fn init_channels() -> (watch::Receiver<manager::Event>, Addr<Manager>) {
@@ -73,7 +74,7 @@ async fn init_unix_actors(
     image_store: Arc<RwLock<ImageStore>>,
 ) {
     if modules.dbus.enabled {
-        workers::dbus::start_spawning(manager, image_store, &modules.dbus.destinations)
+        workers::dbus::start_spawning(manager, image_store)
             .await
             .unwrap();
     }

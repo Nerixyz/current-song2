@@ -19,6 +19,11 @@ When releasing a new version:
 ### Added
 
 - Added the `use-raw-data` query parameter for the overlay. If it's present in the URL, no cleanup will be performed on the client (example: `http://localhost:48457/?use-raw-data`).
+- Linux: The dbus adapter now automatically discovers all `org.mpris.MediaPlayer2.*` services. If you previously ran an instance, you need to update your config and set `modules.dbus.destinations` to `["org.mpris.MediaPlayer2.*"]`.
+
+### Fixed
+
+- Linux: Local images (`file://`) are now loaded correctly.
 
 ## [v0.1.0-alpha.13] - 2024-06-22
 

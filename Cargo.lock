@@ -363,6 +363,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
+name = "arrayvec"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
+
+[[package]]
 name = "async-broadcast"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -613,6 +619,7 @@ dependencies = [
  "actix-web-actors",
  "actix-web-static-files",
  "anyhow",
+ "fast-glob",
  "futures",
  "lazy_static",
  "mpris-dbus",
@@ -635,6 +642,7 @@ dependencies = [
  "win-msgbox",
  "win-wrapper",
  "windows",
+ "zbus_names",
 ]
 
 [[package]]
@@ -751,6 +759,15 @@ checksum = "0f214dc438f977e6d4e3500aaa277f5ad94ca83fbbd9b1a15713ce2344ccc5a1"
 dependencies = [
  "event-listener",
  "pin-project-lite",
+]
+
+[[package]]
+name = "fast-glob"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0eca69ef247d19faa15ac0156968637440824e5ff22baa5ee0cd35b2f7ea6a0f"
+dependencies = [
+ "arrayvec",
 ]
 
 [[package]]
@@ -1336,6 +1353,7 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "zbus",
+ "zbus_names",
 ]
 
 [[package]]
@@ -2728,12 +2746,13 @@ dependencies = [
 
 [[package]]
 name = "zbus_names"
-version = "4.0.0"
+version = "4.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdc27fbd3593ff015cef906527a2ec4115e2e3dbf6204a24d952ac4975c80614"
+checksum = "7be68e64bf6ce8db94f63e72f0c7eb9a60d733f7e0499e628dfab0f84d6bcb97"
 dependencies = [
  "serde",
  "static_assertions",
+ "winnow 0.7.1",
  "zvariant",
 ]
 
