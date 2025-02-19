@@ -1,13 +1,17 @@
+use std::{ffi::OsStr, path::Path, sync::Arc};
+
 use crate::{
     actors::manager::{CreateModule, Manager, RemoveModule, UpdateModule},
-    model::{AlbumInfo, ImageInfo, ModuleState, PlayInfo, TimelineInfo},
+    image_store::ImageStore,
+    model::{AlbumInfo, ImageInfo, InternalImage, ModuleState, PlayInfo, TimelineInfo},
 };
 use actix::Addr;
 use anyhow::Result as AnyResult;
 use mpris_dbus::{interface::PlaybackStatus, player};
 use tap::TapFallible;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, RwLock};
 use tracing::{span, warn, Instrument, Level};
+use url::Url;
 
 #[derive(Debug)]
 struct DBusWorker {
@@ -15,9 +19,15 @@ struct DBusWorker {
     module_id: usize,
     paused: bool,
     source: String,
+    image_store: Arc<RwLock<ImageStore>>,
+    image_id: usize,
 }
 
-pub async fn start_spawning(manager: Addr<Manager>, sources: &[String]) -> AnyResult<()> {
+pub async fn start_spawning(
+    manager: Addr<Manager>,
+    image_store: Arc<RwLock<ImageStore>>,
+    sources: &[String],
+) -> AnyResult<()> {
     for name in sources {
         let source = name.clone();
         let manager = manager.clone();
@@ -28,6 +38,8 @@ pub async fn start_spawning(manager: Addr<Manager>, sources: &[String]) -> AnyRe
         else {
             continue;
         };
+        let image_store = image_store.clone();
+        let image_id = image_store.write().await.create_id();
         tokio::spawn(
             async move {
                 let worker = DBusWorker {
@@ -35,6 +47,8 @@ pub async fn start_spawning(manager: Addr<Manager>, sources: &[String]) -> AnyRe
                     module_id,
                     paused: false,
                     source,
+                    image_store,
+                    image_id,
                 };
                 let Ok(rx) = player::listen(worker.source.clone())
                     .await
@@ -66,7 +80,7 @@ impl DBusWorker {
         if paused && self.paused {
             return;
         }
-        let state = convert_model(state, &self.source);
+        let state = self.convert_model(state).await;
         self.paused = paused;
         let span = span!(Level::TRACE, "Update Module", id = self.module_id, state = ?state, paused = self.paused);
         self.manager
@@ -78,34 +92,88 @@ impl DBusWorker {
             .await
             .ok();
     }
-}
 
-fn convert_model(from: player::State, source: &str) -> ModuleState {
-    if from.status != PlaybackStatus::Playing {
-        return ModuleState::Paused;
+    async fn convert_model(&mut self, from: player::State) -> ModuleState {
+        if from.status != PlaybackStatus::Playing {
+            return ModuleState::Paused;
+        }
+
+        let image = match from.cover_art {
+            Some(url) => self.make_image(url).await,
+            None => None,
+        };
+        if image.is_none() {
+            self.image_store.write().await.clear(self.image_id);
+        }
+
+        return ModuleState::Playing(PlayInfo {
+            title: from.title.unwrap_or_default(),
+            artist: from.artist,
+            track_number: from.track_number.map(|n| n as u32),
+            image,
+            timeline: Some(TimelineInfo {
+                ts: from
+                    .timeline
+                    .ts
+                    .timestamp_millis()
+                    .try_into()
+                    .unwrap_or_default(),
+                duration_ms: from.timeline.duration.unwrap_or(0) / 1000,
+                progress_ms: (from.timeline.position / 1000)
+                    .try_into()
+                    .unwrap_or_default(),
+                rate: from.playback_rate as f32,
+            }),
+            album: from.album.map(|title| AlbumInfo {
+                title,
+                track_count: 0,
+            }),
+            source: format!("dbus::{}", self.source),
+        });
     }
-    return ModuleState::Playing(PlayInfo {
-        title: from.title.unwrap_or_default(),
-        artist: from.artist,
-        track_number: from.track_number.map(|n| n as u32),
-        image: from.cover_art.map(ImageInfo::External),
-        timeline: Some(TimelineInfo {
-            ts: from
-                .timeline
-                .ts
-                .timestamp_millis()
-                .try_into()
-                .unwrap_or_default(),
-            duration_ms: from.timeline.duration.unwrap_or(0) / 1000,
-            progress_ms: (from.timeline.position / 1000)
-                .try_into()
-                .unwrap_or_default(),
-            rate: from.playback_rate as f32,
-        }),
-        album: from.album.map(|title| AlbumInfo {
-            title,
-            track_count: 0,
-        }),
-        source: format!("dbus::{source}"),
-    });
+
+    async fn make_image(&mut self, url_string: String) -> Option<ImageInfo> {
+        let url = Url::parse(&url_string)
+            .inspect_err(
+                |e| warn!(url = url_string, error=%e, "Failed to parse image url from dbus"),
+            )
+            .ok()?;
+
+        if url.scheme() == "file" {
+            let bytes = tokio::fs::read(url.path())
+                .await
+                .inspect_err(|e| warn!(url=url_string, error=%e, "Failed to read image from dbus"))
+                .ok()?;
+            let content_type = match Path::new(url.path())
+                .extension()
+                .and_then(OsStr::to_str)
+                .unwrap_or_default()
+            {
+                "png" => "image/png",
+                "jpg" | "jpeg" => "image/jpeg",
+                "webp" => "image/webp",
+                "avif" => "image/avif",
+                x => {
+                    warn!(
+                        url = url_string,
+                        extension = x,
+                        "Unknown extension in image url",
+                    );
+                    ""
+                }
+            }
+            .to_owned();
+            let epoch_id = self
+                .image_store
+                .write()
+                .await
+                .store(self.image_id, content_type, bytes);
+            Some(ImageInfo::Internal(InternalImage {
+                id: self.image_id,
+                epoch_id,
+            }))
+        } else {
+            Some(ImageInfo::External(url_string))
+        }
+    }
 }

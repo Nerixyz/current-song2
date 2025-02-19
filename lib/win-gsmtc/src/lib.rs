@@ -43,6 +43,7 @@
 //! # Ok(())
 //! # }
 //! ```
+#![cfg(windows)]
 mod conversion;
 mod manager;
 mod model;

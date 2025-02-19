@@ -1,3 +1,5 @@
+#![cfg(windows)]
+
 use gsmtc::{ManagerEvent::*, SessionUpdateEvent::*};
 use windows::core::Result;
 
