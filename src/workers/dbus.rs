@@ -10,8 +10,9 @@ use actix::Addr;
 use anyhow::Result as AnyResult;
 use futures::StreamExt;
 use mpris_dbus::{interface::PlaybackStatus, player};
+use std::sync::RwLock;
 use tap::TapFallible;
-use tokio::sync::{mpsc, RwLock};
+use tokio::sync::mpsc;
 use tracing::{debug, info, span, warn, Instrument, Level};
 use url::Url;
 
@@ -54,7 +55,7 @@ pub async fn start_spawning(
                 continue;
             };
             let image_store = image_store.clone();
-            let image_id = image_store.write().await.create_id();
+            let image_id = image_store.write().unwrap().create_id();
             let source = name.clone();
             tokio::spawn(
                 async move {
@@ -121,7 +122,7 @@ impl DBusWorker {
             None => None,
         };
         if image.is_none() {
-            self.image_store.write().await.clear(self.image_id);
+            self.image_store.write().unwrap().clear(self.image_id);
         }
 
         return ModuleState::Playing(PlayInfo {
@@ -181,11 +182,11 @@ impl DBusWorker {
                 }
             }
             .to_owned();
-            let epoch_id = self
-                .image_store
-                .write()
-                .await
-                .store(self.image_id, content_type, bytes);
+            let epoch_id =
+                self.image_store
+                    .write()
+                    .unwrap()
+                    .store(self.image_id, content_type, bytes);
             Some(ImageInfo::Internal(InternalImage {
                 id: self.image_id,
                 epoch_id,

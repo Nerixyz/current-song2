@@ -30,7 +30,8 @@ use crate::{
 };
 use actix::{Actor, Addr};
 use actix_web::{web, App, HttpServer};
-use tokio::sync::{watch, RwLock};
+use std::sync::RwLock;
+use tokio::sync::watch;
 use tracing_actix_web::TracingLogger;
 
 fn init_channels() -> (watch::Receiver<manager::Event>, Addr<Manager>) {

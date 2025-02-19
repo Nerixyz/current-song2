@@ -9,8 +9,8 @@ use actix::Addr;
 use anyhow::Result as AnyResult;
 use futures::future;
 use gsmtc::{Image, PlaybackStatus, SessionModel};
-use std::sync::Arc;
-use tokio::sync::{mpsc, RwLock};
+use std::sync::{Arc, RwLock};
+use tokio::sync::mpsc;
 use tracing::{event, span, Instrument, Level};
 
 #[derive(Debug)]
@@ -39,17 +39,13 @@ pub async fn start_spawning(
                         continue;
                     }
 
-                    if let (Ok(module_id), mut store) = future::join(
-                        manager.send(CreateModule { priority: 0 }),
-                        image_store.write(),
-                    )
-                    .await
-                    {
+                    if let Ok(module_id) = manager.send(CreateModule { priority: 0 }).await {
                         event!(
                             Level::DEBUG,
                             "Creating GSMTC worker: module-id: {}",
                             module_id
                         );
+                        let mut store = image_store.write().unwrap();
                         tokio::spawn(
                             GsmtcWorker {
                                 image_id: store.create_id(),
@@ -94,12 +90,12 @@ impl GsmtcWorker {
             .await
             .ok();
 
-        self.image_store.write().await.remove(self.image_id);
+        self.image_store.write().unwrap().remove(self.image_id);
     }
 
     #[tracing::instrument(level = "trace")]
     async fn store_image(&mut self, image: Option<Image>) -> Option<ImageInfo> {
-        let mut store = self.image_store.write().await;
+        let mut store = self.image_store.write().unwrap();
         let img = if let Some(img) = image {
             let epoch_id = store.store(self.image_id, img.content_type, img.data);
             Some(ImageInfo::Internal(InternalImage {

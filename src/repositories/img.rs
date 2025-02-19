@@ -1,6 +1,6 @@
 use crate::image_store::ImageStore;
 use actix_web::{error, get, web, HttpResponse, Result};
-use tokio::sync::RwLock;
+use std::sync::RwLock;
 
 #[get("/{id}/{target_epoch}")]
 async fn get_image(
@@ -9,7 +9,7 @@ async fn get_image(
 ) -> Result<HttpResponse> {
     let (id, target_epoch) = path.into_inner();
     let image_store = store.into_inner();
-    let store = image_store.read().await;
+    let store = image_store.read().unwrap();
     let img = store.get(id, target_epoch);
     if let Some(img) = img {
         Ok(HttpResponse::Ok()
