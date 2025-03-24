@@ -58,7 +58,7 @@ fast-glob = "0.4.5"
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
 win-wrapper = { path = "lib/win-wrapper" }
-windows = "0.60"
+windows = "0.61"
 win-msgbox = "0.2"
 
 [target.'cfg(unix)'.dependencies]
