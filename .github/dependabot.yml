@@ -12,6 +12,10 @@ updates:
       js:
         patterns:
           - '*'
+    ignore:
+      - dependency-name: '*'
+        update-types: [version-update:semver-patch]
+
   - package-ecosystem: cargo
     directory: '/'
     schedule:
@@ -24,6 +28,7 @@ updates:
       rust:
         patterns:
           - '*'
+
   - package-ecosystem: pip
     directory: '/docs'
     schedule:
@@ -34,6 +39,10 @@ updates:
       pip:
         patterns:
           - '*'
+    ignore:
+      - dependency-name: '*'
+        update-types: [version-update:semver-patch]
+
   - package-ecosystem: github-actions
     directory: '/'
     schedule:
