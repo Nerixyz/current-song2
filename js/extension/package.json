@@ -24,14 +24,14 @@
   },
   "dependencies": {
     "beaverjs": "^0.3.1",
-    "lit": "^3.2.1"
+    "lit": "^3.3.0"
   },
   "devDependencies": {
     "@parcel/config-webextension": "^2.14.4",
     "@parcel/core": "^2.14.4",
     "@types/firefox-webext-browser": "^120.0.4",
     "@types/jest": "^29.5.14",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "jest": "^29.3.1",
     "parcel": "^2.14.4",
     "rimraf": "^6.0.1",
