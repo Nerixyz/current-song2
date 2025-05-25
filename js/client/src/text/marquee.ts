@@ -10,7 +10,15 @@ export interface MarqueeEl {
   reset: () => void;
 }
 
-export function wrapMarquee(el: HTMLElement, opts: MarqueeOptions): MarqueeEl {
+const defaultOpts: MarqueeOptions = {
+  speed: 0.2,
+  pauseDuration: 1200,
+  repeatPauseDuration: 2000,
+};
+
+export function wrapMarquee(el: HTMLElement, opts: MarqueeOptions = defaultOpts): MarqueeEl {
+  opts = { ...defaultOpts, ...opts };
+
   const wrap = make('div', 'mq-wrap');
   wrap.id = `mq-${el.id}`;
   const mask = make('div', 'mq-mask');

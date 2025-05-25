@@ -25,6 +25,13 @@ import { startUserScript } from './user-scripts';
 import { MarqueeEl, MarqueeOptions, wrapMarquee } from './text/marquee';
 import { setupOptions } from './options';
 
+// setup environment for plugins
+(globalThis as any).cso2 = {
+  marquee: {
+    wrap: wrapMarquee,
+  },
+};
+
 function wrapMarqueeElements(
   root: HTMLElement,
   titleEl: HTMLElement,

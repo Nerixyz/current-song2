@@ -48,3 +48,23 @@
 ```css title="transparent.css"
 --8<-- "src/assets/themes/transparent.css"
 ```
+
+## Album Line
+
+<figure markdown>
+  ![Screenshot of Current Song 2 with album-line.css as theme and album-line.js as user-script](../../assets/themes/album-line.png)
+</figure>
+
+```js title="album-line.js"
+--8<-- "src/assets/themes/album-line.js"
+```
+
+```css title="album-line.css"
+--8<-- "src/assets/themes/album-line.css"
+```
+
+```toml title="config.toml"
+[server]
+custom_script_path = "album-line.js" # or paste in user.js
+custom_theme_path = "album-line.css" # or paste in theme.css
+```
