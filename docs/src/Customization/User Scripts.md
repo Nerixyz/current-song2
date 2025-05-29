@@ -42,6 +42,31 @@ interface TimelineInfo {
 }
 ```
 
+Additionally, user scripts have access to the `cso2` global which contains helper functions. Currently, there's only a function to wrap elements in a marquee container.
+
+```ts
+declare var cso2: CSO2;
+interface CSO2 {
+    marquee: MarqueeLib;
+}
+
+interface MarqueeOptions {
+    speed: number;
+    pauseDuration: number;
+    repeatPauseDuration: number;
+}
+
+interface MarqueeEl {
+    pause: () => void;
+    start: () => void;
+    reset: () => void;
+}
+
+interface MarqueeLib {
+    wrap: (el: HTMLElement, opts?: MarqueeOptions) => MarqueeEl;
+}
+```
+
 Example:
 
 ```javascript title="user.js"
@@ -55,3 +80,5 @@ export function onPause() {
     console.log('Hello, Pause!');
 }
 ```
+
+See [Examples](Theming/Examples.md) for a more involved example of adding an artist line.

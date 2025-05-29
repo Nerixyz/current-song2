@@ -21,9 +21,12 @@ import {
   OutgoingMessages,
   ReconnectingWebsocket,
 } from '../../shared/reconnecting-websocket';
-import { startUserScript } from './user-scripts';
+import { makeCso2Env, startUserScript } from './user-scripts';
 import { MarqueeEl, MarqueeOptions, wrapMarquee } from './text/marquee';
 import { setupOptions } from './options';
+
+// setup environment for plugins
+(globalThis as any).cso2 = makeCso2Env();
 
 function wrapMarqueeElements(
   root: HTMLElement,

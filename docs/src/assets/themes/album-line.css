@@ -1,0 +1,17 @@
+#song-container {
+    /* we have three lines now, so make the container 
+       slightly bigger (default: 4.4rem) */
+    --height: 4.8rem;
+    --max-height: 4.8rem;
+}
+
+#album {
+    /* identical to the default style for h1 and h2 */
+    margin: 0;
+    font-family: var(--font);
+    color: var(--text-color);
+    text-wrap: none;
+    /* use smaller text for the album as it's the lowest item */
+    font-weight: normal;
+    font-size: small;
+}

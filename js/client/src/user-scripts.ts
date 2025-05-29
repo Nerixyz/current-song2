@@ -1,4 +1,5 @@
 import { State } from './state';
+import { MarqueeEl, MarqueeOptions, wrapMarquee } from './text/marquee';
 
 export interface UserScript {
   onPlay(state: State): void;
@@ -47,4 +48,20 @@ export function startUserScript(): UserScript {
   }
 
   return script;
+}
+
+export interface MarqueeLib {
+  wrap: (el: HTMLElement, opts?: MarqueeOptions) => MarqueeEl;
+}
+
+export interface CSO2 {
+  marquee: MarqueeLib;
+}
+
+export function makeCso2Env(): CSO2 {
+  return {
+    marquee: {
+      wrap: wrapMarquee,
+    },
+  };
 }
