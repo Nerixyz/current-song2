@@ -15,7 +15,7 @@ enabled = true
 
 [modules.gsmtc.filter]
 mode = "Exclude"
-items = ["chrome.exe", "msedge.exe", "firefox.exe"]
+regex = '(?i)(?:firefox|chrome|msedge|308046B0AF4A39CB|6F193CCC56814779)(?:\.exe)?'
 
 # DBus is Unix only
 [modules.dbus]
@@ -74,7 +74,7 @@ three modes: `Disabled`,`Include`, and `Exclude`:
     mode = "Disabled"
     ```
 
-- `Include` will only include applications listed in `items`. For example, only
+- `Include` will only include applications listed in `items` or any that match `regex`. For example, only
   include Spotify:
 
     ```toml
@@ -85,7 +85,7 @@ three modes: `Disabled`,`Include`, and `Exclude`:
 
     1. Notice the capital 'S', the filter is case-sensitive.
 
-- `Exclude` will include everything, except applications listed in `items`. For
+- `Exclude` will include everything, except applications listed in `items` or any that match `regex`. For
   example, don't include firefox:
 
     ```toml
@@ -94,9 +94,19 @@ three modes: `Disabled`,`Include`, and `Exclude`:
     items = ["firefox.exe"]
     ```
 
+    Alternatively, you can specify a `regex`:
+
+    ```toml
+    [modules.gsmtc.filter]
+    mode = "Exclude"
+    regex = "^firefox.exe$" # (1)!
+    ```
+
+    1. You can prepend the regex with `(?i)` to make it case-insensitive.
+
 <!-- prettier-ignore -->
 !!! note
-    Both lists are **case-sensitive**. <br/>
+    `items` is **case-sensitive**. <br/>
     You can see the application name in the _Task Manager_ by right-clicking and selecting _Properties_.
 
 ### `is_enabled`

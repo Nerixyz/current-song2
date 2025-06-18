@@ -1,4 +1,9 @@
-use crate::{cfg_unix, cfg_windows};
+#[cfg(windows)]
+use crate::workers::gsmtc::GsmtcConfig;
+use crate::{
+    cfg_unix,
+    utilities::serde::{bool_false, bool_true},
+};
 use serde::{Deserialize, Serialize};
 use std::{
     fs,
@@ -60,16 +65,6 @@ fn default_custom_script_path() -> String {
     "user.js".to_string()
 }
 
-#[inline]
-fn bool_true() -> bool {
-    true
-}
-
-#[inline]
-fn bool_false() -> bool {
-    false
-}
-
 #[derive(Deserialize, Serialize, Debug, Default, Clone)]
 #[serde(default)]
 pub struct ModuleConfig {
@@ -108,55 +103,6 @@ impl Default for FileOutputConfig {
             enabled: false,
             path: default_file_path(),
             format: default_format(),
-        }
-    }
-}
-
-cfg_windows! {
-    use std::collections::HashSet;
-
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    #[serde(default)]
-    pub struct GsmtcConfig {
-        #[serde(default = "bool_true")]
-        pub enabled: bool,
-        pub filter: GsmtcFilter,
-    }
-
-    impl Default for GsmtcConfig {
-        fn default() -> Self {
-            Self {
-                enabled: true,
-                filter: GsmtcFilter::default(),
-            }
-        }
-    }
-
-    #[derive(Deserialize, Serialize, Debug, Clone)]
-    #[serde(tag = "mode", content = "items")]
-    pub enum GsmtcFilter {
-        Disabled,
-        Include(HashSet<String>),
-        Exclude(HashSet<String>),
-    }
-
-    impl Default for GsmtcFilter {
-        fn default() -> Self {
-            let mut set = HashSet::new();
-            set.insert("firefox.exe".into());
-            set.insert("chrome.exe".into());
-            set.insert("msedge.exe".into());
-            Self::Exclude(set)
-        }
-    }
-
-    impl GsmtcFilter {
-        pub fn pass_filter(&self, source_model_id: &str) -> bool {
-            match self {
-                GsmtcFilter::Disabled => true,
-                GsmtcFilter::Include(include) => include.contains(source_model_id),
-                GsmtcFilter::Exclude(exclude) => !exclude.contains(source_model_id),
-            }
         }
     }
 }

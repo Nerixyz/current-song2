@@ -610,6 +610,7 @@ dependencies = [
  "futures",
  "lazy_static",
  "mpris-dbus",
+ "regex",
  "serde",
  "serde_json",
  "static-files",
