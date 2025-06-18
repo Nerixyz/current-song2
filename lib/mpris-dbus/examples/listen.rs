@@ -1,5 +1,7 @@
+#[cfg(unix)]
 use mpris_dbus::player;
 
+#[cfg(unix)]
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
@@ -14,3 +16,6 @@ async fn main() {
         println!("{state:#?}");
     }
 }
+
+#[cfg(not(unix))]
+fn main() {}

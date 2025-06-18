@@ -1,8 +1,10 @@
-#![cfg(windows)]
+#[cfg(windows)]
+use ::{
+    gsmtc::{ManagerEvent::*, SessionUpdateEvent::*},
+    windows::core::Result,
+};
 
-use gsmtc::{ManagerEvent::*, SessionUpdateEvent::*};
-use windows::core::Result;
-
+#[cfg(windows)]
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt()
@@ -44,3 +46,6 @@ async fn main() -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(not(windows))]
+fn main() {}
