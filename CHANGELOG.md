@@ -21,10 +21,12 @@ When releasing a new version:
 - User scripts can now wrap elements in a marquee container with `cso2.marquee.wrap(element)`. See [Album Line](https://currentsong.nerixyz.de/Customization/Theming/Examples/#album-line) for an example.
 - Added the `use-raw-data` query parameter for the overlay. If it's present in the URL, no cleanup will be performed on the client (example: `http://localhost:48457/?use-raw-data`).
 - Linux: The dbus adapter now automatically discovers all `org.mpris.MediaPlayer2.*` services. If you previously ran an instance, you need to update your config and set `modules.dbus.destinations` to `["org.mpris.MediaPlayer2.*"]`.
+- Windows: The GSMTC filters now accept a `regex`, which can be case-insensitive. This is used in the default configuration now. See [Configuration](https://currentsong.nerixyz.de/Configuration) for the current default config.
 
 ### Fixed
 
 - Linux: Local images (`file://`) are now loaded correctly.
+- Windows: The default config now excludes Chrome and Firefox on Windows 11 correctly.
 
 ## [v0.1.0-alpha.13] - 2024-06-22
 
