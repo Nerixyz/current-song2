@@ -110,7 +110,8 @@ async fn async_main() -> std::io::Result<()> {
             .service(static_files::theme_css)
             .service(static_files::user_js)
             .service(static_files::service())
-    });
+    })
+    .workers(2);
 
     match &CONFIG.server.bind {
         config::BindConfig::Single { port } => {
