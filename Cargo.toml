@@ -25,7 +25,7 @@ name = "current-song2"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.46", features = ["sync", "fs"] }
+tokio = { version = "1.47", features = ["sync", "fs"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 
