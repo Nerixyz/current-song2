@@ -79,36 +79,36 @@ describe('FilterManager', function () {
     const filter = new FilterManager(Storage, onUpdate);
 
     // Part 1: check initial state
-    expect(listenFilters).toBeCalledTimes(1);
-    expect(listenFilterMode).toBeCalledTimes(1);
-    expect(listenIncludeFocusedTabs).toBeCalledTimes(1);
-    expect(onUpdate).toBeCalledTimes(0);
-    expect(revokeFilters).toBeCalledTimes(0);
-    expect(revokeFilterMode).toBeCalledTimes(0);
-    expect(revokeIncludeFocusedTabs).toBeCalledTimes(0);
+    expect(listenFilters).toHaveBeenCalledTimes(1);
+    expect(listenFilterMode).toHaveBeenCalledTimes(1);
+    expect(listenIncludeFocusedTabs).toHaveBeenCalledTimes(1);
+    expect(onUpdate).toHaveBeenCalledTimes(0);
+    expect(revokeFilters).toHaveBeenCalledTimes(0);
+    expect(revokeFilterMode).toHaveBeenCalledTimes(0);
+    expect(revokeIncludeFocusedTabs).toHaveBeenCalledTimes(0);
 
     // Part 2.0: check onUpdate with setFilterMode
     setFilterMode();
-    expect(onUpdate).toBeCalledTimes(0);
+    expect(onUpdate).toHaveBeenCalledTimes(0);
     setFilterMode(DEFAULT_FILTER_MODE);
-    expect(onUpdate).toBeCalledTimes(0);
+    expect(onUpdate).toHaveBeenCalledTimes(0);
     setFilterMode(DEFAULT_FILTER_MODE === FilterMode.Block ? FilterMode.Allow : FilterMode.Block);
-    expect(onUpdate).toBeCalledTimes(1);
+    expect(onUpdate).toHaveBeenCalledTimes(1);
 
     // Part 2.1: check onUpdate with setFilters
     //           since arrays are not checked for deep equality, we skip one test
     setFilters();
-    expect(onUpdate).toBeCalledTimes(1);
+    expect(onUpdate).toHaveBeenCalledTimes(1);
     setFilters([{ value: 'github.com', isRegex: false }]);
-    expect(onUpdate).toBeCalledTimes(2);
+    expect(onUpdate).toHaveBeenCalledTimes(2);
 
     // Part 3: check for includeFocusedTabs
     expect(filter.includeFocusedTabs).toBe(DEFAULT_INCLUDE_FOCUSED_TABS);
     setIncludeFocusedTabs();
     expect(filter.includeFocusedTabs).toBe(DEFAULT_INCLUDE_FOCUSED_TABS);
-    expect(onUpdate).toBeCalledTimes(2);
+    expect(onUpdate).toHaveBeenCalledTimes(2);
     setIncludeFocusedTabs(!DEFAULT_INCLUDE_FOCUSED_TABS);
-    expect(onUpdate).toBeCalledTimes(3);
+    expect(onUpdate).toHaveBeenCalledTimes(3);
     expect(filter.includeFocusedTabs).toBe(!DEFAULT_INCLUDE_FOCUSED_TABS);
 
     // Part 4: check updates to filterMode and filters
@@ -126,21 +126,21 @@ describe('FilterManager', function () {
     expect(filter.checkUrl('https://gitlab.com/notifications?query=#forsen')).toBe(false);
 
     // Part 5.0: make sure nothing else was called
-    expect(listenFilters).toBeCalledTimes(1);
-    expect(listenFilterMode).toBeCalledTimes(1);
-    expect(listenIncludeFocusedTabs).toBeCalledTimes(1);
-    expect(revokeFilters).toBeCalledTimes(0);
-    expect(revokeFilterMode).toBeCalledTimes(0);
-    expect(revokeIncludeFocusedTabs).toBeCalledTimes(0);
+    expect(listenFilters).toHaveBeenCalledTimes(1);
+    expect(listenFilterMode).toHaveBeenCalledTimes(1);
+    expect(listenIncludeFocusedTabs).toHaveBeenCalledTimes(1);
+    expect(revokeFilters).toHaveBeenCalledTimes(0);
+    expect(revokeFilterMode).toHaveBeenCalledTimes(0);
+    expect(revokeIncludeFocusedTabs).toHaveBeenCalledTimes(0);
 
     // Part 5.1: check closing
     filter.close();
-    expect(listenFilters).toBeCalledTimes(1);
-    expect(listenFilterMode).toBeCalledTimes(1);
-    expect(listenIncludeFocusedTabs).toBeCalledTimes(1);
-    expect(revokeFilters).toBeCalledTimes(1);
-    expect(revokeFilterMode).toBeCalledTimes(1);
-    expect(revokeIncludeFocusedTabs).toBeCalledTimes(1);
+    expect(listenFilters).toHaveBeenCalledTimes(1);
+    expect(listenFilterMode).toHaveBeenCalledTimes(1);
+    expect(listenIncludeFocusedTabs).toHaveBeenCalledTimes(1);
+    expect(revokeFilters).toHaveBeenCalledTimes(1);
+    expect(revokeFilterMode).toHaveBeenCalledTimes(1);
+    expect(revokeIncludeFocusedTabs).toHaveBeenCalledTimes(1);
   });
 });
 
