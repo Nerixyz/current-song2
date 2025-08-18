@@ -20,7 +20,7 @@ jobs:
     name: 'Build on ${{matrix.os}}'
     runs-on: ${{matrix.os}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # ╭─────────────────────────────╮
       # │ Build extension and overlay │
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.event_name == 'push' && (contains(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'))
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
         with:
           path: artifacts
