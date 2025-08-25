@@ -52,9 +52,9 @@ tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 tracing-actix-web = "0.7"
 tracing-actix = "0.4"
 tracing-appender = "0.2"
-url = "2.5.4"
+url = "2.5.7"
 fast-glob = "1.0.0"
-regex = "1.11.1"
+regex = "1.11.2"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
