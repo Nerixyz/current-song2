@@ -1,6 +1,8 @@
 use crate::CONFIG;
 use actix_files::NamedFile;
 use actix_web::get;
+#[cfg(feature = "single-executable")]
+use std::collections::HashMap;
 use std::io;
 
 #[cfg(feature = "single-executable")]
@@ -10,7 +12,8 @@ mod static_web_files {
 }
 
 #[cfg(feature = "single-executable")]
-pub fn service() -> actix_web_static_files::ResourceFiles {
+pub fn service(
+) -> actix_web_static_files::ResourceFiles<HashMap<&'static str, static_files::Resource>> {
     let generated = static_web_files::generate();
     actix_web_static_files::ResourceFiles::new("", generated).resolve_not_found_to_root()
 }
