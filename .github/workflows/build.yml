@@ -26,7 +26,7 @@ jobs:
       # │ Build extension and overlay │
       # ╰─────────────────────────────╯
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           # https://github.com/parcel-bundler/parcel/issues/9926
           # node-version: latest

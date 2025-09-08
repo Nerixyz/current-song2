@@ -75,7 +75,7 @@ impl SessionManager {
     /// The manager stops after the returned receiver is dropped and an attempt was made to send an event.
     pub async fn create() -> Result<mpsc::UnboundedReceiver<ManagerEvent>> {
         let this = tokio::task::spawn_blocking(|| {
-            GlobalSystemMediaTransportControlsSessionManager::RequestAsync().and_then(|f| f.get())
+            GlobalSystemMediaTransportControlsSessionManager::RequestAsync().and_then(|f| f.join())
         })
         .await
         .map_err(|_| windows::core::Error::from(windows::Win32::Foundation::E_ABORT))??;

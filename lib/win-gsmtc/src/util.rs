@@ -41,7 +41,7 @@ pub(crate) fn request_media_properties_sync(
 ) -> Result<Option<()>> {
     debug!("Getting media properties");
     let session = session.resolve()?;
-    let media_properties = session.TryGetMediaPropertiesAsync()?.get()?;
+    let media_properties = session.TryGetMediaPropertiesAsync()?.join()?;
     let get_properties = media_properties.clone();
     let image = try_get_thumbnail(&get_properties)
         .tap_err(|e| warn!(error = ?e, "Couldn't get image"))
@@ -65,7 +65,7 @@ fn try_get_thumbnail(
     let thumb = bail_opt!(media_properties.Thumbnail().opt());
 
     let read = thumb.OpenReadAsync()?;
-    let stream = read.get()?;
+    let stream = read.join()?;
     let content_type = stream.ContentType()?.to_string();
     let data = read_stream_sync(stream)?;
     Ok(Some(Image { content_type, data }))
@@ -82,7 +82,7 @@ fn read_stream_sync(stream: IRandomAccessStreamWithContentType) -> Result<Vec<u8
     reader
         .LoadAsync(stream_len as u32)
         .tap_err(|e| warn!(error = %e, "Couldn't start loading async"))?
-        .get()
+        .join()
         .tap_err(|e| warn!(error = %e, "Couldn't load async"))?;
     reader
         .ReadBytes(&mut data)
