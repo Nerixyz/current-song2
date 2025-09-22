@@ -27,16 +27,16 @@
     "lit": "^3.3.0"
   },
   "devDependencies": {
-    "@parcel/config-webextension": "^2.15.1",
-    "@parcel/core": "^2.15.1",
+    "@parcel/config-webextension": "^2.16.0",
+    "@parcel/core": "^2.16.0",
     "@types/firefox-webext-browser": "^120.0.4",
     "@types/jest": "^30.0.0",
     "dotenv": "^17.2.1",
     "jest": "^30.1.3",
-    "parcel": "^2.15.1",
+    "parcel": "^2.16.0",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2",
-    "web-ext": "^8.9.0"
+    "web-ext": "^8.10.0"
   }
 }
