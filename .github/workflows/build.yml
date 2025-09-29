@@ -82,7 +82,7 @@ jobs:
         run: cargo build --release --locked
 
       # ╭───────────────────╮
-      # │ Upload articfacts │
+      # │ Upload artifacts │
       # ╰───────────────────╯
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
