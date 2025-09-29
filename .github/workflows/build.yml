@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches: [master, main]
-    tags: ['v*']
+    tags: ["v*"]
   pull_request:
     branches: [master, main]
 
@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest]
-    name: 'Build on ${{matrix.os}}'
+    name: "Build on ${{matrix.os}}"
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v5
@@ -82,7 +82,7 @@ jobs:
         run: cargo build --release --locked
 
       # ╭───────────────────╮
-      # │ Upload articfacts │
+      # │ Upload artifacts │
       # ╰───────────────────╯
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.os == 'windows-latest' }}
@@ -141,7 +141,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: contains(github.ref, 'refs/tags/v')
         with:
-          artifacts: 'artifacts/**/*'
+          artifacts: "artifacts/**/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: false
           allowUpdates: true
@@ -153,7 +153,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
         with:
-          artifacts: 'artifacts/**/*'
+          artifacts: "artifacts/**/*"
           token: ${{ secrets.GITHUB_TOKEN }}
           generateReleaseNotes: false
           replacesArtifacts: true
