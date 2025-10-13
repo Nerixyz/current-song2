@@ -54,7 +54,7 @@ tracing-actix = "0.4"
 tracing-appender = "0.2"
 url = "2.5.7"
 fast-glob = "1.0.0"
-regex = "1.11.3"
+regex = "1.12.1"
 
 [target.'cfg(windows)'.dependencies]
 win-gsmtc = { path = "lib/win-gsmtc" }
