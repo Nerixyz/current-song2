@@ -84,19 +84,19 @@ jobs:
       # ╭───────────────────╮
       # │ Upload artifacts │
       # ╰───────────────────╯
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: current-song2.exe
           path: target/release/current-song2.exe
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: extension.${{ env.ext_type }}
           path: js/extension/artifacts/*.${{ env.ext_type }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ matrix.os == 'windows-latest' }}
         with:
           name: client.zip
@@ -108,7 +108,7 @@ jobs:
     if: (github.event_name == 'push' && (contains(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'))
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           path: artifacts
 
