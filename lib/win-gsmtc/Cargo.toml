@@ -17,12 +17,12 @@ path = "src/lib.rs"
 default = []
 
 [dependencies]
-tokio = { version = "1.47", features = ["sync", "macros", "rt"] }
+tokio = { version = "1.48", features = ["sync", "macros", "rt"] }
 windows = { version = "0.62", features = ["Media_Control", "Foundation", "Foundation_Collections", "Storage_Streams", "Win32_Foundation"] }
 tracing = "0.1"
 serde = { version = "1.0", features = ["derive"], optional = true }
 tap = "1.0"
 
 [dev-dependencies]
-tokio = { version = "1.47", features = ["sync", "macros", "rt-multi-thread"] }
+tokio = { version = "1.48", features = ["sync", "macros", "rt-multi-thread"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
