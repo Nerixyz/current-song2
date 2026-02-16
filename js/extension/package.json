@@ -31,12 +31,12 @@
     "@parcel/core": "^2.16.0",
     "@types/firefox-webext-browser": "^143.0.0",
     "@types/jest": "^30.0.0",
-    "dotenv": "^17.2.1",
+    "dotenv": "^17.3.1",
     "jest": "^30.2.0",
     "parcel": "^2.16.0",
     "rimraf": "^6.1.2",
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2",
-    "web-ext": "^9.2.0"
+    "web-ext": "^9.3.0"
   }
 }
