@@ -32,7 +32,7 @@ jobs:
           # node-version: latest
           node-version: 22.6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
         name: Install pnpm
         id: pnpm-install
         with:
