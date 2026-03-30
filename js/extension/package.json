@@ -36,7 +36,7 @@
     "parcel": "^2.16.0",
     "rimraf": "^6.1.2",
     "ts-jest": "^29.4.1",
-    "typescript": "^5.9.2",
+    "typescript": "^6.0.2",
     "web-ext": "^10.0.0"
   }
 }
