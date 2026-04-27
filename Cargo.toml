@@ -25,7 +25,7 @@ name = "current-song2"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.51", features = ["sync", "fs"] }
+tokio = { version = "1.52", features = ["sync", "fs"] }
 tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 
@@ -64,7 +64,7 @@ win-msgbox = "0.2"
 
 [target.'cfg(unix)'.dependencies]
 mpris-dbus = { path = "lib/mpris-dbus" }
-zbus_names = "4.3.1"
+zbus_names = "4.3.2"
 
 [build-dependencies]
 actix-web-static-files = "4.1"
