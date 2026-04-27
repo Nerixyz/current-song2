@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators';
-import { classMap } from 'lit/directives/class-map';
+import { customElement } from 'lit/decorators/custom-element.js';
+import { state } from 'lit/decorators/state.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { DEFAULT_FILTER_MODE, FilterMode, listenOption, Option, setOption } from '../options';
 
 @customElement('filter-mode-toggle')

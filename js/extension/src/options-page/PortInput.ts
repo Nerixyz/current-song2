@@ -1,5 +1,6 @@
 import { css, html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators';
+import { customElement } from 'lit/decorators/custom-element.js';
+import { state } from 'lit/decorators/state.js';
 import { DEFAULT_CURRENT_PORT, DEFAULT_LEGACY_PORT, listenOption, Option, setOption } from '../options';
 
 const PORT_REGEX = /^\d{2,6}$/;

@@ -1,5 +1,7 @@
 import { html, LitElement, PropertyValues } from 'lit';
-import { customElement, property, state } from 'lit/decorators';
+import { customElement } from 'lit/decorators/custom-element.js';
+import { state } from 'lit/decorators/state.js';
+import { property } from 'lit/decorators/property.js';
 import { listenOption, Option, setOption } from '../options';
 
 @customElement('toggle-option')
