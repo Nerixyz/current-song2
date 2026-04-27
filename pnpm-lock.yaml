@@ -35,6 +35,9 @@ importers:
       '@parcel/config-default':
         specifier: ^2.16.0
         version: 2.16.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
       parcel:
         specifier: ^2.16.0
         version: 2.16.0(@swc/helpers@0.5.17)
@@ -72,6 +75,9 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -4172,13 +4178,15 @@ snapshots:
       - '@parcel/core'
       - napi-wasm
 
-  '@parcel/cache@2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))':
+  '@parcel/cache@2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)':
     dependencies:
       '@parcel/core': 2.16.0(@swc/helpers@0.5.17)
       '@parcel/fs': 2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)
       '@parcel/logger': 2.12.0
       '@parcel/utils': 2.12.0
       lmdb: 2.8.5
+    transitivePeerDependencies:
+      - '@swc/helpers'
 
   '@parcel/cache@2.16.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))':
     dependencies:
@@ -4839,7 +4847,7 @@ snapshots:
 
   '@parcel/types@2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)':
     dependencies:
-      '@parcel/cache': 2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))
+      '@parcel/cache': 2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)
       '@parcel/diagnostic': 2.12.0
       '@parcel/fs': 2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)
       '@parcel/package-manager': 2.12.0(@parcel/core@2.16.0(@swc/helpers@0.5.17))(@swc/helpers@0.5.17)

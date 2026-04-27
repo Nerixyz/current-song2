@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "useDefineForClassFields": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "types": ["node", "jest", "firefox-webext-browser"]
   },
   "include": ["src", "test"]
 }

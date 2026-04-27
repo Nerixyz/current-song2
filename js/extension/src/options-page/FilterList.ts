@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
 import { FilterModel } from '../filters/types';
-import { customElement, state } from 'lit/decorators';
+import { customElement } from 'lit/decorators/custom-element.js';
+import { state } from 'lit/decorators/state.js';
 import { listenJsonOption, Option, setJsonOption } from '../options';
 
 @customElement('filter-list')

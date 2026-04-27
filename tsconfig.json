@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "esnext",
     "target": "ES2020",
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "sourceMap": true,
@@ -9,8 +9,9 @@
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
-    "moduleResolution": "node16",
-    "experimentalDecorators": true
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "types": ["node"]
   },
   "exclude": ["node_modules"]
 }
