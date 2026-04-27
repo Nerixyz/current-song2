@@ -9,7 +9,7 @@
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "node16",
     "experimentalDecorators": true
   },
   "exclude": ["node_modules"]
