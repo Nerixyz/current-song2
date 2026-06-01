@@ -1,3 +1,10 @@
 packages:
   - 'js/client'
   - 'js/extension'
+allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
+  lmdb: true
+  msgpackr-extract: true
+  spawn-sync: true
+  unrs-resolver: true
