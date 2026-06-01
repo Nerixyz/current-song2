@@ -16,15 +16,5 @@
     "prettier": "^3.8.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "@swc/core",
-      "lmdb",
-      "msgpackr-extract",
-      "spawn-sync",
-      "unrs-resolver"
-    ]
   }
 }
