@@ -26,9 +26,11 @@ export class FilterTester extends LitElement {
           Test a URL here
           <input id="url-input" type="text" placeholder="URL" @input=${this._onUrlChange} />
         </label>
-        ${this._urlWillBeSent
-          ? html`<div class="will-send">Media info from this URL will be sent.</div>`
-          : html`<div class="wont-send">Media info from this URL won't be sent.</div>`}
+        ${
+          this._urlWillBeSent
+            ? html`<div class="will-send">Media info from this URL will be sent.</div>`
+            : html`<div class="wont-send">Media info from this URL won't be sent.</div>`
+        }
       </div>
     `;
   }
