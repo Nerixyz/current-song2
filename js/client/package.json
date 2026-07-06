@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@parcel/config-default": "^2.16.0",
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.1.0",
     "parcel": "^2.16.0",
     "parcel-resolver-ignore": "^2.1.3",
     "rimraf": "^6.1.2",
