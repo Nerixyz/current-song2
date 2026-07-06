@@ -31,7 +31,7 @@
     "@parcel/core": "^2.16.0",
     "@types/firefox-webext-browser": "^143.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.1.0",
     "dotenv": "^17.4.2",
     "jest": "^30.4.2",
     "parcel": "^2.16.0",
