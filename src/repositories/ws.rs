@@ -1,12 +1,11 @@
 #![allow(clippy::unused_async)] // required by the actix macros
 
 use crate::{
-    actors::{client_ws::ClientWsSession, extension_ws::ExtensionWsSession, manager::Manager},
+    actors::{client_ws, extension_ws, manager::Manager},
     manager,
 };
 use actix::Addr;
 use actix_web::{get, web, HttpRequest, HttpResponse, Result};
-use actix_web_actors::ws;
 use tokio::sync::watch;
 use tracing::{event, Level};
 
@@ -17,7 +16,14 @@ async fn client(
     events: web::Data<watch::Receiver<manager::Event>>,
 ) -> Result<HttpResponse> {
     event!(Level::DEBUG, "Client connected");
-    ws::start(ClientWsSession::new(events.get_ref().clone()), &req, stream)
+    let (response, session, messages) = actix_ws::handle(&req, stream)?;
+    actix_web::rt::spawn(client_ws::handle(
+        session,
+        messages.aggregate_continuations(),
+        events.as_ref().clone(),
+    ));
+
+    Ok(response)
 }
 
 #[get("/extension")]
@@ -27,7 +33,14 @@ async fn extension(
     manager: web::Data<Addr<Manager>>,
 ) -> Result<HttpResponse> {
     event!(Level::DEBUG, "Extension connected");
-    ws::start(ExtensionWsSession::new(manager.into_inner()), &req, stream)
+    let (response, session, messages) = actix_ws::handle(&req, stream)?;
+    actix_web::rt::spawn(extension_ws::handle(
+        session,
+        messages.aggregate_continuations(),
+        manager.into_inner(),
+    ));
+
+    Ok(response)
 }
 
 pub fn init_ws(config: &mut web::ServiceConfig) {
