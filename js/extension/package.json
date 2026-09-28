@@ -31,13 +31,13 @@
     "@parcel/core": "^2.16.0",
     "@types/firefox-webext-browser": "^143.0.0",
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.4.0",
-    "dotenv": "^17.4.2",
-    "jest": "^30.4.2",
+    "@types/node": "^26.6.2",
+    "dotenv": "^18.0.3",
+    "jest": "^30.5.2",
     "parcel": "^2.16.0",
     "rimraf": "^6.1.2",
     "ts-jest": "^29.4.1",
     "typescript": "^6.0.3",
-    "web-ext": "^10.6.0"
+    "web-ext": "^10.7.0"
   }
 }
